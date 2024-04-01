@@ -1,9 +1,10 @@
 import { Outlet } from 'react-router-dom';
 import GlobalStyles from './assets/styles/GlobalStyles';
-import ModalLayout from './components/modal/ModalLayout';
+import ModalPortal from './components/modal/ModalPortal';
 import Header from './components/layout/Header';
-import styled from 'styled-components';
 import { useIsModalStore } from './store/modal/CreateModalStore';
+import styled from 'styled-components';
+import ModalLayout from './components/modal/ModalLayout';
 
 function App() {
   const useIsModal = useIsModalStore((state) => state.isModal);
@@ -15,10 +16,9 @@ function App() {
         <Outlet />
       </MainContainer>
       {useIsModal && (
-        <ModalLayout>
-          {/* <CreateModal /> */}
-          <p>모달 테스트</p>
-        </ModalLayout>
+        <ModalPortal>
+          <ModalLayout />
+        </ModalPortal>
       )}
     </>
   );
