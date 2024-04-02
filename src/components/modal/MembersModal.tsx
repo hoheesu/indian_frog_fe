@@ -26,7 +26,7 @@ function MembersModal() {
           <Link to="https://github.com/hoheesu" target="_blank">
             <ImageBox></ImageBox>
             <h3>김개굴</h3>
-            <p>프론트 개발자</p>
+            <p>백엔드 개발자</p>
           </Link>
         </li>
         <li>
