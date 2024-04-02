@@ -5,9 +5,9 @@ interface ModalPortalProps {
   children: ReactNode;
 }
 
-const ModalLayout = ({ children }: ModalPortalProps) => {
+const ModalPortal = ({ children }: ModalPortalProps) => {
   const el = document.getElementById('modal-root') as HTMLElement;
   return ReactDOM.createPortal(children, el);
 };
 
-export default ModalLayout;
+export default ModalPortal;

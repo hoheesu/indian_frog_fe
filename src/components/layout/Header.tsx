@@ -1,16 +1,29 @@
-import React from 'react';
 import Button from '../form/Button';
 import styled from 'styled-components';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
+import { useNavigate } from 'react-router-dom';
 
 function Header() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const handleModalOpen = () => {
-    useSetIsModalClick();
+  const navigate = useNavigate();
+  const handleModalOpen = (type?: string) => {
+    type ? useSetIsModalClick(type) : useSetIsModalClick();
   };
+  const pathToRanking = () => {
+    navigate('/ranking');
+  };
+
   return (
     <HeaderContainer>
-      <Button title="모달테스트버튼" onClickFnc={handleModalOpen} />
+      <Button onClickFnc={() => handleModalOpen('members')} isBorder={false}>
+        <p>THE MAKERS</p>
+      </Button>
+      <Button onClickFnc={pathToRanking} isBorder={false}>
+        <p>RANKING</p>
+      </Button>
+      <Button onClickFnc={() => handleModalOpen('login')} isBorder={true}>
+        <p>Log in</p>
+      </Button>
     </HeaderContainer>
   );
 }
