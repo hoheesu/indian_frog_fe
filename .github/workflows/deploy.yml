@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - develop
+  pull_request:
+    branches:
+      - develop
 
 jobs:
   deploy:
@@ -21,8 +24,8 @@ jobs:
 
       - name: 리액트 빌드
         run: |
-          npm install
-          npm run build
+          yarn install
+          vite build
 
       - name: 빌드한 파일 S3에 업로드
         run: aws s3 sync build/ s3://${{ secrets.AWS_S3_BUCKET }} --acl public-read
