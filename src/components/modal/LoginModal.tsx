@@ -7,6 +7,8 @@ function LoginModal() {
   const password = useRef('');
 
   const handleInputOnChange = ({ e, label }: any) => {
+    console.log(e, label);
+
     label.current = e.target.value;
   };
 

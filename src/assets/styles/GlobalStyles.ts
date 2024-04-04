@@ -29,7 +29,7 @@ const GlobalStyles = createGlobalStyle`
     padding: 0;
     border: 0;
     font-size: 100%;
-    font: inherit;
+   font-family: 'Pretendard-Regular';
     vertical-align: baseline;
   }
   /* HTML5 display-role reset for older browsers */

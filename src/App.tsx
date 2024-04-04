@@ -1,5 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import GlobalStyles from './assets/styles/GlobalStyles';
+import GlobalFonts from './assets/styles/GlobalFonts';
 import ModalPortal from './components/modal/ModalPortal';
 import Header from './components/layout/Header';
 import { useIsModalStore } from './store/modal/CreateModalStore';
@@ -11,6 +12,7 @@ function App() {
   return (
     <>
       <GlobalStyles />
+      <GlobalFonts />
       <Header />
       <MainContainer>
         <Outlet />
