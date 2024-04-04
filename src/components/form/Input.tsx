@@ -1,24 +1,24 @@
-import React from 'react';
+import { ChangeEvent } from 'react';
 
 interface InputPropsType {
-  type?: string;
-  label: string;
-  onChangeFnc: (
-    e: React.ChangeEvent<HTMLInputElement>,
-    label: React.MutableRefObject<string> | string,
-  ) => void;
+  type: string;
+  value: string;
+  placeholder?: string;
+  name?: string;
+  onChangeFnc: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
 function Input(props: InputPropsType) {
   return (
-    <>
-      <input
-        type={props.type ? props.type : 'text'}
-        onChange={(e) => {
-          props.onChangeFnc(e, props.label);
-        }}
-      />
-    </>
+    <input
+      type={props.type}
+      name={props.name}
+      value={props.value}
+      placeholder={props.placeholder}
+      onChange={(e) => {
+        props.onChangeFnc(e);
+      }}
+    />
   );
 }
 

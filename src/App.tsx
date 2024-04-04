@@ -4,7 +4,7 @@ import ModalPortal from './components/modal/ModalPortal';
 import Header from './components/layout/Header';
 import { useIsModalStore } from './store/modal/CreateModalStore';
 import styled from 'styled-components';
-import ModalLayout from './components/modal/ModalLayout';
+import ModalTemplate from './components/modal/ModalTemplate';
 
 function App() {
   const useIsModal = useIsModalStore((state) => state.isModal);
@@ -17,7 +17,7 @@ function App() {
       </MainContainer>
       {useIsModal && (
         <ModalPortal>
-          <ModalLayout />
+          <ModalTemplate />
         </ModalPortal>
       )}
     </>

@@ -1,14 +1,19 @@
-import React, { ReactNode } from 'react';
+import { ReactNode } from 'react';
 
 interface ButtonPropsType {
   children: ReactNode;
-  type?: string;
   isBorder: boolean;
+  type?: string;
+  disabled?: boolean;
   onClickFnc: () => void;
 }
 
 function Button({ children, ...props }: ButtonPropsType) {
-  return <button onClick={props.onClickFnc}>{children}</button>;
+  return (
+    <button onClick={props.onClickFnc} disabled={props.disabled}>
+      {children}
+    </button>
+  );
 }
 
 export default Button;
