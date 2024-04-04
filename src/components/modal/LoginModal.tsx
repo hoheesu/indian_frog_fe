@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import Input from '../form/Input';
 import ClosedModalButton from './ClosedModalButton';
 import Button from '../form/Button';
@@ -10,19 +10,17 @@ import {
 
 function LoginModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const [signupInput, setSignupInput] = useState({
+
+  const [emailValidation, setEmailValidation] = useState(false);
+  const [loginInput, setLoginInput] = useState({
     email: '',
     password: '',
   });
-  const [_, setEmailValidation] = useState(false);
-  // console.log(emailValidation);
 
-  const handleModalOpen = (type?: string) => {
-    type ? useSetIsModalClick(type) : useSetIsModalClick();
-  };
-  const handleInputOnChange = ({ e }: any) => {
+  const handleInputOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setSignupInput({ ...signupInput, [name]: value });
+    setLoginInput({ ...loginInput, [name]: value });
+
     if (name === 'email') {
       emailValidCheck(value)
         ? setEmailValidation(true)
@@ -32,12 +30,13 @@ function LoginModal() {
       passwordValidCheck(value);
     }
   };
+
   const handleLoginSubmit = () => {
-    handleModalOpen();
+    useSetIsModalClick();
   };
 
   const handleToSignupModal = () => {
-    handleModalOpen('signup');
+    useSetIsModalClick('signup');
   };
 
   return (
@@ -50,16 +49,27 @@ function LoginModal() {
           <Input
             type="email"
             name="email"
-            value={''}
+            placeholder="이메일을 입력하세요"
+            value={loginInput.email}
             onChangeFnc={handleInputOnChange}
           />
+          {loginInput.email.trim() ? (
+            !emailValidation ? (
+              <p>이메일 형식이 틀렸습니다.</p>
+            ) : (
+              <p>확인</p>
+            )
+          ) : (
+            <p>이메일을 입력해주세요</p>
+          )}
         </p>
         <p>
           <label>비밀번호</label>
           <Input
-            name="password"
             type="password"
-            value={''}
+            name="password"
+            placeholder="비밀번호를 입력하세요"
+            value={loginInput.password}
             onChangeFnc={handleInputOnChange}
           />
         </p>

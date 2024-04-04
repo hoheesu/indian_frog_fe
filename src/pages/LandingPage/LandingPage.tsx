@@ -8,11 +8,8 @@ function LandingPage() {
   return (
     <LandingContainer>
       <H1>인디안 개구리</H1>
-      <Button isBorder={true} onClickFnc={() => navigate('/')}>
+      <Button isBorder={true} onClickFnc={() => navigate('/main')}>
         <p>START</p>
-      </Button>
-      <Button isBorder={true} onClickFnc={() => navigate('/guide')}>
-        <p>HOW TO</p>
       </Button>
     </LandingContainer>
   );

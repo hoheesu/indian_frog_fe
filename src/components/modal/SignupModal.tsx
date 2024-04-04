@@ -6,8 +6,11 @@ import {
   emailValidCheck,
   passwordValidCheck,
 } from '../../utils/inputValidCheck';
+import { useIsModalStore } from '../../store/modal/CreateModalStore';
 
 function SignupModal() {
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+
   const [signupInput, setSignupInput] = useState({
     nickname: '',
     email: '',
@@ -29,7 +32,9 @@ function SignupModal() {
     }
   };
 
-  const handleToLoginModal = () => {};
+  const handleToLoginModal = () => {
+    useSetIsModalClick('login');
+  };
   const handleSignupSubmit = () => {};
 
   return (
@@ -54,9 +59,9 @@ function SignupModal() {
           </Button>
           {signupInput.email.trim() ? (
             !emailValidation ? (
-              <span>이메일 형식이 틀렸습니다.</span>
+              <p style={{ color: 'red' }}>이메일 형식이 틀렸습니다.</p>
             ) : (
-              <span>확인</span>
+              <p style={{ color: 'green' }}>확인</p>
             )
           ) : null}
         </p>
@@ -72,7 +77,6 @@ function SignupModal() {
           <Button onClickFnc={() => {}} isBorder={true}>
             중복체크
           </Button>
-          <span></span>
         </p>
         <p>
           <label>비밀번호</label>
@@ -93,6 +97,9 @@ function SignupModal() {
             placeholder="비밀번호를 재입력하세요"
             onChangeFnc={handleInputOnchange}
           />
+          {signupInput.password !== signupInput.checkPassword ? (
+            <p style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</p>
+          ) : null}
         </p>
         <Button type="submit" isBorder={true} onClickFnc={handleSignupSubmit}>
           <p>회원가입</p>
