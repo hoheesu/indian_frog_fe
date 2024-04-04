@@ -1,10 +1,11 @@
-import React from 'react';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
+import styled from 'styled-components';
 import LoginModal from './LoginModal';
 import MembersModal from './MembersModal';
-import styled from 'styled-components';
+import RankingModal from './RankingModal';
+import SignupModal from './SignupModal';
 
-function ModalLayout() {
+function ModalTemplate() {
   const useIsModal = useIsModalStore((state) => state.isModal);
   return (
     <ModalBackground>
@@ -15,8 +16,12 @@ function ModalLayout() {
               return <LoginModal />;
             case 'members':
               return <MembersModal />;
+            case 'ranking':
+              return <RankingModal />;
+            case 'signup':
+              return <SignupModal />;
             default:
-              return <p>모달 테스트</p>;
+              return <p>{useIsModal}</p>;
           }
         })()}
       </ModalContainer>
@@ -40,4 +45,4 @@ const ModalContainer = styled.div`
   border-radius: 30px;
 `;
 
-export default ModalLayout;
+export default ModalTemplate;

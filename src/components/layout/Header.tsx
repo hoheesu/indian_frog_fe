@@ -1,31 +1,29 @@
 import Button from '../form/Button';
 import styled from 'styled-components';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 function Header() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const handleModalOpen = (type?: string) => {
     type ? useSetIsModalClick(type) : useSetIsModalClick();
   };
-  const pathToRanking = () => {
-    navigate('/ranking');
-  };
+  // const pathToRanking = () => {
+  //   navigate('/ranking');
+  // };
 
   return (
     <HeaderContainer>
-      <BtnWrap>
-        <Button onClickFnc={() => handleModalOpen('members')} isBorder={false}>
-          <p>THE MAKERS</p>
-        </Button>
-        <Button onClickFnc={pathToRanking} isBorder={false}>
-          <p>RANKING</p>
-        </Button>
-        <Button onClickFnc={() => handleModalOpen('login')} isBorder={true}>
-          <p>Log in</p>
-        </Button>
-      </BtnWrap>
+      <Button onClickFnc={() => handleModalOpen('members')} isBorder={false}>
+        <p>THE MAKERS</p>
+      </Button>
+      <Button onClickFnc={() => handleModalOpen('ranking')} isBorder={false}>
+        <p>RANKING</p>
+      </Button>
+      <Button onClickFnc={() => handleModalOpen('login')} isBorder={true}>
+        <p>Log in</p>
+      </Button>
     </HeaderContainer>
   );
 }
