@@ -1,4 +1,3 @@
-import React from 'react';
 import Button from '../form/Button';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 
