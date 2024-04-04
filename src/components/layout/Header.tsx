@@ -9,16 +9,16 @@ function Header() {
   const handleModalOpen = (type?: string) => {
     type ? useSetIsModalClick(type) : useSetIsModalClick();
   };
-  const pathToRanking = () => {
-    navigate('/ranking');
-  };
+  // const pathToRanking = () => {
+  //   navigate('/ranking');
+  // };
 
   return (
     <HeaderContainer>
       <Button onClickFnc={() => handleModalOpen('members')} isBorder={false}>
         <p>THE MAKERS</p>
       </Button>
-      <Button onClickFnc={pathToRanking} isBorder={false}>
+      <Button onClickFnc={() => handleModalOpen('ranking')} isBorder={false}>
         <p>RANKING</p>
       </Button>
       <Button onClickFnc={() => handleModalOpen('login')} isBorder={true}>
