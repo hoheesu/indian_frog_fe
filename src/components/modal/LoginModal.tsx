@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import Input from '../form/Input';
 import ClosedModalButton from './ClosedModalButton';
 import Button from '../form/Button';
@@ -14,7 +14,8 @@ function LoginModal() {
     email: '',
     password: '',
   });
-  const [emailValidation, setEmailValidation] = useState(false);
+  const [_, setEmailValidation] = useState(false);
+  // console.log(emailValidation);
 
   const handleModalOpen = (type?: string) => {
     type ? useSetIsModalClick(type) : useSetIsModalClick();
