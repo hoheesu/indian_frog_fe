@@ -1,4 +1,4 @@
-import Button from '../../components/form/Button';
+import Button from '../../components/layout/form/Button';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 

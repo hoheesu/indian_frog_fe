@@ -1,7 +1,7 @@
 import { ChangeEvent, useState } from 'react';
-import Input from '../form/Input';
+import Input from '../layout/form/Input';
 import ClosedModalButton from './ClosedModalButton';
-import Button from '../form/Button';
+import Button from '../layout/form/Button';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import {
   emailValidCheck,
@@ -44,7 +44,7 @@ function LoginModal() {
       <ClosedModalButton />
       <h2>로그인</h2>
       <form>
-        <p>
+        <div>
           <label>이메일</label>
           <Input
             type="email"
@@ -62,8 +62,8 @@ function LoginModal() {
           ) : (
             <p>이메일을 입력해주세요</p>
           )}
-        </p>
-        <p>
+        </div>
+        <div>
           <label>비밀번호</label>
           <Input
             type="password"
@@ -72,7 +72,7 @@ function LoginModal() {
             value={loginInput.password}
             onChangeFnc={handleInputOnChange}
           />
-        </p>
+        </div>
 
         <Button isBorder={true} onClickFnc={handleLoginSubmit} type="submit">
           <p>로그인</p>

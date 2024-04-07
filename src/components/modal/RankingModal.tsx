@@ -1,6 +1,6 @@
 import ClosedModalButton from './ClosedModalButton';
 import styled from 'styled-components';
-import Button from '../form/Button';
+import Button from '../layout/form/Button';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 

@@ -1,4 +1,4 @@
-import Button from '../form/Button';
+import Button from './form/Button';
 import styled from 'styled-components';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 // import { useNavigate } from 'react-router-dom';
