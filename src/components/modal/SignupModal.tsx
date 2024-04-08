@@ -12,7 +12,6 @@ import {
   emailValidCheck,
   passwordValidCheck,
 } from '../../utils/inputValidCheck';
-// import { useQuery } from '@tanstack/react-query';
 import { useDebounce } from '../../hooks/useDebounce';
 
 function SignupModal() {
@@ -23,7 +22,8 @@ function SignupModal() {
     password: '',
     checkPassword: '',
   });
-  const [emailValidation, setEmailValidation] = useState(false);
+  const [emailValid, setEmailValid] = useState(false);
+  const [pwValid, setPwValid] = useState(false);
   const [emailDuplication, setEmailDuplication] = useState(false);
   const [nicknameDuplication, setNicknameDuplication] = useState(false);
   const userInput = useDebounce(signupInput, 500);
@@ -33,23 +33,22 @@ function SignupModal() {
     setSignupInput({ ...signupInput, [name]: value });
     if (name === 'email') {
       if (emailValidCheck(value)) {
-        setEmailValidation(true);
+        setEmailValid(true);
         (await checkEmailDuplication(value))
           ? setEmailDuplication(true)
           : setEmailDuplication(false);
       } else {
-        setEmailValidation(false);
+        setEmailValid(false);
       }
     }
     if (name === 'nickname') {
     }
     if (name === 'password') {
-      passwordValidCheck(value);
+      passwordValidCheck(value) ? setPwValid(true) : setPwValid(false);
     }
   };
   useEffect(() => {
     (async () => {
-      // if()
       (await checkNicknameDuplication(userInput.nickname))
         ? setNicknameDuplication(true)
         : setNicknameDuplication(false);
@@ -85,14 +84,16 @@ function SignupModal() {
             onChangeFnc={handleInputOnchange}
           />
           {signupInput.email.trim() ? (
-            !emailValidation ? (
+            !emailValid ? (
               <p style={{ color: 'red' }}>이메일 형식이 틀렸습니다.</p>
             ) : emailDuplication ? (
               <p style={{ color: 'green' }}>사용가능한 이메일입니다.</p>
             ) : (
               <p style={{ color: 'red' }}>중복된 이메일입니다.</p>
             )
-          ) : null}
+          ) : (
+            <p style={{ color: 'red' }}></p>
+          )}
         </div>
         <div>
           <label>닉네임</label>
@@ -118,6 +119,15 @@ function SignupModal() {
             placeholder="비밀번호를 입력하세요"
             onChangeFnc={handleInputOnchange}
           />
+          {!pwValid ? (
+            <p>
+              비밀번호는 소문자, 특수문자, 숫자를 포함하여 8 ~15자리로
+              작성해주세요
+            </p>
+          ) : (
+            <p></p>
+          )}
+          <p></p>
         </div>
         <div>
           <label>비밀번호 확인</label>
@@ -147,23 +157,3 @@ function SignupModal() {
 }
 
 export default SignupModal;
-
-// const checkQuery = (value: string) => {
-//   return useQuery({
-//     queryKey: ['checkEmailDup', value],
-//     queryFn: () => checkEmailDuplication(value),
-//   });
-// };
-// const checkQueryData = checkQuery;
-
-// useEffect(() => {
-// if (emailValidCheck(signupInput.email)) {
-//   const checkQueryData = checkQuery(signupInput.email);
-//   if (checkQueryData.isSuccess) {
-//     console.log('성공이니?', checkQueryData.isSuccess);
-//   }
-//   if (checkQueryData.isError) {
-//     console.log('중복이니?', checkQueryData.isError);
-//   }
-// }
-// }, [signupInput, checkQuery]);

@@ -52,3 +52,21 @@ export const signupUser = async (signupInfo: {
     throw error;
   }
 };
+export const loginUser = async (loginInfo: {
+  email: string;
+  password: string;
+}) => {
+  try {
+    const response = await instance.post('/user/login', loginInfo);
+    console.log(response);
+    return response;
+  } catch (error: any) {
+    // const axiosError = error as AxiosError<ErrorResponse>;
+    // if (axiosError.response) {
+    //   console.log(axiosError.response.data.status);
+    //   throw axiosError.response.data;
+    // }
+    alert(error.response.data.message);
+    throw error;
+  }
+};
