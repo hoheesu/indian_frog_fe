@@ -1,6 +1,6 @@
 import ClosedModalButton from './ClosedModalButton';
 import styled from 'styled-components';
-import Button from '../form/Button';
+import Button from '../layout/form/Button';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 
@@ -16,9 +16,9 @@ function RankingModal() {
       <ClosedModalButton />
       <ul>
         <RankItem>
-          <p>Rank</p>
-          <p>인디아나콘다</p>
-          <p>123,456</p>
+          <p>RANK</p>
+          <p>NICKNAME</p>
+          <p>POINT</p>
         </RankItem>
         <RankItem>
           <p>1</p>

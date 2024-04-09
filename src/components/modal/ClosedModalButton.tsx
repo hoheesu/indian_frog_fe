@@ -1,4 +1,4 @@
-import Button from '../form/Button';
+import Button from '../layout/form/Button';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 
 function ClosedModalButton() {
