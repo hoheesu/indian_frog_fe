@@ -19,11 +19,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      # - name: Create env file
-      #   run: |
-      #     touch .env
-      #     echo VITE_GOOGLE_CLIENT_ID=${{ secrets.VITE_GOOGLE_CLIENT_ID }} >> .env
-      #     cat .env
+      - name: Create env file
+        run: |
+          touch .env
+          echo VITE_SERVER_BASE_URL=${{ secrets.VITE_SERVER_BASE_URL }} >> .env
+          cat .env
       - name: Yarn Install
         run: |
           yarn install
