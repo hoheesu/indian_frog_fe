@@ -33,7 +33,7 @@ function LoginModal() {
 
   const handleLoginSubmit = async () => {
     await loginUser(loginInput);
-    // useSetIsModalClick();
+    useSetIsModalClick();
   };
 
   const handleToSignupModal = () => {

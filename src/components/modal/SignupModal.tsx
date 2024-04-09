@@ -28,32 +28,34 @@ function SignupModal() {
   const [nicknameDuplication, setNicknameDuplication] = useState(false);
   const userInput = useDebounce(signupInput, 500);
 
-  const handleInputOnchange = async (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputOnchange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setSignupInput({ ...signupInput, [name]: value });
     if (name === 'email') {
-      if (emailValidCheck(value)) {
-        setEmailValid(true);
-        (await checkEmailDuplication(value))
-          ? setEmailDuplication(true)
-          : setEmailDuplication(false);
-      } else {
-        setEmailValid(false);
-      }
-    }
-    if (name === 'nickname') {
-    }
-    if (name === 'password') {
+      emailValidCheck(value) ? setEmailValid(true) : setEmailValid(false);
+    } else if (name === 'password') {
       passwordValidCheck(value) ? setPwValid(true) : setPwValid(false);
     }
   };
+
+  useEffect(() => {
+    if (emailValid) {
+      (async () => {
+        (await checkEmailDuplication(userInput.email))
+          ? setEmailDuplication(true)
+          : setEmailDuplication(false);
+      })();
+    }
+  }, [userInput.email]);
+
+  // 닉네임 중복검사 디바운스
   useEffect(() => {
     (async () => {
       (await checkNicknameDuplication(userInput.nickname))
         ? setNicknameDuplication(true)
         : setNicknameDuplication(false);
     })();
-  }, [userInput]);
+  }, [userInput.nickname]);
 
   const handleToLoginModal = () => {
     useSetIsModalClick('login');
@@ -125,9 +127,9 @@ function SignupModal() {
               작성해주세요
             </p>
           ) : (
-            <p></p>
+            <p> </p>
           )}
-          <p></p>
+          <p> </p>
         </div>
         <div>
           <label>비밀번호 확인</label>
