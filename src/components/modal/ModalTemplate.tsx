@@ -38,6 +38,7 @@ const ModalBackground = styled.div`
   width: 100vw;
   height: 100vh;
   background-color: #000000aa;
+  z-index: 100;
 `;
 const ModalContainer = styled.div`
   background-color: #fff;

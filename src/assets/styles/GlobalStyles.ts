@@ -31,7 +31,7 @@ const GlobalStyles = createGlobalStyle`
     padding: 0;
     border: 0;
     font-size: 100%;
-    font: inherit;
+   font-family: 'Pretendard-Regular';
     vertical-align: baseline;
   }
   /* HTML5 display-role reset for older browsers */
@@ -59,6 +59,15 @@ const GlobalStyles = createGlobalStyle`
   }
   button {
     cursor: pointer;
+    background: none;
+    border: none;
+  }
+  input {
+    background: none;
+    border: 0;
+  }
+  input:focus {
+    outline: none;
   }
 
 `;
