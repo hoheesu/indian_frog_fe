@@ -36,7 +36,7 @@ function Main() {
                     <p>Loading</p>
                     <Button
                       onClickFnc={() => {
-                        navigate(`/gameRoom/${gameRoom.roomId}`);
+                        navigate(`/gameroomtest/${gameRoom.roomId}`);
                       }}
                       isBorder={true}
                     >
