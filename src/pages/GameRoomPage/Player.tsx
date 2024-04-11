@@ -1,5 +1,5 @@
 import React, { ComponentType, useContext } from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 
 interface PlayerProps {
   player: string;
@@ -176,11 +176,11 @@ const Timer = withPlayer(styled.div<WithPlayerProps>`
     display: inline-block;
     width: 30px;
     height: 29px;
-    /* background: url('src/assets/images/icons/icon-other-timer.svg')  */
-    background: url(${({ player }) =>
-      player === 'other'
-        ? 'src/assets/images/icons/icon-other-timer.svg'
-        : 'src/assets/images/icons/icon-my-timer.svg'});
+    background: ${({ player }) => {
+      return player === 'other'
+        ? 'url(src/assets/images/icons/icon-other-timer.svg)'
+        : 'url(src/assets/images/icons/icon-my-timer.svg)';
+    }};
     background-size: 100%;
   }
 `);

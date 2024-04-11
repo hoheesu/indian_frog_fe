@@ -1,6 +1,5 @@
-import React from 'react';
 import styled from 'styled-components';
-import Button from '../layout/form/Button';
+import Button from '../../components/layout/form/Button';
 
 const GameButton = () => {
   return (

@@ -1,6 +1,5 @@
-import React from 'react';
 import styled from 'styled-components';
-import Input from '../layout/form/Input';
+import Input from '../../components/layout/form/Input';
 
 const BattingInput = () => {
   return (
