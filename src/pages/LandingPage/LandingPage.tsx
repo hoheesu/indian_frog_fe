@@ -1,4 +1,4 @@
-import Button from '../../components/form/Button';
+import Button from '../../components/layout/form/Button';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 
@@ -8,11 +8,8 @@ function LandingPage() {
   return (
     <LandingContainer>
       <H1>인디안 개구리</H1>
-      <Button isBorder={true} onClickFnc={() => navigate('/')}>
+      <Button isBorder={true} onClickFnc={() => navigate('/main')}>
         <p>START</p>
-      </Button>
-      <Button isBorder={true} onClickFnc={() => navigate('/guide')}>
-        <p>HOW TO</p>
       </Button>
     </LandingContainer>
   );
