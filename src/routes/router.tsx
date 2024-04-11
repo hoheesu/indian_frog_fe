@@ -4,6 +4,7 @@ import Main from '../pages/MainPage/Main';
 import LandingPage from '../pages/LandingPage/LandingPage';
 import RuleGuidePage from '../pages/RuleGuidePage/RuleGuidePage';
 import RankingPage from '../pages/RankingPage/RankingPage';
+import GameRoomTest from '../pages/GameRoomTest';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: '/ranking',
         element: <RankingPage />,
+      },
+      {
+        path: '/gameroom/:gameId',
+        element: <GameRoomTest />,
       },
     ],
   },

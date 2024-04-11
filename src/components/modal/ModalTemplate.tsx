@@ -4,6 +4,7 @@ import LoginModal from './LoginModal';
 import MembersModal from './MembersModal';
 import RankingModal from './RankingModal';
 import SignupModal from './SignupModal';
+import CreateRoomModal from './CreateRoomModal';
 
 function ModalTemplate() {
   const useIsModal = useIsModalStore((state) => state.isModal);
@@ -20,6 +21,8 @@ function ModalTemplate() {
               return <RankingModal />;
             case 'signup':
               return <SignupModal />;
+            case 'createRoom':
+              return <CreateRoomModal />;
             default:
               return <p>{useIsModal}</p>;
           }
