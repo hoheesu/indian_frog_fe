@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 
 interface ButtonPropsType {
   children: ReactNode;
-  isBorder: boolean;
+  isBorder?: boolean;
   type?: string;
   disabled?: boolean;
   onClickFnc: () => void;

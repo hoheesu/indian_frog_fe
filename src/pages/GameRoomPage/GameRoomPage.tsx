@@ -1,9 +1,8 @@
-import React from 'react';
 import styled from 'styled-components';
-import Player from '../../components/game/Player';
-import Chat from '../../components/game/Chat';
-import GameButton from '../../components/game/GameButton';
-import BattingInput from '../../components/game/BattingInput';
+import Player from './Player';
+import Chat from './Chat';
+import GameButton from './GameButton';
+import BattingInput from './BattingInput';
 
 const GameRoomPage = () => {
   return (

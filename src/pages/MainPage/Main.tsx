@@ -1,60 +1,71 @@
 import styled from 'styled-components';
 import Button from '../../components/layout/form/Button';
-// import { useIsModalStore } from '../../store/modal/CreateModalStore';
+import { useIsModalStore } from '../../store/modal/CreateModalStore';
+import { useGetGameRoomsList } from '../../hooks/useQuery';
+import { useNavigate } from 'react-router-dom';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 function Main() {
-  // const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-  const handleCreateRoomOnclick = () => {};
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
 
+  const handleCreateRoomOnclick = () => {
+    useSetIsModalClick('createRoom');
+  };
+  const authToken = localStorage.getItem('accessToken');
+  const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
+  const client = Stomp.over(socket);
+
+  client.connect(
+    { Authorization: authToken },
+    function (frame: any) {
+      console.log('Connected: ' + frame);
+    },
+    function (error: any) {
+      console.log('WebSocket connection error: ' + error);
+    },
+  );
+
+  const gameRoomsList = useGetGameRoomsList(0);
+  console.log(gameRoomsList.data?.content);
+  const navigate = useNavigate();
   return (
     <div>
       <RoomLists>
-        {arr.map((test) => {
-          return (
-            <RoomCard key={test}>
-              <DivWrap>
-                <Div1>
-                  <p>일반전</p>
-                  <span>개굴개굴조아맨</span>
-                  <span>|</span>
-                  <span>124번</span>
-                </Div1>
-                <h4>
-                  콩진호 인디언카드 제가 스승입니다. <br />
-                  이길 자신 있는 분만 들어오세요.
-                </h4>
-              </DivWrap>
-              <Div2>
-                <p>Loading</p>
-                <Button onClickFnc={() => {}} isBorder={true}>
-                  <p>게임 참여하기</p>
-                </Button>
-              </Div2>
-            </RoomCard>
-          );
-        })}
-
-        <RoomCard>
-          <DivWrap>
-            <Div1>
-              <p>일반전</p>
-              <span>개굴개굴조아맨</span>
-              <span>|</span>
-              <span>124번</span>
-            </Div1>
-            <h4>
-              콩진호 인디언카드 제가 스승입니다. <br />
-              이길 자신 있는 분만 들어오세요.
-            </h4>
-          </DivWrap>
-          <Div2>
-            <p>Loading</p>
-            <Button onClickFnc={() => {}} isBorder={true}>
-              <p>게임 참여하기</p>
-            </Button>
-          </Div2>
-        </RoomCard>
+        {gameRoomsList.data?.content
+          ? gameRoomsList.data?.content.map((gameRoom: any) => {
+              return (
+                <RoomCard key={gameRoom.roomId}>
+                  <DivWrap>
+                    <Div1>
+                      <p>일반전</p>
+                      <span>개굴개굴조아맨</span>
+                      <span>|</span>
+                      <span>{gameRoom.roomId}</span>
+                    </Div1>
+                    <h4>
+                      {gameRoom.roomName ? gameRoom.roomName : '임시제목'}
+                    </h4>
+                  </DivWrap>
+                  <Div2>
+                    <p>Loading</p>
+                    <Button
+                      onClickFnc={() => {
+                        if (client && gameRoom.roomId) {
+                          client.send(`/app/${gameRoom.roomId}/join`, {}, '');
+                          console.log('--join--  ');
+                        }
+                        navigate(`/gameroomtest/${gameRoom.roomId}`);
+                      }}
+                      isBorder={true}
+                    >
+                      <p>게임 참여하기</p>
+                    </Button>
+                  </Div2>
+                </RoomCard>
+              );
+            })
+          : ''}
       </RoomLists>
       <ButtonsBox>
         <Button onClickFnc={() => {}} isBorder={true}>
