@@ -7,11 +7,11 @@ import {
   emailValidCheck,
   passwordValidCheck,
 } from '../../utils/inputValidCheck';
-import { loginUser } from '../../api/userAuthApi';
+import { useLoginSubmitMutation } from '../../hooks/useMutation';
 
 function LoginModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-
+  const useLoginSubmit = useLoginSubmitMutation();
   const [emailValid, setEmailValid] = useState(false);
   const [pwValid, setPwValid] = useState(false);
   const [loginInput, setLoginInput] = useState({
@@ -32,7 +32,7 @@ function LoginModal() {
   };
 
   const handleLoginSubmit = async () => {
-    await loginUser(loginInput);
+    useLoginSubmit.mutate(loginInput);
     useSetIsModalClick();
   };
 

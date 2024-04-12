@@ -36,8 +36,5 @@ const HeaderContainer = styled.div`
   height: 100px;
   background-color: transparent;
 `;
-const BtnWrap = styled.div`
-  display: flex;
-  align-items: center;
-`;
+
 export default Header;
