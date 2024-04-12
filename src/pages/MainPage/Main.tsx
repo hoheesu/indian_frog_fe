@@ -3,6 +3,8 @@ import Button from '../../components/layout/form/Button';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGetGameRoomsList } from '../../hooks/useQuery';
 import { useNavigate } from 'react-router-dom';
+import SockJS from 'sockjs-client';
+import { Stomp } from '@stomp/stompjs';
 
 function Main() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -10,6 +12,19 @@ function Main() {
   const handleCreateRoomOnclick = () => {
     useSetIsModalClick('createRoom');
   };
+  const authToken = localStorage.getItem('accessToken');
+  const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
+  const client = Stomp.over(socket);
+
+  client.connect(
+    { Authorization: authToken },
+    function (frame: any) {
+      console.log('Connected: ' + frame);
+    },
+    function (error: any) {
+      console.log('WebSocket connection error: ' + error);
+    },
+  );
 
   const gameRoomsList = useGetGameRoomsList(0);
   console.log(gameRoomsList.data?.content);
@@ -36,6 +51,10 @@ function Main() {
                     <p>Loading</p>
                     <Button
                       onClickFnc={() => {
+                        if (client && gameRoom.roomId) {
+                          client.send(`/app/${gameRoom.roomId}/join`, {}, '');
+                          console.log('--join--  ');
+                        }
                         navigate(`/gameroomtest/${gameRoom.roomId}`);
                       }}
                       isBorder={true}
