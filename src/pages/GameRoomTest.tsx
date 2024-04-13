@@ -12,6 +12,8 @@ function GameRoomTest() {
   const client = Stomp.over(socket);
   const authToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
+  console.log(authToken);
+
   // const userName = authToken ? jwtDecode(authToken) : null;
   const decode: {
     auth: string;
@@ -21,6 +23,7 @@ function GameRoomTest() {
     sub: 'string';
   } = jwtDecode(authToken!);
   console.log(decode);
+  console.log(decode.nickname);
 
   interface Message {
     sender: string;
