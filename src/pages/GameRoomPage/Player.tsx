@@ -1,4 +1,4 @@
-import React, { ComponentType, createContext, useContext } from 'react';
+import React, { ComponentType, useContext } from 'react';
 import styled from 'styled-components';
 
 interface PlayerProps {
