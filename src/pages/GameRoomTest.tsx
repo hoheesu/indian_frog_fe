@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { useGameRoomInfoStore } from '../store/modal/CreateModalStore';
+import styled from 'styled-components';
 
 function GameRoomTest() {
   const [myReady, setMyReady] = useState(false);
@@ -16,6 +17,8 @@ function GameRoomTest() {
   console.log(connecting);
 
   const navigate = useNavigate();
+  console.log(authToken);
+
   const gameUserInfo = useGameRoomInfoStore((state) => state.gameInfo);
   console.log(gameUserInfo);
   const decode: {
@@ -39,7 +42,7 @@ function GameRoomTest() {
             `/app/chat.addUser/${gameId}`,
             {},
             JSON.stringify({ sender: decode.nickname, type: 'JOIN' }),
-          ); // uri\
+          );
           setStompClient(client);
         },
         console.log('error'),
@@ -92,7 +95,7 @@ function GameRoomTest() {
   };
 
   return (
-    <>
+    <GameRoomTestContainer>
       <div>GameRoomTest</div>
       <p>{gameId}</p>
       <button
@@ -130,8 +133,11 @@ function GameRoomTest() {
       >
         채팅 버튼 눌렀다면?
       </button>
-    </>
+    </GameRoomTestContainer>
   );
 }
+const GameRoomTestContainer = styled.div`
+  padding-top: 100px;
+`;
 
 export default GameRoomTest;

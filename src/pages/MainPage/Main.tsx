@@ -21,23 +21,24 @@ function Main() {
   };
   return (
     <RoomListsContainer>
-      <RoomLists>
+      <RoomCardList>
         {gameRoomsList.data?.content
           ? gameRoomsList.data?.content.map((gameRoom: any) => {
               return (
-                <RoomCard key={gameRoom.roomId}>
-                  <DivWrap>
-                    <Div1>
-                      <p>일반전</p>
+                <CardItem key={gameRoom.roomId}>
+                  <ContentTop>
+                    <RoomInfo>
+                      <Rules>일반전</Rules>
                       <span>개굴개굴조아맨</span>
-                      <span>|</span>
                       <span>{gameRoom.roomId}</span>
-                    </Div1>
-                    <h4>
-                      {gameRoom.roomName ? gameRoom.roomName : '임시제목'}
-                    </h4>
-                  </DivWrap>
-                  <Div2>
+                    </RoomInfo>
+                    <RoomName>
+                      <h4>
+                        {gameRoom.roomName ? gameRoom.roomName : '임시제목'}
+                      </h4>
+                    </RoomName>
+                  </ContentTop>
+                  <ContentBottom>
                     <p>Loading</p>
                     <Button
                       onClickFnc={() => {
@@ -47,123 +48,179 @@ function Main() {
                     >
                       <p>게임 참여하기</p>
                     </Button>
-                  </Div2>
-                </RoomCard>
+                  </ContentBottom>
+                </CardItem>
               );
             })
           : ''}
-      </RoomLists>
+      </RoomCardList>
       <ButtonsBox>
-        <Button onClickFnc={() => {}} isBorder={true}>
-          방 참여하기
-        </Button>
-        <Button onClickFnc={handleCreateRoomOnclick} isBorder={true}>
-          + 방 만들기
-        </Button>
+        <BoxInner>
+          <Button onClickFnc={() => {}} isBorder={true}>
+            <span>
+              <img src="src/assets/images/icons/icon-plusroom.svg" alt="" />
+            </span>
+            방 참여하기
+          </Button>
+          <Button onClickFnc={handleCreateRoomOnclick} isBorder={true}>
+            <span>
+              <img src="src/assets/images/icons/icon-joinroom.svg" alt="" />
+            </span>
+            방 만들기
+          </Button>
+        </BoxInner>
       </ButtonsBox>
     </RoomListsContainer>
   );
 }
 const RoomListsContainer = styled.div`
-  max-width: 1440px;
+  position: relative;
+  max-width: 1460px;
+  padding: 0 20px;
   margin: 0 auto;
 `;
-const ButtonsBox = styled.div`
-  position: fixed;
-  width: 100vw;
-  bottom: 0;
+const RoomCardList = styled.ul`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 60px 30px;
+  width: 100%;
+  margin-top: 50px;
+`;
+const RoomInfo = styled.div`
   display: flex;
-  justify-content: flex-end;
-  align-items: flex-end;
-  height: 300px;
+  align-items: center;
   gap: 10px;
-  padding: 0 60px 94px;
+  span {
+    font-size: 14px;
+    color: #938f78;
+    + span {
+      &::before {
+        content: '|';
+        padding-right: 10px;
+      }
+    }
+  }
+`;
+const Rules = styled.p`
+  padding: 5px 14px;
+  border: 2px solid var(--color-main);
+  color: var(--color-main);
+  border-radius: 50px;
+  font-size: 14px;
+`;
+const ContentTop = styled.div`
+  padding: 20px 20px 30px;
+`;
+const RoomName = styled.div`
+  margin-top: 70px;
+  height: 40px;
+  font-size: 20px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+`;
+const CardItem = styled.li`
+  &::before {
+    content: '';
+    display: block;
+    position: absolute;
+    top: -50px;
+    right: -10px;
+    width: 102px;
+    height: 95px;
+    background: url('src/assets/images/img-listicon.svg') no-repeat center;
+  }
+  &:hover {
+    transform: translateY(-5px);
+  }
+  display: flex;
+  flex-direction: column;
+  border-radius: 20px;
+  position: relative;
+  background: #fff;
+  box-shadow: 7px 7px 10px rgba(0, 0, 0, 0.1);
+  border: 6px solid #e6dbbb;
+  transition: all 0.1s ease-in-out;
+  &:nth-child(even) {
+    &::before {
+      background: url('src/assets/images/img-listicon2.svg') no-repeat center;
+    }
+  }
+`;
+const ContentBottom = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #e6dbbb;
+  > p {
+    background-color: #f9f4e0;
+    padding: 8px 10px;
+    border-radius: 50px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  button {
+    background-color: var(--color-sub);
+    color: var(--color-white);
+    border: none;
+    min-width: 135px;
+    height: 43px;
+    padding: 11px 20px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 700;
+    transition: background-color 0.1s ease-in-out;
+    &:hover {
+      background-color: #ff7e05;
+    }
+  }
+`;
+const ButtonsBox = styled.div`
+  display: flex;
+  align-items: center;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 250px;
   background: linear-gradient(
     to bottom,
     #fffdee00 0%,
     #fffdeeba 10%,
     #fffdee 50%
   );
+`;
+const BoxInner = styled.div`
+  width: 100%;
+  margin: 0 auto;
+  max-width: 1460px;
+  padding: 0 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
   & button {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
     font-size: 30px;
-    padding: 20px 30px;
-    border-radius: 40px;
-    border: none;
-    height: max-content;
+    min-width: 200px;
+    height: 70px;
+    padding: 10px 20px;
+    border-radius: 50px;
     background-color: var(--color-main);
     color: var(--color-white);
-  }
-`;
-const RoomLists = styled.ul`
-  display: grid;
-  width: 100%;
-  overflow-y: scroll;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 20px;
-  padding: 0 60px 300px;
-`;
-const RoomCard = styled.li`
-  border-radius: 20px;
-  border: 8px solid #decfaa;
-  min-width: 300px;
-`;
-const DivWrap = styled.div`
-  background-color: #fff;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  margin: 0 auto;
-  width: 100%;
-  padding: 20px 16px 40px;
-  & > h4 {
     font-size: 20px;
-    line-height: 28px;
-    font-weight: bold;
-    color: #56533d;
-    text-overflow: ellipsis;
-    height: 3.3rem;
-    overflow: hidden;
-    word-break: break-word;
-    display: -webkit-box;
-    -webkit-line-clamp: 2; // 원하는 라인수
-    -webkit-box-orient: vertical;
-  }
-`;
-const Div1 = styled.div`
-  display: flex;
-  align-items: center;
-  margin-bottom: 70px;
-  gap: 10px;
-  font-size: 13px;
-  & > p {
-    padding: 6px 8px;
-    color: var(--color-main);
-    border: 2px solid var(--color-main);
-    border-radius: 50px;
     font-weight: 700;
-  }
-  & > span {
-    color: #938f78;
-  }
-`;
-const Div2 = styled.div`
-  display: flex;
-  justify-content: space-between;
-  padding: 20px 16px;
-  align-items: flex-end;
-  background-color: #decfaa;
-  & > p {
-    background-color: #f9f4e0;
-    padding: 8px 10px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 800;
-  }
-  & > button {
-    background-color: var(--color-sub);
-    color: var(--color-white);
-    border: none;
-    padding: 11px 20px;
-    border-radius: 21px;
+    transition: background-color 0.1s ease-in-out;
+    &:hover {
+      background-color: #81c008;
+    }
   }
 `;
 export default Main;

@@ -8,9 +8,9 @@ const GameRoomPage = () => {
   return (
     <GameWrap>
       <GameRoom>
-        <Player player="other" nick="모래알은반짝" point="5000" />
+        <Player player="other" nick="모래알은반짝" point="5000" state="wait" />
         <MyState>
-          <Player player="me" nick="올챙이개구리적" point="5000" />
+          <Player player="me" nick="올챙이개구리적" point="5000" state="wait" />
           <GameButton />
           <BattingInput />
         </MyState>
