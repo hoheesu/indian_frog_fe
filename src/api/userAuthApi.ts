@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { instance } from './axios';
+import { authInstance, instance } from './axios';
 import { ErrorResponse } from 'react-router-dom';
 
 export const checkEmailDuplication = async (userEmail: string) => {
@@ -72,7 +72,17 @@ export const loginUser = async (loginInfo: {
       console.log(axiosError.response.data.status);
       throw axiosError.response.data;
     }
-    // alert(error.response.data.message);
-    // throw error;
+  }
+};
+
+export const refreshToken = async () => {
+  // const accessToken = localStorage.getItem('accessToken');
+  try {
+    const response = await authInstance.post(`/token/refresh`);
+    localStorage.setItem('accessToken', response.data.accessToken);
+    return response.data.accessToken;
+  } catch (err) {
+    console.error('엑세스 토큰 새로고침에 실패하였습니다', err);
+    throw err;
   }
 };

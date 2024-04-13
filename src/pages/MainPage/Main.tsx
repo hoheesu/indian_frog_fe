@@ -3,34 +3,24 @@ import Button from '../../components/layout/form/Button';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGetGameRoomsList } from '../../hooks/useQuery';
 import { useNavigate } from 'react-router-dom';
-import SockJS from 'sockjs-client';
-import { Stomp } from '@stomp/stompjs';
+import { useJoinRoomMutation } from '../../hooks/useMutation';
 
 function Main() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const navigate = useNavigate();
+  const gameRoomsList = useGetGameRoomsList(0);
+  const useJoinRoom = useJoinRoomMutation();
 
   const handleCreateRoomOnclick = () => {
     useSetIsModalClick('createRoom');
   };
-  const authToken = localStorage.getItem('accessToken');
-  const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
-  const client = Stomp.over(socket);
 
-  client.connect(
-    { Authorization: authToken },
-    function (frame: any) {
-      console.log('Connected: ' + frame);
-    },
-    function (error: any) {
-      console.log('WebSocket connection error: ' + error);
-    },
-  );
-
-  const gameRoomsList = useGetGameRoomsList(0);
-  console.log(gameRoomsList.data?.content);
-  const navigate = useNavigate();
+  const handleJoinRoomNumberOnClick = (roomNumber: number) => {
+    useJoinRoom.mutate(roomNumber);
+    navigate(`/gameroomtest/${roomNumber}`);
+  };
   return (
-    <div>
+    <RoomListsContainer>
       <RoomLists>
         {gameRoomsList.data?.content
           ? gameRoomsList.data?.content.map((gameRoom: any) => {
@@ -51,11 +41,7 @@ function Main() {
                     <p>Loading</p>
                     <Button
                       onClickFnc={() => {
-                        if (client && gameRoom.roomId) {
-                          client.send(`/app/${gameRoom.roomId}/join`, {}, '');
-                          console.log('--join--  ');
-                        }
-                        navigate(`/gameroomtest/${gameRoom.roomId}`);
+                        handleJoinRoomNumberOnClick(gameRoom.roomId);
                       }}
                       isBorder={true}
                     >
@@ -75,11 +61,15 @@ function Main() {
           + 방 만들기
         </Button>
       </ButtonsBox>
-    </div>
+    </RoomListsContainer>
   );
 }
+const RoomListsContainer = styled.div`
+  max-width: 1440px;
+  margin: 0 auto;
+`;
 const ButtonsBox = styled.div`
-  position: absolute;
+  position: fixed;
   width: 100vw;
   bottom: 0;
   display: flex;
@@ -107,7 +97,6 @@ const ButtonsBox = styled.div`
 const RoomLists = styled.ul`
   display: grid;
   width: 100%;
-  height: calc(100vh - 100px);
   overflow-y: scroll;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 20px;
@@ -116,6 +105,7 @@ const RoomLists = styled.ul`
 const RoomCard = styled.li`
   border-radius: 20px;
   border: 8px solid #decfaa;
+  min-width: 300px;
 `;
 const DivWrap = styled.div`
   background-color: #fff;
@@ -129,6 +119,13 @@ const DivWrap = styled.div`
     line-height: 28px;
     font-weight: bold;
     color: #56533d;
+    text-overflow: ellipsis;
+    height: 3.3rem;
+    overflow: hidden;
+    word-break: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; // 원하는 라인수
+    -webkit-box-orient: vertical;
   }
 `;
 const Div1 = styled.div`
