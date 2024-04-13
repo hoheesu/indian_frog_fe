@@ -1,45 +1,68 @@
-import React, { ComponentType, useContext } from 'react';
+import React, { ComponentType, createContext, useContext } from 'react';
 import styled from 'styled-components';
 
 interface PlayerProps {
   player: string;
   nick: string;
   point: string;
+  state: string;
 }
 interface WithPlayerProps {
   player: string;
+  state: string;
 }
-const PlayerContext = React.createContext<string>('');
 
+const PlayerContext = React.createContext<string>('');
+const StateContext = React.createContext<string>('');
 // 고위 컴포넌트 함수
 const withPlayer =
   <P extends object>(Component: ComponentType<P & WithPlayerProps>) =>
   (props: P) => {
     const player = useContext(PlayerContext);
-    return <Component {...props} player={player} />;
+    const state = useContext(StateContext);
+
+    return <Component {...props} player={player} state={state} />;
   };
 
-const Player: React.FC<PlayerProps> = ({ player, nick, point }) => {
+const Player: React.FC<PlayerProps> = ({ player, nick, point, state }) => {
   return (
     <PlayerContext.Provider value={player}>
-      <PlayerBox>
-        <PlayerBadge>{player === 'other' ? '상대개구리' : '나'}</PlayerBadge>
-        <BoxInner>
-          <TopArea>
-            <PlayerProfile>
-              <img src="src/assets/images/img-profile-dummy.png" alt="" />
-            </PlayerProfile>
-            <PlayerInfo>
-              <PlayerName>{nick}</PlayerName>
-              <PlayerPoint>{point}</PlayerPoint>
-            </PlayerInfo>
-          </TopArea>
-          <BottomArea>
-            <Timer>28:00</Timer>
-            <Status>Choosing...</Status>
-          </BottomArea>
-        </BoxInner>
-      </PlayerBox>
+      <StateContext.Provider value={state}>
+        <PlayerBox>
+          <PlayerBadge>{player === 'other' ? '상대개구리' : '나'}</PlayerBadge>
+          <BoxInner>
+            <TopArea>
+              <PlayerProfile>
+                <img src="src/assets/images/img-profile-dummy.png" alt="" />
+              </PlayerProfile>
+              <PlayerInfo>
+                <PlayerName>{nick}</PlayerName>
+                <PlayerPoint>{point}</PlayerPoint>
+              </PlayerInfo>
+            </TopArea>
+            <BottomArea>
+              <Timer>00:00</Timer>
+              <Status>
+                {state === 'ready'
+                  ? 'Ready'
+                  : state === 'wait'
+                    ? 'Waiting..'
+                    : state === 'choose'
+                      ? 'Choosing..'
+                      : state === 'raise'
+                        ? 'Raise'
+                        : state === 'die'
+                          ? 'Die'
+                          : state === 'check'
+                            ? 'Check'
+                            : state === 'complate'
+                              ? 'Completion'
+                              : null}
+              </Status>
+            </BottomArea>
+          </BoxInner>
+        </PlayerBox>
+      </StateContext.Provider>
     </PlayerContext.Provider>
   );
 };
@@ -178,18 +201,36 @@ const Timer = withPlayer(styled.div<WithPlayerProps>`
     height: 29px;
     background: ${({ player }) => {
       return player === 'other'
-        ? 'url(src/assets/images/icons/icon-other-timer.svg)'
-        : 'url(src/assets/images/icons/icon-my-timer.svg)';
+        ? 'url(src/assets/images/icons/icon-other-timer.svg)no-repeat center'
+        : 'url(src/assets/images/icons/icon-my-timer.svg)no-repeat center';
     }};
-    background-size: 100%;
+    background-size: 90%;
   }
 `);
-const Status = styled(Timer)`
+
+const Status = withPlayer(styled(Timer)<WithPlayerProps>`
   flex: 1.5;
   font-size: 20px;
+  background: ${({ state }) => (state === 'die' ? '#F34923' : null)};
   &::before {
-    background: url('src/assets/images/icons/icon-card.svg') no-repeat center;
-    background-size: 100%;
+    background: ${({ state }) => {
+      return state === 'choose'
+        ? 'url(src/assets/images/icons/icon-choose.svg)no-repeat center'
+        : state === 'wait'
+          ? 'url(src/assets/images/icons/icon-wait.svg)no-repeat center'
+          : state === 'complate'
+            ? 'url(src/assets/images/icons/icon-complate.svg)no-repeat center'
+            : state === 'ready'
+              ? 'url(src/assets/images/icons/icon-ready.svg)no-repeat center'
+              : state === 'raise'
+                ? 'url(src/assets/images/icons/icon-raise.svg)no-repeat center'
+                : state === 'die'
+                  ? 'url(src/assets/images/icons/icon-die.svg)no-repeat center'
+                  : state === 'check'
+                    ? 'url(src/assets/images/icons/icon-check.svg)no-repeat center'
+                    : null;
+    }};
+    background-size: 85%;
   }
-`;
+`);
 export default Player;
