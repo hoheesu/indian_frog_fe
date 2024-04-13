@@ -4,7 +4,6 @@ import GlobalFonts from './assets/styles/GlobalFonts';
 import ModalPortal from './components/modal/ModalPortal';
 import Header from './components/layout/Header';
 import { useIsModalStore } from './store/modal/CreateModalStore';
-import styled from 'styled-components';
 import ModalTemplate from './components/modal/ModalTemplate';
 
 function App() {
@@ -14,9 +13,7 @@ function App() {
       <GlobalStyles />
       <GlobalFonts />
       <Header />
-
       <Outlet />
-
       {useIsModal && (
         <ModalPortal>
           <ModalTemplate />
