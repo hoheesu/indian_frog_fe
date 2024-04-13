@@ -14,9 +14,9 @@ function App() {
       <GlobalStyles />
       <GlobalFonts />
       <Header />
-      <MainContainer>
-        <Outlet />
-      </MainContainer>
+
+      <Outlet />
+
       {useIsModal && (
         <ModalPortal>
           <ModalTemplate />
@@ -25,8 +25,5 @@ function App() {
     </>
   );
 }
-const MainContainer = styled.div`
-  padding-top: 100px;
-`;
 
 export default App;
