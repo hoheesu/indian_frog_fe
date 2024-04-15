@@ -34,6 +34,7 @@ authInstance.interceptors.response.use(
         originalRequest.headers['Authorization'] = `${newAccessToken}`;
         return authInstance(originalRequest);
       } catch (refreshError) {
+        console.log(refreshError);
         return Promise.reject(refreshError);
       }
     }

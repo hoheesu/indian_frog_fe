@@ -76,13 +76,14 @@ export const loginUser = async (loginInfo: {
 };
 
 export const refreshToken = async () => {
-  // const accessToken = localStorage.getItem('accessToken');
   try {
-    const response = await authInstance.post(`/token/refresh`);
+    const response = await authInstance.post('/token/refresh', {
+      withCredentials: true,
+    });
     localStorage.setItem('accessToken', response.data.accessToken);
+    console.log(response);
     return response.data.accessToken;
   } catch (err) {
-    console.error('엑세스 토큰 새로고침에 실패하였습니다', err);
     throw err;
   }
 };
