@@ -1,6 +1,8 @@
 import Button from '../../components/layout/form/Button';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import imgLogo from '../../assets/images/img-logo.svg';
+import imgStart from '../../assets/images/img-start.svg';
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -9,11 +11,11 @@ function LandingPage() {
     <LandingWrap>
       <LandingContainer>
         <H1>
-          <img src="src/assets/images/img-logo.svg" alt="" />
+          <img src={imgLogo} alt="" />
         </H1>
         <Button isBorder={true} onClickFnc={() => navigate('/main')}>
           <p>
-            <img src="src/assets/images/img-start.svg" alt="" />
+            <img src={imgStart} alt="" />
           </p>
         </Button>
       </LandingContainer>
