@@ -1,4 +1,4 @@
-import { UseMutationResult, useMutation } from '@tanstack/react-query';
+import { useMutation } from '@tanstack/react-query';
 import { loginUser } from '../api/userAuthApi';
 import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
