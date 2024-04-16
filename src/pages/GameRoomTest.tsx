@@ -14,10 +14,9 @@ function GameRoomTest() {
   const { gameId } = useParams();
   const authToken = localStorage.getItem('accessToken');
   const [stompClient, setStompClient] = useState<any>(null);
-  // const [connecting, setConnecting] = useState<boolean>(false);
-
-  const navigate = useNavigate();
   const gameUserInfo = useGameRoomInfoStore((state) => state.gameInfo);
+  const navigate = useNavigate();
+
   const decode: {
     auth: string;
     exp: number;
@@ -28,7 +27,6 @@ function GameRoomTest() {
 
   const connect = () => {
     if (decode.nickname && gameId) {
-      // setConnecting(true);
       const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
       const client = Stomp.over(socket);
       client.connect(
@@ -50,10 +48,6 @@ function GameRoomTest() {
     }
   };
 
-  //   stompClient.connect({}, function(frame) {
-  //     // 게임 시작 메시지 전송
-  //     stompClient.send("/app/gameRoom/1/START", {}, JSON.stringify({}));
-  // });
   const onReceived = (payload: any) => {
     try {
       const message: any = JSON.parse(payload.body);
@@ -63,6 +57,7 @@ function GameRoomTest() {
       console.log('!!!!!error-paylad --->', error);
     }
   };
+
   const gameRecevied = (payload: any) => {
     try {
       const message: any = JSON.parse(payload.body);
@@ -112,13 +107,17 @@ function GameRoomTest() {
   }, [gameUserInfo]);
 
   useEffect(() => {
-    if (ourReady === 'ALL_READY') {
-      // stompClient.publish({
-      //   destination: `/app/gameRoom/${gameId}/START`,
-      //   body: JSON.stringify({}),
-      // });
-      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
-    }
+    console.log('니 누기야', decode.nickname);
+    console.log('나 호스트다', gameUserInfo.host);
+    // if (ourReady === 'ALL_READY') {
+    //   if (decode.nickname === gameUserInfo.host) {
+    //     stompClient.send(
+    //       `/app/gameRoom/${gameId}/START`,
+    //       {},
+    //       JSON.stringify({}),
+    //     );
+    //   }
+    // }
   }, [ourReady]);
 
   return (
