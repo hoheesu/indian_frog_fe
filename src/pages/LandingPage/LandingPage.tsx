@@ -1,6 +1,8 @@
 import Button from '../../components/layout/form/Button';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
+import ImgLogo from '../../assets/images/img-logo.svg';
+import ImgStart from '../../assets/images/img-start.svg';
 
 function LandingPage() {
   const navigate = useNavigate();
@@ -9,11 +11,11 @@ function LandingPage() {
     <LandingWrap>
       <LandingContainer>
         <H1>
-          <img src="src/assets/images/img-logo.svg" alt="" />
+          <img src={ImgLogo} alt="" />
         </H1>
         <Button isBorder={true} onClickFnc={() => navigate('/main')}>
           <p>
-            <img src="src/assets/images/img-start.svg" alt="" />
+            <img src={ImgStart} alt="" />
           </p>
         </Button>
       </LandingContainer>
@@ -28,6 +30,7 @@ const LandingWrap = styled.div`
     rgba(163, 231, 111, 1) 0%,
     rgba(210, 239, 139, 1) 100%
   );
+  padding: 0 60px;
 `;
 const LandingContainer = styled.div`
   display: flex;
@@ -36,9 +39,20 @@ const LandingContainer = styled.div`
   align-items: center;
   gap: 20px;
   height: 100vh;
+  button {
+    max-width: 530px;
+    width: 100%;
+    img {
+      width: 100%;
+    }
+  }
 `;
 const H1 = styled.h1`
-  font-size: 120px;
+  max-width: 700px;
+  width: 100%;
+  img {
+    width: 100%;
+  }
 `;
 
 export default LandingPage;
