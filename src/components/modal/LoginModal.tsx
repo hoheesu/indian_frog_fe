@@ -56,12 +56,12 @@ function LoginModal() {
           />
           {loginInput.email.trim() ? (
             !emailValid ? (
-              <p>이메일 형식이 틀렸습니다.</p>
+              <p className="error">이메일 형식이 틀렸습니다.</p>
             ) : (
               <p>확인</p>
             )
           ) : (
-            <p>이메일을 입력해주세요</p>
+            <p className="error">이메일을 입력해주세요</p>
           )}
         </div>
         <div>
@@ -75,12 +75,12 @@ function LoginModal() {
           />
           {loginInput.password.trim() ? (
             !pwValid ? (
-              <p>비밀번호 형식이 틀렸습니다.</p>
+              <p className="error">비밀번호 형식이 틀렸습니다.</p>
             ) : (
               <p>확인</p>
             )
           ) : (
-            <p>비밀번호를 입력해주세요</p>
+            <p className="error">비밀번호를 입력해주세요</p>
           )}
         </div>
 
@@ -88,6 +88,7 @@ function LoginModal() {
           <p>로그인</p>
         </Button>
       </form>
+
       <Button isBorder={false} onClickFnc={handleLoginSubmit}>
         <p>비밀번호 찾기</p>
       </Button>

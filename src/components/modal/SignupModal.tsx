@@ -75,6 +75,7 @@ function SignupModal() {
   return (
     <>
       <ClosedModalButton />
+      <h2>회원가입</h2>
       <form onSubmit={(e) => e.preventDefault()}>
         <div>
           <label>이메일</label>
