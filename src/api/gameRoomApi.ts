@@ -31,6 +31,7 @@ export const joinGameRoom = async (gameRoomId: number) => {
   try {
     const response = await authInstance.post(`/gameRoom/${gameRoomId}/join`);
     console.log(response);
+    return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
