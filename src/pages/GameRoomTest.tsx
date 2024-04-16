@@ -1,18 +1,17 @@
-// import { useState } from 'react';
 import { Stomp } from '@stomp/stompjs';
 import { jwtDecode } from 'jwt-decode';
-// import { useEffect, useState } from 'react';
+import {useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import SockJS from 'sockjs-client';
 
 function GameRoomTest() {
-  // const [messageArea, setMessageArea] = useState<Message[]>([]);
+  const [messageArea, setMessageArea] = useState<Message[]>([]);
+  const [messageContent, setMessageContent] = useState<string>('');
   const { gameId } = useParams();
   const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
+  const navigate = useNavigate();
   const client = Stomp.over(socket);
   const authToken = localStorage.getItem('accessToken');
-  const navigate = useNavigate();
-  console.log(authToken);
 
   // const userName = authToken ? jwtDecode(authToken) : null;
   const decode: {
@@ -30,17 +29,6 @@ function GameRoomTest() {
     content: string;
     type: string;
   }
-  // useEffect(() => {
-  //   client.send(`/app/${gameId}/join`, {}, '');
-  //   console.log(`join ${gameId}`);
-  // }, []);
-
-  // const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
-  // const client = Stomp.over(socket);
-  // if (client && data?.data.data.roomId) {
-  //   client.send(`/app/${data?.data.data.roomId}/join`, {}, '');
-  //   console.log('--join--  ');
-  // }
 
   client.connect(
     { Authorization: authToken },
@@ -50,6 +38,7 @@ function GameRoomTest() {
         client.subscribe(`/topic/gameRoom/${gameId}`, function (payload: any) {
           const message: Message = JSON.parse(payload.body);
           console.log('payloadMessage -->', message);
+          setMessageArea((prev) => [...prev, message]);
         });
       } else {
         console.log('게임방 ID가 제공되지 않았습니다.');
@@ -59,6 +48,7 @@ function GameRoomTest() {
       console.log('WebSocket connection error: ' + error);
     },
   );
+
   const readyBtn = () => {
     client.send(
       `/app/gameRoom/${gameId}/ready`,
@@ -75,13 +65,52 @@ function GameRoomTest() {
     navigate('/main');
   };
 
+  // 채팅
+
+  console.log(messageArea);
+
+  const handleSendMessage = () => {
+    if (messageContent && client && gameId) {
+      const chatMessage = {
+        content: messageContent,
+        sender: decode.nickname,
+        type: 'CHAT',
+      };
+      client.send(
+        `/app/chat.sendMessage/${gameId}`,
+        {},
+        JSON.stringify(chatMessage),
+      );
+      setMessageContent('');
+    }
+  };
+  const handleKeyPress = (e: any) => {
+    if (e.key === 'Enter') {
+      handleSendMessage();
+      e.preventDefault();
+    }
+  };
+
   return (
-    <>
+    <div style={{ marginTop: '100px' }}>
       <div>GameRoomTest</div>
       <p>{gameId}</p>
       <button onClick={readyBtn}>Ready</button>
       <button onClick={leaveBtn}>나가기</button>
-    </>
+      <div>
+        {messageArea.map((msg, index) => (
+          <div key={index}>
+            <strong>{msg.sender}:</strong> {msg.content}
+          </div>
+        ))}
+      </div>
+      <input
+        value={messageContent}
+        onChange={(e) => setMessageContent(e.target.value)}
+        onKeyPress={handleKeyPress}
+      />
+      <button onClick={handleSendMessage}>Send</button>
+    </div>
   );
 }
 

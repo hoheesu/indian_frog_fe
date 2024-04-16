@@ -4,6 +4,10 @@ import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGetGameRoomsList } from '../../hooks/useQuery';
 import { useNavigate } from 'react-router-dom';
 import { joinGameRoom } from '../../api/gameRoomApi';
+import IconJoinroom from '../../assets/images/icons/icon-joinroom.svg';
+import IconPlusroom from '../../assets/images/icons/icon-plusroom.svg';
+import ImgListleaf from '../../assets/images/img-listicon.svg';
+import ImgListleaf2 from '../../assets/images/img-listicon2.svg';
 
 function Main() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -55,13 +59,13 @@ function Main() {
         <BoxInner>
           <Button onClickFnc={() => {}} isBorder={true}>
             <span>
-              <img src="src/assets/images/icons/icon-plusroom.svg" alt="" />
+              <img src={IconPlusroom} alt="" />
             </span>
             방 참여하기
           </Button>
           <Button onClickFnc={handleCreateRoomOnclick} isBorder={true}>
             <span>
-              <img src="src/assets/images/icons/icon-joinroom.svg" alt="" />
+              <img src={IconJoinroom} alt="" />
             </span>
             방 만들기
           </Button>
@@ -73,15 +77,16 @@ function Main() {
 const RoomListsContainer = styled.div`
   position: relative;
   max-width: 1460px;
-  padding: 0 20px;
+  padding: 100px 20px;
   margin: 0 auto;
+  padding-bottom: 300px;
 `;
 const RoomCardList = styled.ul`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 60px 30px;
   width: 100%;
-  margin-top: 50px;
+  margin-top: 100px;
 `;
 const RoomInfo = styled.div`
   display: flex;
@@ -128,7 +133,7 @@ const CardItem = styled.li`
     right: -10px;
     width: 102px;
     height: 95px;
-    background: url('src/assets/images/img-listicon.svg') no-repeat center;
+    background: url(${ImgListleaf}) no-repeat center;
   }
   &:hover {
     transform: translateY(-5px);
@@ -143,7 +148,7 @@ const CardItem = styled.li`
   transition: all 0.1s ease-in-out;
   &:nth-child(even) {
     &::before {
-      background: url('src/assets/images/img-listicon2.svg') no-repeat center;
+      background: url(${ImgListleaf2}) no-repeat center;
     }
   }
 `;
@@ -220,4 +225,5 @@ const BoxInner = styled.div`
     }
   }
 `;
+
 export default Main;
