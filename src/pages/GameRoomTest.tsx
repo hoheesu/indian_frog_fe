@@ -9,18 +9,15 @@ import styled from 'styled-components';
 function GameRoomTest() {
   const [myReady, setMyReady] = useState(false);
   const [ourReady, setOurReady] = useState('');
+  const [gameState, setGameState] = useState('');
 
   const { gameId } = useParams();
   const authToken = localStorage.getItem('accessToken');
   const [stompClient, setStompClient] = useState<any>(null);
-  const [connecting, setConnecting] = useState<boolean>(false);
-  console.log(connecting);
+  // const [connecting, setConnecting] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  console.log(authToken);
-
   const gameUserInfo = useGameRoomInfoStore((state) => state.gameInfo);
-  console.log(gameUserInfo);
   const decode: {
     auth: string;
     exp: number;
@@ -31,34 +28,50 @@ function GameRoomTest() {
 
   const connect = () => {
     if (decode.nickname && gameId) {
-      setConnecting(true);
+      // setConnecting(true);
       const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
       const client = Stomp.over(socket);
       client.connect(
         { Authorization: authToken },
         () => {
           client.subscribe(`/topic/gameRoom/${gameId}`, onReceived);
+          client.subscribe(`/user/queue/gameInfo`, gameRecevied);
           client.send(
             `/app/chat.addUser/${gameId}`,
             {},
             JSON.stringify({ sender: decode.nickname, type: 'JOIN' }),
-          );
+          ); // uri\
           setStompClient(client);
         },
-        console.log('error'),
+        function (error: any) {
+          console.log('ConnectError ===>' + error);
+        },
       );
     }
   };
 
+  //   stompClient.connect({}, function(frame) {
+  //     // 게임 시작 메시지 전송
+  //     stompClient.send("/app/gameRoom/1/START", {}, JSON.stringify({}));
+  // });
   const onReceived = (payload: any) => {
-    const message: any = JSON.parse(payload.body);
-    console.log('payloadMessage -->', message);
-    setOurReady(message.gameState);
+    try {
+      const message: any = JSON.parse(payload.body);
+      console.log('payloadMessage -->', message);
+      setOurReady(message.gameState);
+    } catch (error) {
+      console.log('!!!!!error-paylad --->', error);
+    }
   };
-
-  useEffect(() => {
-    connect();
-  }, []);
+  const gameRecevied = (payload: any) => {
+    try {
+      const message: any = JSON.parse(payload.body);
+      console.log('*** gameState payload -->', message);
+      setGameState(message.gameState);
+    } catch (error) {
+      console.log('!!!!!error-paylad --->', error);
+    }
+  };
 
   const readyBtn = () => {
     console.log('레디버튼 눌렀다잉');
@@ -93,6 +106,20 @@ function GameRoomTest() {
       JSON.stringify(chatMessage),
     );
   };
+  useEffect(() => {
+    connect();
+    console.log('넌 도대체 어디 있니?', gameUserInfo);
+  }, [gameUserInfo]);
+
+  useEffect(() => {
+    if (ourReady === 'ALL_READY') {
+      // stompClient.publish({
+      //   destination: `/app/gameRoom/${gameId}/START`,
+      //   body: JSON.stringify({}),
+      // });
+      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+    }
+  }, [ourReady]);
 
   return (
     <GameRoomTestContainer>
@@ -126,6 +153,7 @@ function GameRoomTest() {
         })()}
       </p>
       <p>우리 레디: {ourReady}</p>
+      <p>게임 상태: {gameState}</p>
       <button
         onClick={() => {
           sendMessage();
@@ -139,5 +167,4 @@ function GameRoomTest() {
 const GameRoomTestContainer = styled.div`
   padding-top: 100px;
 `;
-
 export default GameRoomTest;

@@ -131,6 +131,7 @@ const MyState = styled.div`
 `;
 const GameWrap = styled.div`
   position: relative;
+  top: 100px;
   background: linear-gradient(
     180deg,
     rgba(163, 231, 111, 1) 0%,
