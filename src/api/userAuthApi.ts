@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { instance } from './axios';
+import { authInstance, instance } from './axios';
 import { ErrorResponse } from 'react-router-dom';
 
 export const checkEmailDuplication = async (userEmail: string) => {
@@ -72,7 +72,18 @@ export const loginUser = async (loginInfo: {
       console.log(axiosError.response.data.status);
       throw axiosError.response.data;
     }
-    // alert(error.response.data.message);
-    // throw error;
+  }
+};
+
+export const refreshToken = async () => {
+  try {
+    const response = await authInstance.post('/token/refresh', {
+      withCredentials: true,
+    });
+    const accessToken = response?.headers.authorization;
+    localStorage.setItem('accessToken', accessToken);
+    return response.data.accessToken;
+  } catch (err) {
+    throw err;
   }
 };
