@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
-import SockJS from 'sockjs-client';
 import { useGameRoomInfoStore } from '../store/modal/CreateModalStore';
+import SockJS from 'sockjs-client';
 import styled from 'styled-components';
 
 function GameRoomTest() {
@@ -120,6 +120,32 @@ function GameRoomTest() {
       stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
     }
   }, [ourReady]);
+
+  // 채팅
+
+  // console.log(messageArea);
+
+  // const handleSendMessage = () => {
+  //   if (messageContent && client && gameId) {
+  //     const chatMessage = {
+  //       content: messageContent,
+  //       sender: decode.nickname,
+  //       type: 'CHAT',
+  //     };
+  //     client.send(
+  //       `/app/chat.sendMessage/${gameId}`,
+  //       {},
+  //       JSON.stringify(chatMessage),
+  //     );
+  //     setMessageContent('');
+  //   }
+  // };
+  // const handleKeyPress = (e: any) => {
+  //   if (e.key === 'Enter') {
+  //     handleSendMessage();
+  //     e.preventDefault();
+  //   }
+  // };
 
   return (
     <GameRoomTestContainer>
