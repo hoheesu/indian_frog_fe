@@ -1,19 +1,23 @@
-import { Stomp } from '@stomp/stompjs';
+import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
-import {useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { Stomp } from '@stomp/stompjs';
+import { useGameRoomInfoStore } from '../store/modal/CreateModalStore';
 import SockJS from 'sockjs-client';
+import styled from 'styled-components';
 
 function GameRoomTest() {
-  const [messageArea, setMessageArea] = useState<Message[]>([]);
-  const [messageContent, setMessageContent] = useState<string>('');
-  const { gameId } = useParams();
-  const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
-  const navigate = useNavigate();
-  const client = Stomp.over(socket);
-  const authToken = localStorage.getItem('accessToken');
+  const [myReady, setMyReady] = useState(false);
+  const [ourReady, setOurReady] = useState('');
+  const [gameState, setGameState] = useState('');
 
-  // const userName = authToken ? jwtDecode(authToken) : null;
+  const { gameId } = useParams();
+  const authToken = localStorage.getItem('accessToken');
+  const [stompClient, setStompClient] = useState<any>(null);
+  // const [connecting, setConnecting] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+  const gameUserInfo = useGameRoomInfoStore((state) => state.gameInfo);
   const decode: {
     auth: string;
     exp: number;
@@ -21,97 +25,172 @@ function GameRoomTest() {
     nickname: string;
     sub: 'string';
   } = jwtDecode(authToken!);
-  console.log(decode);
-  console.log(decode.nickname);
 
-  interface Message {
-    sender: string;
-    content: string;
-    type: string;
-  }
+  const connect = () => {
+    if (decode.nickname && gameId) {
+      // setConnecting(true);
+      const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
+      const client = Stomp.over(socket);
+      client.connect(
+        { Authorization: authToken },
+        () => {
+          client.subscribe(`/topic/gameRoom/${gameId}`, onReceived);
+          client.subscribe(`/user/queue/gameInfo`, gameRecevied);
+          client.send(
+            `/app/chat.addUser/${gameId}`,
+            {},
+            JSON.stringify({ sender: decode.nickname, type: 'JOIN' }),
+          ); // uri\
+          setStompClient(client);
+        },
+        function (error: any) {
+          console.log('ConnectError ===>' + error);
+        },
+      );
+    }
+  };
 
-  client.connect(
-    { Authorization: authToken },
-    (frame: any) => {
-      console.log('Connect  ', frame);
-      if (gameId) {
-        client.subscribe(`/topic/gameRoom/${gameId}`, function (payload: any) {
-          const message: Message = JSON.parse(payload.body);
-          console.log('payloadMessage -->', message);
-          setMessageArea((prev) => [...prev, message]);
-        });
-      } else {
-        console.log('게임방 ID가 제공되지 않았습니다.');
-      }
-    },
-    function (error: any) {
-      console.log('WebSocket connection error: ' + error);
-    },
-  );
+  //   stompClient.connect({}, function(frame) {
+  //     // 게임 시작 메시지 전송
+  //     stompClient.send("/app/gameRoom/1/START", {}, JSON.stringify({}));
+  // });
+  const onReceived = (payload: any) => {
+    try {
+      const message: any = JSON.parse(payload.body);
+      console.log('payloadMessage -->', message);
+      setOurReady(message.gameState);
+    } catch (error) {
+      console.log('!!!!!error-paylad --->', error);
+    }
+  };
+  const gameRecevied = (payload: any) => {
+    try {
+      const message: any = JSON.parse(payload.body);
+      console.log('*** gameState payload -->', message);
+      setGameState(message.gameState);
+    } catch (error) {
+      console.log('!!!!!error-paylad --->', error);
+    }
+  };
 
   const readyBtn = () => {
-    client.send(
-      `/app/gameRoom/${gameId}/ready`,
-      {},
-      JSON.stringify({ sender: decode.nickname }),
-    );
+    console.log('레디버튼 눌렀다잉');
+    if (stompClient) {
+      setMyReady((prev) => !prev);
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ready`,
+        {},
+        JSON.stringify({ sender: decode.nickname }),
+      );
+    }
   };
+
   const leaveBtn = () => {
-    client.send(
+    console.log('나가기버튼 눌렀다잉');
+    stompClient.send(
       `/app/${gameId}/leave`,
       { Authorization: authToken },
       JSON.stringify({ sender: decode.nickname }),
     );
     navigate('/main');
   };
+  const sendMessage = () => {
+    const chatMessage = {
+      content: 'messageContent',
+      sender: decode.nickname,
+      type: 'CHAT',
+    };
+    stompClient.send(
+      `/app/chat.sendMessage/${gameId}`,
+      {},
+      JSON.stringify(chatMessage),
+    );
+  };
+  useEffect(() => {
+    connect();
+    console.log('넌 도대체 어디 있니?', gameUserInfo);
+  }, [gameUserInfo]);
+
+  useEffect(() => {
+    if (ourReady === 'ALL_READY') {
+      // stompClient.publish({
+      //   destination: `/app/gameRoom/${gameId}/START`,
+      //   body: JSON.stringify({}),
+      // });
+      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+    }
+  }, [ourReady]);
 
   // 채팅
 
-  console.log(messageArea);
+  // console.log(messageArea);
 
-  const handleSendMessage = () => {
-    if (messageContent && client && gameId) {
-      const chatMessage = {
-        content: messageContent,
-        sender: decode.nickname,
-        type: 'CHAT',
-      };
-      client.send(
-        `/app/chat.sendMessage/${gameId}`,
-        {},
-        JSON.stringify(chatMessage),
-      );
-      setMessageContent('');
-    }
-  };
-  const handleKeyPress = (e: any) => {
-    if (e.key === 'Enter') {
-      handleSendMessage();
-      e.preventDefault();
-    }
-  };
+  // const handleSendMessage = () => {
+  //   if (messageContent && client && gameId) {
+  //     const chatMessage = {
+  //       content: messageContent,
+  //       sender: decode.nickname,
+  //       type: 'CHAT',
+  //     };
+  //     client.send(
+  //       `/app/chat.sendMessage/${gameId}`,
+  //       {},
+  //       JSON.stringify(chatMessage),
+  //     );
+  //     setMessageContent('');
+  //   }
+  // };
+  // const handleKeyPress = (e: any) => {
+  //   if (e.key === 'Enter') {
+  //     handleSendMessage();
+  //     e.preventDefault();
+  //   }
+  // };
 
   return (
-    <div style={{ marginTop: '100px' }}>
+    <GameRoomTestContainer>
       <div>GameRoomTest</div>
       <p>{gameId}</p>
-      <button onClick={readyBtn}>Ready</button>
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          readyBtn();
+        }}
+      >
+        Ready
+      </button>
       <button onClick={leaveBtn}>나가기</button>
-      <div>
-        {messageArea.map((msg, index) => (
-          <div key={index}>
-            <strong>{msg.sender}:</strong> {msg.content}
-          </div>
-        ))}
-      </div>
-      <input
-        value={messageContent}
-        onChange={(e) => setMessageContent(e.target.value)}
-        onKeyPress={handleKeyPress}
-      />
-      <button onClick={handleSendMessage}>Send</button>
-    </div>
+      <p>나의 레디: {`${myReady}`}</p>
+      <p>
+        너의 레디:
+        {(() => {
+          switch (ourReady) {
+            case 'READY':
+              return myReady ? 'false' : 'true';
+            case 'UNREADY':
+              return myReady ? 'false' : 'true';
+            case 'ALL_READY':
+              return 'true';
+            case 'NO_ONE_READY':
+              return 'false';
+            default:
+              return 'false';
+          }
+        })()}
+      </p>
+      <p>우리 레디: {ourReady}</p>
+      <p>게임 상태: {gameState}</p>
+      <button
+        onClick={() => {
+          sendMessage();
+        }}
+      >
+        채팅 버튼 눌렀다면?
+      </button>
+    </GameRoomTestContainer>
   );
 }
-
+const GameRoomTestContainer = styled.div`
+  padding-top: 100px;
+`;
 export default GameRoomTest;
