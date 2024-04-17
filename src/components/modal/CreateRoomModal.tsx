@@ -17,6 +17,7 @@ function CreateRoomModal() {
   const handleCreateRoomButtonClick = async () => {
     useCreateRoom.mutate(roomInput);
   };
+
   return (
     <div>
       <ClosedModalButton />
