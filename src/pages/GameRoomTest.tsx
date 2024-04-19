@@ -13,6 +13,9 @@ function GameRoomTest() {
   const [gameState, setGameState] = useState('');
   const [joinNickname, setJoinNickname] = useState('');
   const [endRound, setEndRound] = useState(false);
+  const [endGame, setEndGame] = useState(false);
+  const [userChoice, setUserChoice] = useState(false);
+  const [reStart, setReStart] = useState(false);
 
   const { gameId } = useParams();
   const authToken = localStorage.getItem('accessToken');
@@ -28,9 +31,7 @@ function GameRoomTest() {
     nickname: string;
     sub: 'string';
   } = jwtDecode(authToken!);
-  // join으로 들어왔을때만 내정보가 가게
-  // A유저가 CREATE
-  // B유저가 JOIN
+
   const connect = () => {
     if (decode.nickname && gameId) {
       const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
@@ -40,6 +41,8 @@ function GameRoomTest() {
         () => {
           client.subscribe(`/topic/gameRoom/${gameId}`, onReceived);
           client.subscribe(`/user/queue/gameInfo`, gameRecevied);
+          client.subscribe(`/user/queue/endRoundInfo`, gameRecevied);
+          client.subscribe(`/user/queue/endGameInfo`, gameRecevied);
           client.send(
             `/app/chat.addUser/${gameId}`,
             {},
@@ -53,13 +56,6 @@ function GameRoomTest() {
       );
     }
   };
-  // 내가 A유저임?
-  // A유저 라면
-  // 포인트 알려주는 메세지가 도착했다.
-  // console.log(point)
-  // point를 html -> 보여주는로직
-  // 내가 B유저임?
-  // B유저라면?
 
   const onReceived = async (payload: any) => {
     try {
@@ -69,30 +65,33 @@ function GameRoomTest() {
       if (message.type === 'JOIN') {
         setJoinNickname(message.sender);
       }
-      if (message === 'END') {
+      if (message.gameState === 'START') {
+        setReStart(true);
+        setUserChoice(false);
+      }
+      if (message.nextState === 'END') {
         setEndRound(true);
+        setReStart(false);
       }
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
     }
   };
-  useEffect(() => {
-    if (decode.nickname === joinNickname) {
-      if (!!gameUserInfo.participant) {
-        alert('내가 방금 들어옴');
-      }
-    }
-  }, [joinNickname]);
-  useEffect(() => {
-    if (stompClient && endRound) {
-      stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
-    }
-  }, [endRound]);
 
   const gameRecevied = (payload: any) => {
     try {
       const message: any = JSON.parse(payload.body);
       console.log('*** gameState payload -->', message);
+      if (message.nextState === 'START') {
+        setReStart(true);
+        setEndRound(false);
+      }
+      if (message.nextState === 'GAME_END') {
+        setEndGame(true);
+      }
+      if (message.nextState === 'USER_CHOICE') {
+        setUserChoice(true);
+      }
       setGameState(message.gameState);
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
@@ -123,6 +122,7 @@ function GameRoomTest() {
     }
     navigate('/main');
   };
+
   const sendMessage = () => {
     const chatMessage = {
       content: 'messageContent',
@@ -136,6 +136,43 @@ function GameRoomTest() {
     );
   };
 
+  const checkBtn = () => {
+    console.log('체크 눌렀다잉');
+    if (stompClient) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ACTION`,
+        {},
+        JSON.stringify({ action: 'CHECK', nickname: decode.nickname }),
+      );
+    }
+  };
+
+  const dieBtn = () => {
+    console.log('다이 눌렀다잉');
+    if (stompClient) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ACTION`,
+        {},
+        JSON.stringify({ action: 'DIE', nickname: decode.nickname }),
+      );
+    }
+  };
+
+  const raiseBtn = () => {
+    console.log('레이즈 눌렀다잉');
+    if (stompClient) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ACTION`,
+        {},
+        JSON.stringify({
+          action: 'RAISE',
+          nickname: decode.nickname,
+          point: 5,
+        }),
+      );
+    }
+  };
+
   useEffect(() => {
     console.log('나 들어왔는데 넌 누구니?', gameUserInfo);
     console.log('난 호스트야 이것들아', hostUser);
@@ -146,6 +183,7 @@ function GameRoomTest() {
     console.log('니가 호스트인가보다', gameUserInfo.host);
     if (ourReady === 'ALL_READY') {
       stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+      setEndGame(false);
     }
   }, [ourReady]);
 
@@ -159,30 +197,50 @@ function GameRoomTest() {
     };
   }, []);
 
-  const checkBtn = () => {
-    console.log('체크 눌렀다잉');
-    if (stompClient) {
+  useEffect(() => {
+    if (decode.nickname === joinNickname) {
+      if (!!gameUserInfo.participant) {
+        alert('내가 방금 들어옴');
+      }
+    }
+  }, [joinNickname]);
+
+  useEffect(() => {
+    if (stompClient && reStart) {
+      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+    }
+  }, [reStart]);
+
+  useEffect(() => {
+    if (stompClient && endRound) {
+      stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
+    }
+  }, [endRound]);
+
+  useEffect(() => {
+    console.log('어벤져스 엔드게임');
+    if (stompClient && endGame) {
+      console.log('여기는 조건문 내부 어벤져스 엔드게임');
       stompClient.send(
-        `/app/gameRoom/${gameId}/ACTION`,
+        `/app/gameRoom/${gameId}/GAME_END`,
         {},
-        JSON.stringify({ action: 'CHECK', nickname: decode.nickname }),
+        JSON.stringify({}),
       );
     }
-  };
-  const raiseBtn = () => {
-    console.log('체크 눌렀다잉');
-    if (stompClient) {
+  }, [endGame]);
+
+  useEffect(() => {
+    if (stompClient && userChoice) {
       stompClient.send(
-        `/app/gameRoom/${gameId}/ACTION`,
+        `/app/gameRoom/${gameId}/USER_CHOICE`,
         {},
         JSON.stringify({
-          action: 'RAISE',
           nickname: decode.nickname,
-          point: 5,
+          userChoice: 'PLAY_AGAIN',
         }),
       );
     }
-  };
+  }, [userChoice]);
 
   return (
     <GameRoomTestContainer>
@@ -238,7 +296,15 @@ function GameRoomTest() {
       >
         레이즈
       </button>
-      <button onClick={() => {}}>다이</button>
+      <button
+        onClick={() => {
+          dieBtn();
+        }}
+      >
+        다이
+      </button>
+      <p>내 카드: {}</p>
+      <p>니 카드: {}</p>
     </GameRoomTestContainer>
   );
 }

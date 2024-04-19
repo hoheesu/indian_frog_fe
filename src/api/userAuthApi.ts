@@ -80,6 +80,7 @@ export const refreshToken = async () => {
     const response = await authInstance.post('/token/refresh', {
       withCredentials: true,
     });
+    console.log(response);
     const accessToken = response?.headers.authorization;
     localStorage.setItem('accessToken', accessToken);
     return response.data.accessToken;
