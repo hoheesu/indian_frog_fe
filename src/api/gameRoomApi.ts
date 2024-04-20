@@ -30,12 +30,20 @@ export const getGameRoomsList = async (pageNum: number) => {
 export const joinGameRoom = async (gameRoomId: number) => {
   try {
     const response = await authInstance.post(`/gameRoom/${gameRoomId}/join`);
-    console.log(response);
     return response.data;
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
       return axiosError.response;
     }
+  }
+};
+
+export const gameRoomInfo = async (gameRoomId: number) => {
+  try {
+    const response = await authInstance.get(`/gameRoom/${gameRoomId}`);
+    return response.data.data;
+  } catch (error) {
+    throw error;
   }
 };

@@ -9,12 +9,12 @@ import IconJoinroom from '../../assets/images/icons/icon-joinroom.svg';
 import IconPlusroom from '../../assets/images/icons/icon-plusroom.svg';
 import ImgListleaf from '../../assets/images/img-listicon.svg';
 import ImgListleaf2 from '../../assets/images/img-listicon2.svg';
+
 function Main() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const navigate = useNavigate();
   const gameRoomsList = useGetGameRoomsList(0);
   const useJoinRoom = useJoinRoomMutation();
-
   const handleCreateRoomOnclick = () => {
     useSetIsModalClick('createRoom');
   };
