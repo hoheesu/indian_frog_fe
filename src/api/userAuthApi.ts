@@ -81,9 +81,21 @@ export const refreshToken = async () => {
       withCredentials: true,
     });
     const accessToken = response?.headers.authorization;
+
     localStorage.setItem('accessToken', accessToken);
     return response.data.accessToken;
   } catch (err) {
     throw err;
+  }
+};
+export const getUserPoint = async () => {
+  try {
+    const { data } = await authInstance.get(`/point`);
+    return data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      return axiosError.response;
+    }
   }
 };

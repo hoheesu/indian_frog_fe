@@ -3,7 +3,10 @@ import Button from '../../components/layout/form/Button';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGetGameRoomsList } from '../../hooks/useQuery';
 import { useNavigate } from 'react-router-dom';
-import { useJoinRoomMutation } from '../../hooks/useMutation';
+import {
+  useCreateRoomMutation,
+  useJoinRoomMutation,
+} from '../../hooks/useMutation';
 
 import IconJoinroom from '../../assets/images/icons/icon-joinroom.svg';
 import IconPlusroom from '../../assets/images/icons/icon-plusroom.svg';
@@ -14,6 +17,7 @@ function Main() {
   const navigate = useNavigate();
   const gameRoomsList = useGetGameRoomsList(0);
   const useJoinRoom = useJoinRoomMutation();
+  console.log(gameRoomsList.data);
 
   const handleCreateRoomOnclick = () => {
     useSetIsModalClick('createRoom');

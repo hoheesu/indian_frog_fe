@@ -131,13 +131,13 @@ const MyState = styled.div`
 `;
 const GameWrap = styled.div`
   position: relative;
-  top: 100px;
+  padding-top: 100px;
   background: linear-gradient(
     180deg,
     rgba(163, 231, 111, 1) 0%,
     rgba(210, 239, 139, 1) 100%
   );
-  height: calc(100vh - 100px);
+  height: 100vh;
   overflow: hidden;
 `;
 const GameRoom = styled.div`

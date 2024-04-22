@@ -6,6 +6,9 @@ import RankingModal from './RankingModal';
 import SignupModal from './SignupModal';
 import CreateRoomModal from './CreateRoomModal';
 import HowtoModal from './HowtoModal';
+import LogoutModal from './LogoutModal';
+import PointChargeModal from './PointChargeModal';
+import UpdateImgModal from './UpdateImgModal';
 
 function ModalTemplate() {
   const useIsModal = useIsModalStore((state) => state.isModal);
@@ -16,6 +19,8 @@ function ModalTemplate() {
           switch (useIsModal) {
             case 'login':
               return <LoginModal />;
+            case 'logout':
+              return <LogoutModal />;
             case 'members':
               return <MembersModal />;
             case 'ranking':
@@ -26,6 +31,11 @@ function ModalTemplate() {
               return <CreateRoomModal />;
             case 'howto':
               return <HowtoModal />;
+            case 'pointCharge':
+              return <PointChargeModal />;
+            case 'updateImg':
+              return <UpdateImgModal />;
+
             default:
               return <p>{useIsModal}</p>;
           }
@@ -98,6 +108,7 @@ const ModalContainer = styled.div`
       font-weight: 500;
     }
     + button {
+      display: flex;
       margin: 20px auto 0;
       text-align: center;
       > p {
