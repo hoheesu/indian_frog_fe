@@ -13,6 +13,7 @@ function LandingPage() {
         <H1>
           <img src={ImgLogo} alt="" />
         </H1>
+
         <Button isBorder={true} onClickFnc={() => navigate('/main')}>
           <p>
             <img src={ImgStart} alt="" />
@@ -22,6 +23,7 @@ function LandingPage() {
     </LandingWrap>
   );
 }
+
 const LandingWrap = styled.div`
   width: 100%;
   height: 100vh;

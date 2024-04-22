@@ -31,7 +31,7 @@ const GlobalStyles = createGlobalStyle`
     padding: 0;
     border: 0;
     font-size: 100%;
-   font-family: 'Pretendard-Regular';
+   font-family: 'Pretendard Regular';
     vertical-align: baseline;
   }
   /* HTML5 display-role reset for older browsers */
@@ -69,6 +69,9 @@ const GlobalStyles = createGlobalStyle`
   input:focus {
     outline: none;
   }
-
+a {
+  color: inherit;
+  text-decoration: none;
+}
 `;
 export default GlobalStyles;

@@ -7,6 +7,7 @@ import RuleGuidePage from '../pages/RuleGuidePage/RuleGuidePage';
 import RankingPage from '../pages/RankingPage/RankingPage';
 import GameRoomPage from '../pages/GameRoomPage/GameRoomPage';
 import GameRoomTest from '../pages/GameRoomTest';
+import Mypage from '../pages/Mypage/Mypage';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -43,6 +44,14 @@ export const router = createBrowserRouter([
         element: (
           <ProtectedRoute>
             <GameRoomPage />
+          </ProtectedRoute>
+        ),
+      },
+      {
+        path: '/myPage',
+        element: (
+          <ProtectedRoute>
+            <Mypage />
           </ProtectedRoute>
         ),
       },

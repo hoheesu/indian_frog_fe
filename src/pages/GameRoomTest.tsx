@@ -45,6 +45,8 @@ function GameRoomTest() {
 
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken'); // AccessToken (로컬스토리지)
+  const [messageArea, setMessageArea] = useState<Message[]>([]);
+  const [messageContent, setMessageContent] = useState('');
   // const gameUserInfo = useGameRoomInfoStore((state) => state.gameInfo); // [REST] join할때 받은 response 데이터
   // const hostUser = useHostUserInfoStore((state) => state.hostUserInfo); // [REST] 방을 만들때 받은 response 데이터
   const navigate = useNavigate();
@@ -57,38 +59,69 @@ function GameRoomTest() {
     sub: 'string';
   } = jwtDecode(authToken!);
 
-  const connect = () => {
-    // WS 커넥트
-    if (decode.nickname && gameId) {
-      const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`);
-      const client = Stomp.over(socket);
-      client.connect(
-        { Authorization: authToken },
-        () => {
-          client.subscribe(`/topic/gameRoom/${gameId}`, onReceived); // 게임룸 기본 구독주소
-          client.subscribe(`/user/queue/gameInfo`, gameRecevied); // 게임시작할때 카드정보 받는 구독주소
-          client.subscribe(`/user/queue/endRoundInfo`, gameRecevied); // 라운드 끝나고 받는 정보
-          client.subscribe(`/user/queue/endGameInfo`, gameRecevied); // 게임이 종료된 후 받는 정보
-          client.send(
-            // 커넥트와 동시에 JOIN 메세지 보내는 send요청
-            `/app/chat.addUser/${gameId}`,
-            {},
-            JSON.stringify({ sender: decode.nickname, type: 'JOIN' }),
-          );
-          setStompClient(client);
-        },
-        function (error: any) {
-          console.log('ConnectError ===>' + error);
-        },
-      );
-    }
-  };
+  //메시지 타입지정
+  interface Message {
+    sender: string;
+    content: string;
+    type: string;
+  }
+
+  useEffect(() => {
+    const connect = () => {
+      if (decode.nickname && gameId) {
+        const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
+        const client = Stomp.over(socket);
+        client.connect(
+          { Authorization: authToken },
+          () => {
+            client.subscribe(`/topic/gameRoom/${gameId}`, onReceived);
+            client.subscribe(`/user/queue/gameInfo`, gameRecevied);
+            client.subscribe(`/user/queue/endRoundInfo`, gameRecevied); // 라운드 끝나고 받는 정보
+            client.subscribe(`/user/queue/endGameInfo`, gameRecevied); // 게임이 종료된 후 받는 정보
+            // 채팅방 접속시
+            client.send(
+              `/app/chat.addUser/${gameId}`,
+              {},
+              JSON.stringify({ sender: decode.nickname, type: 'JOIN' }),
+            );
+            setStompClient(client);
+          },
+          (error: any) => {
+            console.log('Connect error:', error);
+          },
+        );
+      }
+    };
+    connect();
+    return () => {
+      if (stompClient) {
+        // 퇴장
+        stompClient.send(
+          `/app/${gameId}/leave`,
+          { Authorization: authToken },
+          JSON.stringify({ sender: decode.nickname, type: 'LEAVE' }),
+        );
+        stompClient.disconnect();
+      }
+    };
+  }, [decode.nickname, gameId, authToken]);
 
   const onReceived = async (payload: any) => {
     try {
-      const message: any = await JSON.parse(payload.body);
+      const message: any = (await JSON.parse(payload.body)) as Message;
       console.log('payloadMessage -->', message);
       setOurReady(message.gameState);
+      // 채팅목록, 로컬스토리지에 저장
+      if (
+        message.type === 'CHAT' ||
+        message.type === 'JOIN' ||
+        message.type === 'LEAVE'
+      ) {
+        setMessageArea((prev) => {
+          const updatedMessages = [...prev, message];
+          return updatedMessages;
+        });
+      }
       if (message.type === 'JOIN') {
         gameRoomInfoUpdate();
         setJoinNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
@@ -320,16 +353,35 @@ function GameRoomTest() {
     }
   }, [userChoice]);
 
-  useEffect(() => {
-    //^ 첫번째 마운트 상황에서 실행하는 Effect
-    connect();
-    return () => {
-      if (stompClient) {
-        console.log('나 언마운트~');
-        leaveBtn();
-      }
-    };
-  }, []);
+  // useEffect(() => {
+  //   //^ 첫번째 마운트 상황에서 실행하는 Effect
+  //   connect();
+  //   return () => {
+  //     if (stompClient) {
+  //       console.log('나 언마운트~');
+  //       leaveBtn();
+  //     }
+  //   };
+  // }, []);
+  // 채팅기능
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (messageContent && stompClient && gameId && decode.nickname) {
+      const chatMessage: Message = {
+        sender: decode.nickname,
+        content: messageContent,
+        type: 'CHAT',
+      };
+
+      stompClient.send(
+        `/app/chat.sendMessage/${gameId}`,
+        {},
+        JSON.stringify(chatMessage),
+      );
+
+      setMessageContent('');
+    }
+  };
   return (
     <GameRoomTestContainer>
       <div>GameRoomTest</div>
@@ -395,6 +447,31 @@ function GameRoomTest() {
         }}
       >
         다이
+      </button>
+      <div style={{ background: '#fff' }}>
+        {messageArea.map((msg, index) => (
+          <div key={index}>
+            {msg.type === 'JOIN' ? (
+              <p>{msg.sender}님이 접속하셨습니다.</p>
+            ) : msg.type === 'LEAVE' ? (
+              <p>{msg.sender}님이 퇴장하셨습니다.</p>
+            ) : (
+              <p>
+                <strong>{msg.sender}:</strong> {msg.content}
+              </p>
+            )}
+          </div>
+        ))}
+      </div>
+      <form onSubmit={handleSendMessage}>
+        <input
+          style={{ background: '#fff', height: '50px' }}
+          value={messageContent}
+          onChange={(e) => setMessageContent(e.target.value)}
+        />
+      </form>
+      <button onClick={handleSendMessage} style={{ background: '#ddd' }}>
+        Send
       </button>
       <div>
         <p>

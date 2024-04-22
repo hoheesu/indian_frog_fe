@@ -10,8 +10,8 @@ function App() {
   const useIsModal = useIsModalStore((state) => state.isModal);
   return (
     <>
-      <GlobalStyles />
       <GlobalFonts />
+      <GlobalStyles />
       <Header />
       <Outlet />
       {useIsModal && (
