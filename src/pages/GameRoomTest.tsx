@@ -108,7 +108,7 @@ function GameRoomTest() {
 
   const onReceived = async (payload: any) => {
     try {
-      const message = (await JSON.parse(payload.body)) as Message;
+      const message: any = (await JSON.parse(payload.body)) as Message;
       console.log('payloadMessage -->', message);
       setOurReady(message.gameState);
       // 채팅목록, 로컬스토리지에 저장
