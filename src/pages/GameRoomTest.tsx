@@ -40,6 +40,7 @@ function GameRoomTest() {
   const [yourCard, setYourCard] = useState('');
   const [roundPoint, setRoundPoint] = useState(0);
   const [action, setAction] = useState('');
+  console.log(action);
   const [turn, setTurn] = useState(false);
 
   const { gameId } = useParams(); // 게임방 아이디

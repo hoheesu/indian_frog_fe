@@ -32,17 +32,18 @@ const GameRoomPage = () => {
   const [userPoint, setUserPoint] = useState<number>(0); // 접속한 유저의 포인트
   const [relativeNickname, setRelativeNickname] = useState<string | null>(); // 상대방 닉네임
   const [relativePoint, setRelativePoint] = useState<number>(0); // 상대방 포인트
-  const [userState, setUserState] = useState('');
+  // const [userState, setUserState] = useState('');
   const [userReady, setUserReady] = useState(false); // 내 레디상테
 
   const [ourReady, setOurReady] = useState(''); // 우리의 레디상태 (READY, UNREADY, NO_ONE_READY, ALLREADY)
 
   const [userChoice, setUserChoice] = useState(false); // 게임을 나갈건지 재시작할지 결정
   const [reStart, setReStart] = useState(false); // 다음 라운드 시작
-
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
+
+  console.log(reStart, userChoice, userType);
 
   const userInfoDecode: {
     auth: string;
