@@ -2,22 +2,53 @@ import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
-import { useGameRoomInfoStore } from '../store/modal/CreateModalStore';
 import SockJS from 'sockjs-client';
 import styled from 'styled-components';
+// import { useGameRoomInfoStore } from '../store/modal/GameRoomInfoStore';
+// import { useHostUserInfoStore } from '../store/modal/HostUserInfo';
+import { gameRoomInfo } from '../api/gameRoomApi';
+
+interface GameRoomInfo {
+  hostImageUrl: string;
+  hostNickname: string | null;
+  hostPoints: number;
+  participantImageUrl: string | null;
+  participantNickname: string | null;
+  participantPoints: number;
+  gameState: string;
+  participantCount: number;
+  roomId: number;
+  roomName: string;
+}
 
 function GameRoomTest() {
-  const [myReady, setMyReady] = useState(false);
-  const [ourReady, setOurReady] = useState('');
-  const [gameState, setGameState] = useState('');
+  const [stompClient, setStompClient] = useState<any>(null); // Stomp
+  const [myReady, setMyReady] = useState(false); // 내 레디상테
+  const [ourReady, setOurReady] = useState(''); // 우리의 레디상태 (READY, UNREADY, NO_ONE_READY, ALLREADY)
+  const [gameState, setGameState] = useState(''); // 게임상태
+  const [joinNickname, setJoinNickname] = useState(''); // 최근 참여자 닉네임
+  const [endRound, setEndRound] = useState(false); // 라운드 종료
+  const [endGame, setEndGame] = useState(false); // 게임 종료
+  const [userChoice, setUserChoice] = useState(false); // 게임을 나갈건지 재시작할지 결정
+  const [reStart, setReStart] = useState(false); // 다음 라운드 시작
 
-  const { gameId } = useParams();
-  const authToken = localStorage.getItem('accessToken');
-  const [stompClient, setStompClient] = useState<any>(null);
-  // const [connecting, setConnecting] = useState<boolean>(false);
+  const [userInfo, setUserInfo] = useState<GameRoomInfo>(); // 유저 타입 (host / guest)
+  const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
+  const [yourNickname, setYourNickname] = useState<string | null>(); // 상대방 닉네임
+  const [yourPoint, setYourPoint] = useState<number>(0); // 상대방 포인트
+  const [myPoint, setMyPoint] = useState<number>(0); // 접속한 유저의 포인트
+  const [yourCard, setYourCard] = useState('');
+  const [roundPoint, setRoundPoint] = useState(0);
+  const [action, setAction] = useState('');
+  console.log(action);
+  const [turn, setTurn] = useState(false);
 
+  const { gameId } = useParams(); // 게임방 아이디
+  const authToken = localStorage.getItem('accessToken'); // AccessToken (로컬스토리지)
+  // const gameUserInfo = useGameRoomInfoStore((state) => state.gameInfo); // [REST] join할때 받은 response 데이터
+  // const hostUser = useHostUserInfoStore((state) => state.hostUserInfo); // [REST] 방을 만들때 받은 response 데이터
   const navigate = useNavigate();
-  const gameUserInfo = useGameRoomInfoStore((state) => state.gameInfo);
+
   const decode: {
     auth: string;
     exp: number;
@@ -27,20 +58,23 @@ function GameRoomTest() {
   } = jwtDecode(authToken!);
 
   const connect = () => {
+    // WS 커넥트
     if (decode.nickname && gameId) {
-      // setConnecting(true);
-      const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`); // baseurl -> 서버주소
+      const socket = new SockJS(`${import.meta.env.VITE_SERVER_BASE_URL}/ws`);
       const client = Stomp.over(socket);
       client.connect(
         { Authorization: authToken },
         () => {
-          client.subscribe(`/topic/gameRoom/${gameId}`, onReceived);
-          client.subscribe(`/user/queue/gameInfo`, gameRecevied);
+          client.subscribe(`/topic/gameRoom/${gameId}`, onReceived); // 게임룸 기본 구독주소
+          client.subscribe(`/user/queue/gameInfo`, gameRecevied); // 게임시작할때 카드정보 받는 구독주소
+          client.subscribe(`/user/queue/endRoundInfo`, gameRecevied); // 라운드 끝나고 받는 정보
+          client.subscribe(`/user/queue/endGameInfo`, gameRecevied); // 게임이 종료된 후 받는 정보
           client.send(
+            // 커넥트와 동시에 JOIN 메세지 보내는 send요청
             `/app/chat.addUser/${gameId}`,
             {},
             JSON.stringify({ sender: decode.nickname, type: 'JOIN' }),
-          ); // uri\
+          );
           setStompClient(client);
         },
         function (error: any) {
@@ -50,23 +84,83 @@ function GameRoomTest() {
     }
   };
 
-  //   stompClient.connect({}, function(frame) {
-  //     // 게임 시작 메시지 전송
-  //     stompClient.send("/app/gameRoom/1/START", {}, JSON.stringify({}));
-  // });
-  const onReceived = (payload: any) => {
+  const onReceived = async (payload: any) => {
     try {
-      const message: any = JSON.parse(payload.body);
+      const message: any = await JSON.parse(payload.body);
       console.log('payloadMessage -->', message);
       setOurReady(message.gameState);
+      if (message.type === 'JOIN') {
+        gameRoomInfoUpdate();
+        setJoinNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
+      }
+      if (message.gameState === 'START') {
+        // START요청 보내고 받았을 때,
+        setReStart(true); // 라운드 시작 요청
+        setUserChoice(false); // userChoice 초기화
+      }
+      if (message.nextState === 'END') {
+        // 라운드 종료시
+        setEndRound(true); // 라운드 종료 요청
+        setReStart(false); // 라운드 시작 초기화
+      }
+      if (message.pot) {
+        setRoundPoint(message.pot);
+      }
+      if (message.nowBet) {
+        setRoundPoint(message.pot);
+      }
+      if (message.currentPlayer) {
+        setTurn(message.currentPlayer === decode.nickname ? true : false);
+      }
+      if (message.nowState === 'ACTION') {
+        if (message.actionType === 'CHECK') {
+          setAction('쨰끄');
+        }
+        if (message.actionType === 'RAISE') {
+          setAction('레이즈');
+        }
+        if (message.actionType === 'DIE') {
+          setAction('따이');
+        }
+      }
+      if (message.nextState === 'ACTION') {
+      }
+      if (message.nowState === 'END') {
+        alert(
+          `${message.round}라운드 ${message.roundWinner === decode.nickname ? '승리' : '패배'}`,
+        );
+      }
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
     }
   };
+
   const gameRecevied = (payload: any) => {
     try {
       const message: any = JSON.parse(payload.body);
       console.log('*** gameState payload -->', message);
+      if (message.nextState === 'START') {
+        // 게임라운드 시작할 때,
+        setReStart(true); // 라운드 시작
+        setEndRound(false); // 라운드 종료 초기화
+      }
+      if (message.nextState === 'GAME_END') {
+        setEndGame(true); // 게임종료
+      }
+      if (message.nextState === 'USER_CHOICE') {
+        setUserChoice(true); // 게임종료후 유저 선택
+      }
+      if (message.playerCard) {
+        setYourCard(message.playerCard);
+      }
+      if (message.roundPot) {
+        setRoundPoint(message.roundPot);
+      }
+      if (message.firstBet) {
+        setMyPoint((prevState) => prevState - message.firstBet);
+        setYourPoint((prevState) => prevState - message.firstBet);
+        console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
+      }
       setGameState(message.gameState);
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
@@ -74,6 +168,7 @@ function GameRoomTest() {
   };
 
   const readyBtn = () => {
+    // 레디 버튼 눌렀을때
     console.log('레디버튼 눌렀다잉');
     if (stompClient) {
       setMyReady((prev) => !prev);
@@ -86,15 +181,18 @@ function GameRoomTest() {
   };
 
   const leaveBtn = () => {
-    console.log('나가기버튼 눌렀다잉');
     stompClient.send(
       `/app/${gameId}/leave`,
       { Authorization: authToken },
       JSON.stringify({ sender: decode.nickname }),
     );
+    if (stompClient) {
+      stompClient.disconnect();
+    }
     navigate('/main');
   };
-  const sendMessage = () => {
+
+  const startClickBtn = () => {
     const chatMessage = {
       content: 'messageContent',
       sender: decode.nickname,
@@ -106,47 +204,132 @@ function GameRoomTest() {
       JSON.stringify(chatMessage),
     );
   };
-  useEffect(() => {
-    connect();
-    console.log('넌 도대체 어디 있니?', gameUserInfo);
-  }, [gameUserInfo]);
+
+  const checkBtn = () => {
+    if (stompClient) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ACTION`,
+        {},
+        JSON.stringify({ action: 'CHECK', nickname: decode.nickname }),
+      );
+    }
+  };
+
+  const dieBtn = () => {
+    if (stompClient) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ACTION`,
+        {},
+        JSON.stringify({ action: 'DIE', nickname: decode.nickname }),
+      );
+    }
+  };
+
+  const raiseBtn = () => {
+    if (stompClient) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ACTION`,
+        {},
+        JSON.stringify({
+          action: 'RAISE',
+          nickname: decode.nickname,
+          point: 5,
+        }),
+      );
+    }
+  };
+  const gameRoomInfoUpdate = async () => {
+    try {
+      const result = await gameRoomInfo(Number(gameId));
+      setUserInfo(result);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
+    // ALL_READY가 들어올때 게임을 실행하는 Effect
     if (ourReady === 'ALL_READY') {
-      // stompClient.publish({
-      //   destination: `/app/gameRoom/${gameId}/START`,
-      //   body: JSON.stringify({}),
-      // });
-      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+      // stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+      setReStart(true);
+      setEndGame(false);
     }
   }, [ourReady]);
 
-  // 채팅
+  useEffect(() => {
+    // 유저정보가 변경될 때, 실행하는 Effect
+    console.log('방 정보 갖고왔다 이제야', userInfo);
+  }, [userInfo]);
 
-  // console.log(messageArea);
+  useEffect(() => {
+    if (decode.nickname === joinNickname) {
+      if (decode.nickname === userInfo?.hostNickname) {
+        setUserType('host');
+        setMyPoint(userInfo?.hostPoints);
+      }
+      if (decode.nickname === userInfo?.participantNickname) {
+        setUserType('guest');
+        setMyPoint(userInfo?.participantPoints);
+        setYourNickname(userInfo?.hostNickname);
+        setYourPoint(userInfo?.hostPoints);
+      }
+    } else {
+      if (userInfo?.participantCount === 2) {
+        setUserType('host');
+        setMyPoint(userInfo?.hostPoints);
+        setYourNickname(userInfo?.participantNickname);
+        setYourPoint(userInfo?.participantPoints);
+      }
+    }
+  }, [userInfo]);
 
-  // const handleSendMessage = () => {
-  //   if (messageContent && client && gameId) {
-  //     const chatMessage = {
-  //       content: messageContent,
-  //       sender: decode.nickname,
-  //       type: 'CHAT',
-  //     };
-  //     client.send(
-  //       `/app/chat.sendMessage/${gameId}`,
-  //       {},
-  //       JSON.stringify(chatMessage),
-  //     );
-  //     setMessageContent('');
-  //   }
-  // };
-  // const handleKeyPress = (e: any) => {
-  //   if (e.key === 'Enter') {
-  //     handleSendMessage();
-  //     e.preventDefault();
-  //   }
-  // };
+  useEffect(() => {
+    if (stompClient && reStart) {
+      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+    }
+  }, [reStart]);
 
+  useEffect(() => {
+    if (stompClient && endRound) {
+      stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
+    }
+  }, [endRound]);
+
+  useEffect(() => {
+    console.log('어벤져스 엔드게임');
+    if (stompClient && endGame) {
+      console.log('여기는 조건문 내부 어벤져스 엔드게임');
+      stompClient.send(
+        `/app/gameRoom/${gameId}/GAME_END`,
+        {},
+        JSON.stringify({}),
+      );
+    }
+  }, [endGame]);
+
+  useEffect(() => {
+    if (stompClient && userChoice) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/USER_CHOICE`,
+        {},
+        JSON.stringify({
+          nickname: decode.nickname,
+          userChoice: 'PLAY_AGAIN',
+        }),
+      );
+    }
+  }, [userChoice]);
+
+  useEffect(() => {
+    //^ 첫번째 마운트 상황에서 실행하는 Effect
+    connect();
+    return () => {
+      if (stompClient) {
+        console.log('나 언마운트~');
+        leaveBtn();
+      }
+    };
+  }, []);
   return (
     <GameRoomTestContainer>
       <div>GameRoomTest</div>
@@ -158,6 +341,13 @@ function GameRoomTest() {
         }}
       >
         Ready
+      </button>
+      <button
+        onClick={() => {
+          startClickBtn();
+        }}
+      >
+        시작
       </button>
       <button onClick={leaveBtn}>나가기</button>
       <p>나의 레디: {`${myReady}`}</p>
@@ -180,13 +370,43 @@ function GameRoomTest() {
       </p>
       <p>우리 레디: {ourReady}</p>
       <p>게임 상태: {gameState}</p>
+      {endRound ? (
+        <p>라운드 종료 정산중 ..</p>
+      ) : (
+        <p>{turn ? '니턴이야 골라' : '상대턴이야 기다려'}</p>
+      )}
       <button
         onClick={() => {
-          sendMessage();
+          checkBtn();
         }}
       >
-        채팅 버튼 눌렀다면?
+        체크
       </button>
+      <button
+        onClick={() => {
+          raiseBtn();
+        }}
+      >
+        레이즈
+      </button>
+      <button
+        onClick={() => {
+          dieBtn();
+        }}
+      >
+        다이
+      </button>
+      <div>
+        <p>
+          내 닉네임: {decode.nickname} / {userType.toUpperCase()}
+        </p>
+        <p>내 카드: {}</p>
+        <p>내 뽀인뜨: {myPoint}</p>
+        <p>니 닉네임: {yourNickname}</p>
+        <p>니 카드: {yourCard}</p>
+        <p>니 뽀인뜨: {yourPoint}</p>
+        <p>판돈: {roundPoint}</p>
+      </div>
     </GameRoomTestContainer>
   );
 }
