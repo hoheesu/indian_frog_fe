@@ -96,6 +96,10 @@ const ModalContainer = styled.div`
       margin-top: 30px;
       font-size: 18px;
       font-weight: 500;
+      &:disabled {
+        background-color: #ddd;
+        cursor: default;
+      }
     }
     + button {
       margin: 20px auto 0;

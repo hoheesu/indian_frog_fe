@@ -26,6 +26,8 @@ function SignupModal() {
   const [pwValid, setPwValid] = useState(false);
   const [emailDuplication, setEmailDuplication] = useState(false);
   const [nicknameDuplication, setNicknameDuplication] = useState(false);
+  const [userValid, setUserValid] = useState(true);
+
   const userInput = useDebounce(signupInput, 500);
 
   const handleInputOnchange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -50,12 +52,22 @@ function SignupModal() {
 
   // 닉네임 중복검사 디바운스
   useEffect(() => {
-    (async () => {
-      (await checkNicknameDuplication(userInput.nickname))
-        ? setNicknameDuplication(true)
-        : setNicknameDuplication(false);
-    })();
+    if (userInput.nickname.trim().length > 1) {
+      (async () => {
+        (await checkNicknameDuplication(userInput.nickname))
+          ? setNicknameDuplication(true)
+          : setNicknameDuplication(false);
+      })();
+    }
   }, [userInput.nickname]);
+
+  useEffect(() => {
+    if (emailDuplication && nicknameDuplication && pwValid) {
+      if (signupInput.password === signupInput.checkPassword) {
+        setUserValid(false);
+      } else setUserValid(true);
+    } else setUserValid(true);
+  }, [userInput]);
 
   const handleToLoginModal = () => {
     useSetIsModalClick('login');
@@ -107,11 +119,13 @@ function SignupModal() {
             placeholder="닉네임을 입력하세요"
             onChangeFnc={handleInputOnchange}
           />
-          {nicknameDuplication ? (
-            <p style={{ color: 'green' }}>사용가능한 닉네임입니다.</p>
-          ) : (
-            <p style={{ color: 'red' }}>중복된 닉네임입니다.</p>
-          )}
+          {signupInput.nickname.trim() ? (
+            nicknameDuplication ? (
+              <p style={{ color: 'green' }}>사용가능한 닉네임입니다.</p>
+            ) : (
+              <p style={{ color: 'red' }}>중복된 닉네임입니다.</p>
+            )
+          ) : null}
         </div>
         <div>
           <label>비밀번호</label>
@@ -145,7 +159,12 @@ function SignupModal() {
             <p style={{ color: 'red' }}>비밀번호가 일치하지 않습니다.</p>
           ) : null}
         </div>
-        <Button type="submit" isBorder={true} onClickFnc={handleSignupSubmit}>
+        <Button
+          type="submit"
+          isBorder={true}
+          onClickFnc={handleSignupSubmit}
+          disabled={userValid}
+        >
           <p>회원가입</p>
         </Button>
       </form>
