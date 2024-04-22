@@ -353,16 +353,16 @@ function GameRoomTest() {
     }
   }, [userChoice]);
 
-  useEffect(() => {
-    //^ 첫번째 마운트 상황에서 실행하는 Effect
-    connect();
-    return () => {
-      if (stompClient) {
-        console.log('나 언마운트~');
-        leaveBtn();
-      }
-    };
-  }, []);
+  // useEffect(() => {
+  //   //^ 첫번째 마운트 상황에서 실행하는 Effect
+  //   connect();
+  //   return () => {
+  //     if (stompClient) {
+  //       console.log('나 언마운트~');
+  //       leaveBtn();
+  //     }
+  //   };
+  // }, []);
   // 채팅기능
   const handleSendMessage = (e: React.FormEvent) => {
     e.preventDefault();
