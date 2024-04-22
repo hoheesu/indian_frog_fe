@@ -21,7 +21,7 @@ function Main() {
 
   const handleJoinRoomNumberOnClick = (roomNumber: number) => {
     useJoinRoom.mutate(roomNumber);
-    navigate(`/gameroomtest/${roomNumber}`);
+    navigate(`/gameroom/${roomNumber}`);
   };
   return (
     <RoomListsContainer>

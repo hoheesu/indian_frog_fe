@@ -35,10 +35,12 @@ function GameRoomTest() {
   const [userInfo, setUserInfo] = useState<GameRoomInfo>(); // 유저 타입 (host / guest)
   const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
   const [yourNickname, setYourNickname] = useState<string | null>(); // 상대방 닉네임
-  const [yourPoint, setYourPoint] = useState<number | null>(0); // 상대방 포인트
-  const [myPoint, setMyPoint] = useState<number | null>(0); // 접속한 유저의 포인트
+  const [yourPoint, setYourPoint] = useState<number>(0); // 상대방 포인트
+  const [myPoint, setMyPoint] = useState<number>(0); // 접속한 유저의 포인트
   const [yourCard, setYourCard] = useState('');
   const [roundPoint, setRoundPoint] = useState(0);
+  const [action, setAction] = useState('');
+  const [turn, setTurn] = useState(false);
 
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken'); // AccessToken (로컬스토리지)
@@ -100,6 +102,33 @@ function GameRoomTest() {
         setEndRound(true); // 라운드 종료 요청
         setReStart(false); // 라운드 시작 초기화
       }
+      if (message.pot) {
+        setRoundPoint(message.pot);
+      }
+      if (message.nowBet) {
+        setRoundPoint(message.pot);
+      }
+      if (message.currentPlayer) {
+        setTurn(message.currentPlayer === decode.nickname ? true : false);
+      }
+      if (message.nowState === 'ACTION') {
+        if (message.actionType === 'CHECK') {
+          setAction('쨰끄');
+        }
+        if (message.actionType === 'RAISE') {
+          setAction('레이즈');
+        }
+        if (message.actionType === 'DIE') {
+          setAction('따이');
+        }
+      }
+      if (message.nextState === 'ACTION') {
+      }
+      if (message.nowState === 'END') {
+        alert(
+          `${message.round}라운드 ${message.roundWinner === decode.nickname ? '승리' : '패배'}`,
+        );
+      }
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
     }
@@ -123,11 +152,13 @@ function GameRoomTest() {
       if (message.playerCard) {
         setYourCard(message.playerCard);
       }
-      if (message.roundPot || message.pot) {
+      if (message.roundPot) {
         setRoundPoint(message.roundPot);
       }
       if (message.firstBet) {
-        alert(`기본 배팅금액은 ${message.firstBet}point입니다.`);
+        setMyPoint((prevState) => prevState - message.firstBet);
+        setYourPoint((prevState) => prevState - message.firstBet);
+        console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
       }
       setGameState(message.gameState);
     } catch (error) {
@@ -216,7 +247,7 @@ function GameRoomTest() {
   };
 
   useEffect(() => {
-    //^ ALL_READY가 들어올때 게임을 실행하는 Effect
+    // ALL_READY가 들어올때 게임을 실행하는 Effect
     if (ourReady === 'ALL_READY') {
       // stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
       setReStart(true);
@@ -225,7 +256,7 @@ function GameRoomTest() {
   }, [ourReady]);
 
   useEffect(() => {
-    //^ 유저정보가 변경될 때, 실행하는 Effect
+    // 유저정보가 변경될 때, 실행하는 Effect
     console.log('방 정보 갖고왔다 이제야', userInfo);
   }, [userInfo]);
 
@@ -234,7 +265,6 @@ function GameRoomTest() {
       if (decode.nickname === userInfo?.hostNickname) {
         setUserType('host');
         setMyPoint(userInfo?.hostPoints);
-        console.log('작동~');
       }
       if (decode.nickname === userInfo?.participantNickname) {
         setUserType('guest');
@@ -339,6 +369,11 @@ function GameRoomTest() {
       </p>
       <p>우리 레디: {ourReady}</p>
       <p>게임 상태: {gameState}</p>
+      {endRound ? (
+        <p>라운드 종료 정산중 ..</p>
+      ) : (
+        <p>{turn ? '니턴이야 골라' : '상대턴이야 기다려'}</p>
+      )}
       <button
         onClick={() => {
           checkBtn();

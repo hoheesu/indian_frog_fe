@@ -34,7 +34,7 @@ export const useCreateRoomMutation = () => {
         hostName: data?.data.data.hostName,
         hostPoint: data?.data.data.myPoint,
       });
-      navigate(`/gameroomtest/${data?.data.data.roomId}`);
+      navigate(`/gameroom/${data?.data.data.roomId}`);
       useSetIsModalClick();
     },
     onError: (error) => {
@@ -52,7 +52,7 @@ export const useJoinRoomMutation = () => {
     mutationFn: joinGameRoom,
     onSuccess: async (data, roomNumber: number) => {
       useSetGameRoomInfo(data);
-      navigate(`/gameroomtest/${roomNumber}`);
+      navigate(`/gameroom/${roomNumber}`);
     },
     onError: (error) => {
       alert(error.message);
