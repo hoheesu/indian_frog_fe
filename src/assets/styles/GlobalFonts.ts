@@ -63,7 +63,7 @@ const GlobalFonts = createGlobalStyle`
     font-style: bold;
     font-display: swap;
   }
-  
+
 `;
 
 export default GlobalFonts;

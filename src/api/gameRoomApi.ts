@@ -5,7 +5,7 @@ import { ErrorResponse } from 'react-router-dom';
 export const createGameRoom = async (roomInput: { roomName: string }) => {
   try {
     const response = await authInstance.post('/gameRoom/create', roomInput);
-    return response;
+    return response.data.data;
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
