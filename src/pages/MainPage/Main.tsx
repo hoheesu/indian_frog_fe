@@ -3,29 +3,25 @@ import Button from '../../components/layout/form/Button';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGetGameRoomsList } from '../../hooks/useQuery';
 import { useNavigate } from 'react-router-dom';
-import {
-  useCreateRoomMutation,
-  useJoinRoomMutation,
-} from '../../hooks/useMutation';
+import { useJoinRoomMutation } from '../../hooks/useMutation';
 
 import IconJoinroom from '../../assets/images/icons/icon-joinroom.svg';
 import IconPlusroom from '../../assets/images/icons/icon-plusroom.svg';
 import ImgListleaf from '../../assets/images/img-listicon.svg';
 import ImgListleaf2 from '../../assets/images/img-listicon2.svg';
+
 function Main() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const navigate = useNavigate();
   const gameRoomsList = useGetGameRoomsList(0);
   const useJoinRoom = useJoinRoomMutation();
-  console.log(gameRoomsList.data);
-
   const handleCreateRoomOnclick = () => {
     useSetIsModalClick('createRoom');
   };
 
   const handleJoinRoomNumberOnClick = (roomNumber: number) => {
     useJoinRoom.mutate(roomNumber);
-    navigate(`/gameroomtest/${roomNumber}`);
+    navigate(`/gameroom/${roomNumber}`);
   };
   return (
     <RoomListsContainer>

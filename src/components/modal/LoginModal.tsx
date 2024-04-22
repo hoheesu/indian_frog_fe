@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import Input from '../layout/form/Input';
 import ClosedModalButton from './ClosedModalButton';
 import Button from '../layout/form/Button';
@@ -18,6 +18,7 @@ function LoginModal() {
   const useLoginSubmit = useLoginSubmitMutation();
   const [emailValid, setEmailValid] = useState(false);
   const [pwValid, setPwValid] = useState(false);
+  const [userValid, setUserValid] = useState(true);
   const [loginInput, setLoginInput] = useState({
     email: '',
     password: '',
@@ -43,6 +44,11 @@ function LoginModal() {
   const handleToSignupModal = () => {
     useSetIsModalClick('signup');
   };
+  useEffect(() => {
+    if (emailValid && pwValid) {
+      setUserValid(false);
+    } else setUserValid(true);
+  }, [loginInput]);
 
   return (
     <>
@@ -88,7 +94,12 @@ function LoginModal() {
           )}
         </div>
 
-        <Button isBorder={true} onClickFnc={handleLoginSubmit} type="submit">
+        <Button
+          isBorder={true}
+          onClickFnc={handleLoginSubmit}
+          type="submit"
+          disabled={userValid}
+        >
           <p>로그인</p>
         </Button>
       </form>
