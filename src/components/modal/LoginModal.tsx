@@ -7,7 +7,10 @@ import {
   emailValidCheck,
   passwordValidCheck,
 } from '../../utils/inputValidCheck';
-import { useLoginSubmitMutation } from '../../hooks/useMutation';
+import {
+  useLoginSubmitMutation,
+  useSnsLoginSubmitMutation,
+} from '../../hooks/useMutation';
 import styled from 'styled-components';
 import IconSnsNaver from '../../assets/images/icons/icon-sns-naver.svg';
 import IconSnsGoogle from '../../assets/images/icons/icon-sns-google.svg';
@@ -16,6 +19,7 @@ import IconSnsKakao from '../../assets/images/icons/icon-sns-kakao.svg';
 function LoginModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const useLoginSubmit = useLoginSubmitMutation();
+  const useSnsLoginSubmit = useSnsLoginSubmitMutation();
   const [emailValid, setEmailValid] = useState(false);
   const [pwValid, setPwValid] = useState(false);
   const [userValid, setUserValid] = useState(true);
@@ -49,6 +53,11 @@ function LoginModal() {
       setUserValid(false);
     } else setUserValid(true);
   }, [loginInput]);
+
+  const handleSnsLoginSubmit = async (snsName: string) => {
+    useSnsLoginSubmit.mutate(snsName);
+    useSetIsModalClick();
+  };
 
   return (
     <>
@@ -114,17 +123,26 @@ function LoginModal() {
         <h3>간편하게 시작하기</h3>
         <ul>
           <li className="sns-naver">
-            <Button isBorder={false} onClickFnc={() => {}}>
+            <Button
+              isBorder={false}
+              onClickFnc={() => handleSnsLoginSubmit('naver')}
+            >
               <p>네이버로 시작하기</p>
             </Button>
           </li>
           <li className="sns-google">
-            <Button isBorder={false} onClickFnc={() => {}}>
+            <Button
+              isBorder={false}
+              onClickFnc={() => handleSnsLoginSubmit('google')}
+            >
               <p>구글로 시작하기</p>
             </Button>
           </li>
           <li className="sns-kakao">
-            <Button isBorder={false} onClickFnc={() => {}}>
+            <Button
+              isBorder={false}
+              onClickFnc={() => handleSnsLoginSubmit('kakao')}
+            >
               <p>카카오로 시작하기</p>
             </Button>
           </li>

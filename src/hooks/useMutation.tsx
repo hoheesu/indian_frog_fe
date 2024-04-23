@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { loginUser } from '../api/userAuthApi';
+import { loginUser, snsLoginUser } from '../api/userAuthApi';
 import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
@@ -89,6 +89,21 @@ export const useUpdateProfileMutation = () => {
     mutationFn: updateProfile,
     onSuccess: (data: { userImgUrl: string }) => {
       setUserImgUrl(data.userImgUrl);
+      queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+};
+export const useSnsLoginSubmitMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: snsLoginUser,
+    onSuccess: (data) => {
+      const accessToken = data?.headers.authorization;
+      localStorage.setItem('accessToken', accessToken);
+      alert(data?.data.message);
       queryClient.invalidateQueries();
     },
     onError: (error) => {

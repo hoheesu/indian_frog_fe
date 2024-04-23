@@ -37,7 +37,11 @@ export const router = createBrowserRouter([
       },
       {
         path: '/ranking',
-        element: <RankingPage />,
+        element: (
+          <ProtectedRoute>
+            <RankingPage />
+          </ProtectedRoute>
+        ),
       },
       {
         path: '/gameroom/:gameId',

@@ -7,12 +7,14 @@ import IconArrowRight from '../../assets/images/icons/icon-arrow-right.svg';
 import IconRanking from '../../assets/images/icons/icon-ranking.svg';
 import IconCoin from '../../assets/images/icons/icon-coin-rotate.svg';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
+import { useNavigate } from 'react-router-dom';
 const Mypage = () => {
   const myPageInfo = useGetMypageInfo();
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const handleModalOpen = (type?: string) => {
     type ? useSetIsModalClick(type) : useSetIsModalClick();
   };
+  const navigate = useNavigate();
   return (
     <>
       <MypageWrap>
@@ -46,7 +48,9 @@ const Mypage = () => {
                 <span>{myPageInfo.data?.ranking}</span>위
               </p>
             </ItemBox>
-            <ArrowLink onClick={() => {}}>1 ~ 50위 보기</ArrowLink>
+            <ArrowLink onClick={() => navigate('/ranking')}>
+              전체 랭킹 보기
+            </ArrowLink>
           </li>
           <li>
             <ItemBox>
@@ -71,7 +75,12 @@ const Mypage = () => {
                 <i>
                   <img src={IconCoin} alt="" />
                 </i>
-                <span>{formatNumber(myPageInfo.data?.point)}</span>
+                <span>
+                  {' '}
+                  {myPageInfo.data?.point < 0
+                    ? 0
+                    : formatNumber(myPageInfo.data?.point)}
+                </span>
               </p>
             </ItemBox>
           </li>

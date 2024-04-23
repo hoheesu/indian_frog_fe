@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { getGameRoomsList } from '../api/gameRoomApi';
-import { getMypageInfo } from '../api/myPageApi';
+import { getMypageInfo, getRankingList } from '../api/myPageApi';
 import { getUserPoint } from '../api/userAuthApi';
 
 export const useGetGameRoomsList = (pageNum: number) => {
@@ -20,5 +20,11 @@ export const useGetUserPoint = () => {
   return useQuery({
     queryKey: ['userPoint', getUserPoint],
     queryFn: getUserPoint,
+  });
+};
+export const useGetRankingList = () => {
+  return useQuery({
+    queryKey: ['rankingList', getRankingList],
+    queryFn: getRankingList,
   });
 };

@@ -100,3 +100,15 @@ export const getUserPoint = async () => {
     }
   }
 };
+export const snsLoginUser = async (snsName: string) => {
+  try {
+    const response = await instance.post(`/oauth2/authorization/${snsName}`);
+    return response;
+  } catch (error: any) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      console.log(axiosError.response.data.status);
+      throw axiosError.response.data;
+    }
+  }
+};

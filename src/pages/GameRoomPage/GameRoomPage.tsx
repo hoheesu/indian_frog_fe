@@ -215,6 +215,7 @@ const GameRoomPage = () => {
             nick={userInfoDecode.nickname}
             point={userPoint.toString()}
             state={userReady ? 'ready' : 'wait'}
+            // profile={}
           />
           <Button onClickFnc={handleReadyButtonClick}>레디</Button>
           <GameButton />

@@ -1,5 +1,6 @@
 import React, { ComponentType, useContext } from 'react';
 import styled from 'styled-components';
+import ImgDefaultProfile from '../../assets/images/img-character.svg';
 
 interface PlayerProps {
   player: string;
@@ -33,7 +34,7 @@ const Player: React.FC<PlayerProps> = ({ player, nick, point, state }) => {
           <BoxInner>
             <TopArea>
               <PlayerProfile>
-                <img src="src/assets/images/img-profile-dummy.png" alt="" />
+                <img src={ImgDefaultProfile} alt="" />
               </PlayerProfile>
               <PlayerInfo>
                 <PlayerName>{nick}</PlayerName>

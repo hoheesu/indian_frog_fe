@@ -12,6 +12,7 @@ import IconMypage from '../../assets/images/icons/icon-mypage.svg';
 import { useGetUserPoint } from '../../hooks/useQuery';
 import { useEffect } from 'react';
 import { loginUser } from '../../api/userAuthApi';
+import { formatNumber } from '../../utils/numberFormatCheck';
 function Header() {
   const location = useLocation().pathname;
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -66,7 +67,9 @@ function Header() {
               <span>
                 <img src={IconCoin} alt="" />
               </span>
-              {useUserPoint.data?.point}
+              {useUserPoint.data?.point < 0
+                ? 0
+                : formatNumber(useUserPoint.data?.point)}
             </p>
           </Button>
         ) : null}
@@ -124,7 +127,7 @@ const HeaderContainer = styled.div<{ $location: string }>`
   background-color: transparent;
   z-index: 100;
   ${({ $location }) =>
-    $location === '/main'
+    $location === '/main' || $location === '/ranking'
       ? css`
           background: #fffdee;
           border-bottom: 1px solid #eadfc2;

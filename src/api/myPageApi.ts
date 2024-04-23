@@ -38,3 +38,15 @@ export const updateProfile = async (userImg: { userImg: File }) => {
     }
   }
 };
+
+export const getRankingList = async () => {
+  try {
+    const { data } = await authInstance.get('/ranking');
+    return data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      return axiosError.response;
+    }
+  }
+};
