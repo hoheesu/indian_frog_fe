@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Input from '../../components/layout/form/Input';
+import IconEnter from '../../assets/images/icons/icon-enter.svg';
 
 const BattingInput = () => {
   return (
@@ -29,7 +30,7 @@ const BattingWrap = styled.div`
     height: 40px;
     border-radius: 50%;
     background-color: #5a8900;
-    background-image: url('src/assets/images/icons/icon-enter.svg');
+    background-image: url(${IconEnter});
     background-position: center;
     background-repeat: no-repeat;
     background-size: 80%;

@@ -107,9 +107,10 @@ const ArrowLink = styled.button`
   &:after {
     content: '';
     display: block;
-    width: 13px;
-    height: 13px;
-    background: url(${IconArrowRight});
+    width: 18px;
+    height: 18px;
+    background: url(${IconArrowRight}) no-repeat center;
+    background-size: 100%;
   }
   font-size: 18px;
   gap: 5px;

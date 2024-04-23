@@ -102,7 +102,7 @@ export const getUserPoint = async () => {
 };
 export const snsLoginUser = async (snsName: string) => {
   try {
-    const response = await instance.post(`/proxy/${snsName}`);
+    const response = await instance.get(`/proxy/${snsName}`);
     return response;
   } catch (error: any) {
     const axiosError = error as AxiosError<ErrorResponse>;

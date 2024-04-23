@@ -1,6 +1,17 @@
 import React, { ComponentType, useContext } from 'react';
 import styled from 'styled-components';
 import ImgDefaultProfile from '../../assets/images/img-character.svg';
+import IconLeaf from '../../assets/images/icons/icon-leaf.svg';
+import IconCoinRotate from '../../assets/images/icons/icon-coin-rotate.svg';
+import IconOtherTimer from '../../assets/images/icons/icon-other-timer.svg';
+import IconMyTimer from '../../assets/images/icons/icon-my-timer.svg';
+import IconChoose from '../../assets/images/icons/icon-choose.svg';
+import IconWait from '../../assets/images/icons/icon-wait.svg';
+import IconComplate from '../../assets/images/icons/icon-complete.svg';
+import IconReady from '../../assets/images/icons/icon-ready.svg';
+import IconRaise from '../../assets/images/icons/icon-raise.svg';
+import IconDie from '../../assets/images/icons/icon-die.svg';
+import IconCheck from '../../assets/images/icons/icon-check.svg';
 
 interface PlayerProps {
   player: string;
@@ -108,7 +119,7 @@ const PlayerBadge = withPlayer(styled.em<WithPlayerProps>`
     left: -10px;
     width: 70px;
     height: 35px;
-    background: url('src/assets/images/icons/icon-leaf.svg') no-repeat center;
+    background: url(${IconLeaf}) no-repeat center;
     background-size: 100%;
   }
 `);
@@ -141,12 +152,10 @@ const PlayerProfile = withPlayer(styled.div<WithPlayerProps>`
       : 'conic-gradient(#CD7522 277deg, #e3d5b3 0deg)'};
   overflow: hidden;
   img {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 90%;
-    height: auto;
+    width: 100px;
+    height: 100px;
+    object-fit: fill;
+    background: #fff;
     border-radius: 50%;
   }
 `);
@@ -176,8 +185,7 @@ const PlayerPoint = styled.p`
     top: 1px;
     width: 20px;
     height: 20px;
-    background: url('src/assets/images/icons/icon-coin-rotate.svg') no-repeat
-      center;
+    background: url(${IconCoinRotate}) no-repeat center;
     background-size: 100%;
   }
 `;
@@ -202,8 +210,8 @@ const Timer = withPlayer(styled.div<WithPlayerProps>`
     height: 29px;
     background: ${({ player }) => {
       return player === 'other'
-        ? 'url(src/assets/images/icons/icon-other-timer.svg)no-repeat center'
-        : 'url(src/assets/images/icons/icon-my-timer.svg)no-repeat center';
+        ? `url(${IconOtherTimer})no-repeat center`
+        : `url(${IconMyTimer})no-repeat center`;
     }};
     background-size: 90%;
   }
@@ -216,19 +224,19 @@ const Status = withPlayer(styled(Timer)<WithPlayerProps>`
   &::before {
     background: ${({ state }) => {
       return state === 'choose'
-        ? 'url(src/assets/images/icons/icon-choose.svg)no-repeat center'
+        ? `url(${IconChoose})no-repeat center`
         : state === 'wait'
-          ? 'url(src/assets/images/icons/icon-wait.svg)no-repeat center'
+          ? `url(${IconWait})no-repeat center`
           : state === 'complate'
-            ? 'url(src/assets/images/icons/icon-complate.svg)no-repeat center'
+            ? `url(${IconComplate})no-repeat center`
             : state === 'ready'
-              ? 'url(src/assets/images/icons/icon-ready.svg)no-repeat center'
+              ? `url(${IconReady})no-repeat center`
               : state === 'raise'
-                ? 'url(src/assets/images/icons/icon-raise.svg)no-repeat center'
+                ? `url(${IconRaise})no-repeat center`
                 : state === 'die'
-                  ? 'url(src/assets/images/icons/icon-die.svg)no-repeat center'
+                  ? `url(${IconDie})no-repeat center`
                   : state === 'check'
-                    ? 'url(src/assets/images/icons/icon-check.svg)no-repeat center'
+                    ? `url(${IconCheck})no-repeat center`
                     : null;
     }};
     background-size: 85%;

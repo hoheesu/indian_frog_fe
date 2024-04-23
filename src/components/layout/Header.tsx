@@ -53,7 +53,14 @@ function Header() {
             THE MAKERS
           </p>
         </Button>
-        <Button onClickFnc={() => handleModalOpen('ranking')} isBorder={false}>
+        <Button
+          onClickFnc={() => {
+            authToken
+              ? handleModalOpen('ranking')
+              : alert('로그인 후 이용 가능합니다.');
+          }}
+          isBorder={false}
+        >
           <p>
             <span>
               <img src={IconRanking} alt="" />

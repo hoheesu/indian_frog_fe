@@ -30,7 +30,7 @@ function RankingModal() {
     <>
       <ClosedModalButton />
       <RanKingWrap>
-        <h2>게임랭킹</h2>
+        <h3>게임랭킹</h3>
         <ListTitle>
           <p>RANK</p>
           <p>NICKNAME</p>
@@ -153,7 +153,7 @@ const MyRanking = styled(RankingItem)`
 const RanKingWrap = styled.div`
   min-width: 500px;
   padding-top: 40px;
-  h2 {
+  > h3 {
     position: absolute;
     top: -50px;
     left: 50%;
@@ -164,7 +164,7 @@ const RanKingWrap = styled.div`
     justify-content: center;
     font-family: NPSfontBold;
     padding-top: 15px;
-    font-size: 34px;
+    font-size: 30px;
     height: 111px;
     text-align: center;
     margin: 0 0 40px;
