@@ -10,7 +10,7 @@ import IconLogout from '../../assets/images/icons/icon-logout.svg';
 import IconCoin from '../../assets/images/icons/icon-coin-rotate.svg';
 import IconMypage from '../../assets/images/icons/icon-mypage.svg';
 import { useGetUserPoint } from '../../hooks/useQuery';
-import { useEffect } from 'react';
+import { useMemo } from 'react';
 import { loginUser } from '../../api/userAuthApi';
 import { formatNumber } from '../../utils/numberFormatCheck';
 function Header() {
@@ -23,7 +23,7 @@ function Header() {
   const useUserPoint = useGetUserPoint();
   const navigate = useNavigate();
 
-  useEffect(() => {
+  useMemo(() => {
     loginUser;
   }, []);
   return (

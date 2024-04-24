@@ -7,19 +7,17 @@ import {
   emailValidCheck,
   passwordValidCheck,
 } from '../../utils/inputValidCheck';
-import {
-  useLoginSubmitMutation,
-  useSnsLoginSubmitMutation,
-} from '../../hooks/useMutation';
+import { useLoginSubmitMutation } from '../../hooks/useMutation';
 import styled from 'styled-components';
 import IconSnsNaver from '../../assets/images/icons/icon-sns-naver.svg';
 import IconSnsGoogle from '../../assets/images/icons/icon-sns-google.svg';
 import IconSnsKakao from '../../assets/images/icons/icon-sns-kakao.svg';
+import { useGetSnsLogin } from '../../hooks/useQuery';
 
 function LoginModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const useLoginSubmit = useLoginSubmitMutation();
-  const useSnsLoginSubmit = useSnsLoginSubmitMutation();
+  // const useSnsLoginSubmit = useSnsLoginSubmitMutation();
   const [emailValid, setEmailValid] = useState(false);
   const [pwValid, setPwValid] = useState(false);
   const [userValid, setUserValid] = useState(true);
@@ -27,7 +25,7 @@ function LoginModal() {
     email: '',
     password: '',
   });
-
+  const [snsName, setSnsName] = useState('');
   const handleInputOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginInput({ ...loginInput, [name]: value });
@@ -54,10 +52,19 @@ function LoginModal() {
     } else setUserValid(true);
   }, [loginInput]);
 
-  const handleSnsLoginSubmit = async (snsName: string) => {
-    useSnsLoginSubmit.mutate(snsName);
-    useSetIsModalClick();
+  const { data, refetch } = useGetSnsLogin(snsName as string, {
+    enabled: !!snsName,
+  });
+  const handleSnsLoginClick = (name: string) => {
+    setSnsName(name);
+    refetch();
   };
+  useEffect(() => {
+    console.log(data);
+    if (data) {
+      window.location.href = data;
+    }
+  }, [handleSnsLoginClick]);
 
   return (
     <>
@@ -125,7 +132,7 @@ function LoginModal() {
           <li className="sns-naver">
             <Button
               isBorder={false}
-              onClickFnc={() => handleSnsLoginSubmit('naver')}
+              onClickFnc={() => handleSnsLoginClick('naver')}
             >
               <p>네이버로 시작하기</p>
             </Button>
@@ -133,7 +140,7 @@ function LoginModal() {
           <li className="sns-google">
             <Button
               isBorder={false}
-              onClickFnc={() => handleSnsLoginSubmit('google')}
+              onClickFnc={() => handleSnsLoginClick('google')}
             >
               <p>구글로 시작하기</p>
             </Button>
@@ -141,7 +148,7 @@ function LoginModal() {
           <li className="sns-kakao">
             <Button
               isBorder={false}
-              onClickFnc={() => handleSnsLoginSubmit('kakao')}
+              onClickFnc={() => handleSnsLoginClick('kakao')}
             >
               <p>카카오로 시작하기</p>
             </Button>

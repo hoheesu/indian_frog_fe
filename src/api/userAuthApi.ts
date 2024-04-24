@@ -102,8 +102,8 @@ export const getUserPoint = async () => {
 };
 export const snsLoginUser = async (snsName: string) => {
   try {
-    const response = await instance.get(`/proxy/${snsName}`);
-    return response;
+    const response = await instance.get(`/oauth2/url/${snsName}`);
+    return response.data.url;
   } catch (error: any) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {

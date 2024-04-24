@@ -7,6 +7,7 @@ import { useGameRoomInfoStore } from '../store/modal/GameRoomInfoStore';
 import { useHostUserInfoStore } from '../store/modal/HostUserInfo';
 import { chargePoint, updateProfile } from '../api/myPageApi';
 import useUserProfileStore from '../store/profile/useUserProfileStore';
+import { QUERY_KEYS } from './useQuery';
 
 export const useLoginSubmitMutation = () => {
   const queryClient = useQueryClient();
@@ -26,6 +27,7 @@ export const useLoginSubmitMutation = () => {
 
 export const useCreateRoomMutation = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const useHostUserInfo = useHostUserInfoStore(
     (state) => state.setHostUserInfo,
@@ -39,6 +41,9 @@ export const useCreateRoomMutation = () => {
         hostPoint: data?.data.data.myPoint,
       });
       navigate(`/gameroom/${data?.data.data.roomId}`);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GameRoomsList],
+      });
       useSetIsModalClick();
     },
     onError: (error) => {
@@ -48,6 +53,7 @@ export const useCreateRoomMutation = () => {
 };
 
 export const useJoinRoomMutation = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const useSetGameRoomInfo = useGameRoomInfoStore(
     (state) => state.setIsGameInfo,
@@ -57,6 +63,9 @@ export const useJoinRoomMutation = () => {
     onSuccess: async (data, roomNumber: number) => {
       useSetGameRoomInfo(data);
       navigate(`/gameroom/${roomNumber}`);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GameRoomsList],
+      });
     },
     onError: (error) => {
       alert(error.message);
@@ -89,25 +98,27 @@ export const useUpdateProfileMutation = () => {
     mutationFn: updateProfile,
     onSuccess: (data: { userImgUrl: string }) => {
       setUserImgUrl(data.userImgUrl);
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.MyPageInfo],
+      });
     },
     onError: (error) => {
       alert(error.message);
     },
   });
 };
-export const useSnsLoginSubmitMutation = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: snsLoginUser,
-    onSuccess: (data) => {
-      const accessToken = data?.headers.authorization;
-      localStorage.setItem('accessToken', accessToken);
-      alert(data?.data.message);
-      queryClient.invalidateQueries();
-    },
-    onError: (error) => {
-      alert(error.message);
-    },
-  });
-};
+// export const useSnsLoginSubmitMutation = () => {
+//   // const queryClient = useQueryClient();
+//   return useMutation({
+//     mutationFn: snsLoginUser,
+//     onSuccess: () => {
+//       // const accessToken = data?.headers.authorization;
+//       // localStorage.setItem('accessToken', accessToken);
+//       // alert(data?.data.message);
+//       // queryClient.invalidateQueries();
+//     },
+//     onError: (error) => {
+//       alert(error.message);
+//     },
+//   });
+// };

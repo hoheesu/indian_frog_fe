@@ -7,7 +7,7 @@ import { useGetRankingList } from '../../hooks/useQuery';
 import { formatNumber } from '../../utils/numberFormatCheck';
 import IconCrown from '../../assets/images/icons/icon-crown.svg';
 import IconArrowR from '../../assets/images/icons/icon-arrow-right.svg';
-import ImgBannerRanking from '../../assets/images/img-banner-ranking.svg';
+import ImgBannerTitle from '../../assets/images/img-banner-title.svg';
 
 function RankingModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -30,7 +30,7 @@ function RankingModal() {
     <>
       <ClosedModalButton />
       <RanKingWrap>
-        <h3>게임랭킹</h3>
+        <BannerTitle>게임랭킹</BannerTitle>
         <ListTitle>
           <p>RANK</p>
           <p>NICKNAME</p>
@@ -153,25 +153,6 @@ const MyRanking = styled(RankingItem)`
 const RanKingWrap = styled.div`
   min-width: 500px;
   padding-top: 40px;
-  > h3 {
-    position: absolute;
-    top: -50px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 229px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: NPSfontBold;
-    padding-top: 15px;
-    font-size: 30px;
-    height: 111px;
-    text-align: center;
-    margin: 0 0 40px;
-    font-weight: 800;
-    background: url(${ImgBannerRanking}) no-repeat center;
-    color: #fff;
-  }
   + button {
     display: flex;
     margin-top: 20px;
@@ -190,5 +171,23 @@ const RanKingWrap = styled.div`
     }
   }
 `;
-
+const BannerTitle = styled.h3`
+  position: absolute;
+  top: -50px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 229px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: NPSfontBold;
+  padding-top: 15px;
+  font-size: 30px;
+  height: 111px;
+  text-align: center;
+  margin: 0 0 40px;
+  font-weight: 800;
+  background: url(${ImgBannerTitle}) no-repeat center;
+  color: #fff;
+`;
 export default RankingModal;
