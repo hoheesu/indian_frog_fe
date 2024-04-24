@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { loginUser, snsLoginUser } from '../api/userAuthApi';
+import { loginUser } from '../api/userAuthApi';
 import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
