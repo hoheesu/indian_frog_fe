@@ -10,6 +10,7 @@ import BattingInput from './BattingInput';
 import SockJS from 'sockjs-client';
 import Button from '../../components/layout/form/Button';
 import { gameRoomInfo } from '../../api/gameRoomApi';
+import { useIsModalStore } from '../../store/modal/CreateModalStore';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -49,11 +50,13 @@ const GameRoomPage = () => {
   const [isRaise, setIsRaise] = useState(false);
   const [currentPlayer, setCurrentPlayer] = useState<boolean | null>(null);
   const [roundEndInfo, setRoundEndInfo] = useState({
+    roundEnd: false,
     roundLoser: '',
     roundWinner: '',
     roundPot: 0,
   });
 
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
@@ -131,9 +134,9 @@ const GameRoomPage = () => {
     try {
       const message: any = JSON.parse(payload.body);
       console.log('*** gameState payload -->', message);
-      if (message.nextState === 'START') {
-        setReStart(true); // 라운드 시작
-      }
+      // if (message.nextState === 'START') {
+      //   setReStart(true); // 라운드 시작
+      // }
       if (message.playerCard) {
         setOtherCard(message.playerCard);
       }
@@ -152,10 +155,25 @@ const GameRoomPage = () => {
       }
       if (message.nowState === 'END') {
         setRoundEndInfo({
+          roundEnd: true,
           roundLoser: message.roundLoser,
           roundWinner: message.roundWinner,
           roundPot: message.roundPot,
         });
+        setTimeout(() => {
+          useSetIsModalClick('updateImg');
+          setRoundEndInfo({
+            roundEnd: false,
+            roundLoser: '',
+            roundWinner: '',
+            roundPot: 0,
+          });
+          if (message.nextState === 'START') {
+            setReStart(true);
+            setRoundEnd(false);
+          }
+          useSetIsModalClick();
+        }, 5000);
       }
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
@@ -211,14 +229,6 @@ const GameRoomPage = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (stompClient && reStart) {
-  //     stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
-  //     setGameRoomState('');
-  //     setUserReady(false);
-  //   }
-  // }, [reStart]);
-
   useEffect(() => {
     if (userInfoDecode.nickname !== leaveNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
@@ -273,28 +283,39 @@ const GameRoomPage = () => {
   }, [readyState]);
 
   const otherState = useMemo(() => {
-    switch (readyState) {
-      case 'READY':
-        return userReady ? 'wait' : 'ready';
-      case 'UNREADY':
-        return userReady ? 'wait' : 'ready';
-      case 'ALL_READY':
-        return 'ready';
-      case 'NO_ONE_READY':
-        setUserReady(false);
-        return 'wait';
-      default:
-        currentPlayer ? 'wait' : 'choose';
-        return 'wait';
+    if (readyState) {
+      switch (readyState) {
+        case 'READY':
+          return userReady ? 'wait' : 'ready';
+        case 'UNREADY':
+          return userReady ? 'wait' : 'ready';
+        case 'ALL_READY':
+          return 'ready';
+        case 'NO_ONE_READY':
+          setUserReady(false);
+          return 'wait';
+        default:
+          return 'wait';
+      }
+    } else if (currentPlayer) {
+      return currentPlayer ? 'wait' : 'choose';
+    } else {
+      return 'wait';
     }
   }, [readyState, currentPlayer]);
 
   useEffect(() => {
     setCurrentPlayer(null);
-    if (stompClient) {
+    if (stompClient && roundEnd) {
       stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
     }
   }, [roundEnd]);
+
+  useEffect(() => {
+    if (reStart) {
+      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+    }
+  }, [reStart]);
 
   return (
     <GameWrap>
@@ -347,11 +368,33 @@ const GameRoomPage = () => {
         </BattingPoint>
         <strong>card1</strong>
         <Chat />
-        <div>ddd</div>
+        <SnackBar roundEndInfo={roundEndInfo.roundEnd}>
+          <p>라운드 승자: {roundEndInfo.roundWinner}</p>
+          <p>라운드 패자: {roundEndInfo.roundLoser}</p>
+          <p>라운드 배팅: {roundEndInfo.roundPot.toString()}</p>
+        </SnackBar>
       </GameRoom>
     </GameWrap>
   );
 };
+
+const SnackBar = styled.div<any>`
+  position: absolute;
+  display: flex;
+  bottom: ${(props) => (props.roundEndInfo ? '100px' : '-100px')};
+  left: 50%;
+  width: 500px;
+  height: 100px;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  border-radius: 10px;
+  background-color: #fff;
+  transition: all 0.5s;
+  z-index: 100;
+  box-shadow: 2px 3px 5px 0px;
+`;
 const BattingPoint = styled.div`
   &::before {
     content: '';
