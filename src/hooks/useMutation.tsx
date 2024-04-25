@@ -3,8 +3,7 @@ import { loginUser } from '../api/userAuthApi';
 import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
-import { useGameRoomInfoStore } from '../store/modal/GameRoomInfoStore';
-import { useHostUserInfoStore } from '../store/modal/HostUserInfo';
+
 import { chargePoint, updateProfile } from '../api/myPageApi';
 import useUserProfileStore from '../store/profile/useUserProfileStore';
 
@@ -27,17 +26,9 @@ export const useLoginSubmitMutation = () => {
 export const useCreateRoomMutation = () => {
   const navigate = useNavigate();
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const useHostUserInfo = useHostUserInfoStore(
-    (state) => state.setHostUserInfo,
-  );
   return useMutation({
     mutationFn: createGameRoom,
     onSuccess: (data) => {
-      console.log(data?.data.data);
-      useHostUserInfo({
-        hostName: data?.data.data.hostName,
-        hostPoint: data?.data.data.myPoint,
-      });
       navigate(`/gameroom/${data?.data.data.roomId}`);
       useSetIsModalClick();
     },
@@ -49,13 +40,9 @@ export const useCreateRoomMutation = () => {
 
 export const useJoinRoomMutation = () => {
   const navigate = useNavigate();
-  const useSetGameRoomInfo = useGameRoomInfoStore(
-    (state) => state.setIsGameInfo,
-  );
   return useMutation({
     mutationFn: joinGameRoom,
     onSuccess: async (data, roomNumber: number) => {
-      useSetGameRoomInfo(data);
       navigate(`/gameroom/${roomNumber}`);
     },
     onError: (error) => {

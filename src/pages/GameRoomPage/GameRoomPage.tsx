@@ -11,6 +11,7 @@ import SockJS from 'sockjs-client';
 import Button from '../../components/layout/form/Button';
 import { gameRoomInfo } from '../../api/gameRoomApi';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
+import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -31,18 +32,17 @@ const GameRoomPage = () => {
   const [roomUserInfo, setRoomUserInfo] = useState<GameRoomInfo>(); // 유저 타입 (host / guest)
   const [leaveNickname, setLeaveNickname] = useState(''); // 최근 참여자 닉네임
   const [joinNickname, setJoinNickname] = useState(''); // 최근 참여자 닉네임
-  const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
+  // const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
   const [userPoint, setUserPoint] = useState<number>(0); // 접속한 유저의 포인트
   const [otherNickname, setOtherNickname] = useState<string | null>(); // 상대방 닉네임
   const [otherPoint, setOtherPoint] = useState<number>(0); // 상대방 포인트
   const [userReady, setUserReady] = useState(false); // 내 레디상테
 
   const [readyState, setReadyState] = useState(''); // 우리의 레디상태 (READY, UNREADY, NO_ONE_READY, ALLREADY)
-
   const [gameRoomState, setGameRoomState] = useState(''); // 우리의 레디상태 (READY, UNREADY, NO_ONE_READY, ALLREADY)
-
   const [reStart, setReStart] = useState(false); // 다음 라운드 시작
   const [roundEnd, setRoundEnd] = useState(false);
+  const [gameEnd, setGameEnd] = useState(false);
 
   const [userChoice, setUserChoice] = useState(false); // 게임을 나갈건지 재시작할지 결정
   const [otherCard, setOtherCard] = useState('');
@@ -56,6 +56,10 @@ const GameRoomPage = () => {
     roundPot: 0,
   });
 
+  const [useSetGameEndInfo, useUserChoice] = useGameEndStore((state) => [
+    state.setGameEndInfo,
+    state.userChoice,
+  ]);
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
@@ -161,7 +165,6 @@ const GameRoomPage = () => {
           roundPot: message.roundPot,
         });
         setTimeout(() => {
-          useSetIsModalClick('updateImg');
           setRoundEndInfo({
             roundEnd: false,
             roundLoser: '',
@@ -172,8 +175,21 @@ const GameRoomPage = () => {
             setReStart(true);
             setRoundEnd(false);
           }
-          useSetIsModalClick();
         }, 5000);
+      }
+      if (message.nextState === 'GAME_END') {
+        setGameEnd(true);
+      }
+      if (message.nowState === 'GAME_END') {
+        useSetIsModalClick('gameOver');
+        useSetGameEndInfo({
+          gameWinner: message.gameWinner,
+          gameLoser: message.gameLoser,
+          winnerPoint: message.winnerPot,
+          loserPoint: message.loserPot,
+          isUserWin:
+            message.gameWinner === userInfoDecode.nickname ? true : false,
+        });
       }
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
@@ -232,7 +248,7 @@ const GameRoomPage = () => {
   useEffect(() => {
     if (userInfoDecode.nickname !== leaveNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
-        setUserType('host');
+        // setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
         setOtherNickname('');
         setOtherPoint(0);
@@ -240,18 +256,18 @@ const GameRoomPage = () => {
     }
     if (userInfoDecode.nickname === joinNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
-        setUserType('host');
+        // setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
       }
       if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
-        setUserType('guest');
+        // setUserType('guest');
         setUserPoint(roomUserInfo?.participantPoints);
         setOtherNickname(roomUserInfo?.hostNickname);
         setOtherPoint(roomUserInfo?.hostPoints);
       }
     } else {
       if (roomUserInfo?.participantCount === 2) {
-        setUserType('host');
+        // setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
         setOtherNickname(roomUserInfo?.participantNickname);
         setOtherPoint(roomUserInfo?.participantPoints);
@@ -316,7 +332,28 @@ const GameRoomPage = () => {
       stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
     }
   }, [reStart]);
+  useEffect(() => {
+    if (gameEnd) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/GAME_END`,
+        {},
+        JSON.stringify({}),
+      );
+    }
+  }, [gameEnd]);
 
+  useEffect(() => {
+    if (gameEnd && useUserChoice) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/USER_CHOICE`,
+        {},
+        JSON.stringify({
+          nickname: userInfoDecode.nickname,
+          userChoice: useUserChoice,
+        }),
+      );
+    }
+  }, [useUserChoice]);
   return (
     <GameWrap>
       <Button onClickFnc={handleLeaveButtonClick}>나가기</Button>
@@ -368,7 +405,7 @@ const GameRoomPage = () => {
         </BattingPoint>
         <strong>card1</strong>
         <Chat />
-        <SnackBar roundEndInfo={roundEndInfo.roundEnd}>
+        <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
           <p>라운드 승자: {roundEndInfo.roundWinner}</p>
           <p>라운드 패자: {roundEndInfo.roundLoser}</p>
           <p>라운드 배팅: {roundEndInfo.roundPot.toString()}</p>
@@ -381,7 +418,7 @@ const GameRoomPage = () => {
 const SnackBar = styled.div<any>`
   position: absolute;
   display: flex;
-  bottom: ${(props) => (props.roundEndInfo ? '100px' : '-100px')};
+  bottom: ${(props) => (props.$roundEndInfo ? '100px' : '-100px')};
   left: 50%;
   width: 500px;
   height: 100px;
