@@ -1,16 +1,57 @@
 import styled from 'styled-components';
 import Button from '../../components/layout/form/Button';
+import { useParams } from 'react-router-dom';
+import { jwtDecode } from 'jwt-decode';
 
-const GameButton = () => {
+interface Props {
+  setIsRaise: React.Dispatch<React.SetStateAction<boolean>>;
+  stompClient: any;
+}
+
+const GameButton = ({ setIsRaise, stompClient }: Props) => {
+  const { gameId } = useParams(); // 게임방 아이디
+  const authToken = localStorage.getItem('accessToken'); // AccessToken (로컬스토리지)
+  const userInfoDecode: {
+    auth: string;
+    exp: number;
+    iat: number;
+    nickname: string;
+    sub: 'string';
+  } = jwtDecode(authToken!);
+
+  const handleDieButtonClick = () => {
+    if (stompClient) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ACTION`,
+        {},
+        JSON.stringify({ action: 'DIE', nickname: userInfoDecode.nickname }),
+      );
+    }
+  };
+
+  const handleRaiseButtonClick = () => {
+    setIsRaise((prevState) => !prevState);
+  };
+
+  const handleCheckButtonClick = () => {
+    if (stompClient) {
+      stompClient.send(
+        `/app/gameRoom/${gameId}/ACTION`,
+        {},
+        JSON.stringify({ action: 'CHECK', nickname: userInfoDecode.nickname }),
+      );
+    }
+  };
+
   return (
     <GameBtns>
-      <Button onClickFnc={() => {}} isBorder={false}>
+      <Button onClickFnc={handleDieButtonClick} isBorder={false}>
         <p className="die">Die</p>
       </Button>
-      <Button onClickFnc={() => {}} isBorder={false}>
+      <Button onClickFnc={handleRaiseButtonClick} isBorder={false}>
         <p className="raise">Raise</p>
       </Button>
-      <Button onClickFnc={() => {}} isBorder={false}>
+      <Button onClickFnc={handleCheckButtonClick} isBorder={false}>
         <p className="check">Check</p>
       </Button>
     </GameBtns>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
@@ -25,32 +25,45 @@ interface GameRoomInfo {
 }
 
 const GameRoomPage = () => {
-  const [stompClient, setStompClient] = useState<any>(null); // Stomp
+  const [stompClient, setStompClient] = useState<any>(null); //! 타입 명시
+
   const [roomUserInfo, setRoomUserInfo] = useState<GameRoomInfo>(); // 유저 타입 (host / guest)
+  const [leaveNickname, setLeaveNickname] = useState(''); // 최근 참여자 닉네임
   const [joinNickname, setJoinNickname] = useState(''); // 최근 참여자 닉네임
   const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
   const [userPoint, setUserPoint] = useState<number>(0); // 접속한 유저의 포인트
-  const [relativeNickname, setRelativeNickname] = useState<string | null>(); // 상대방 닉네임
-  const [relativePoint, setRelativePoint] = useState<number>(0); // 상대방 포인트
-  // const [userState, setUserState] = useState('');
+  const [otherNickname, setOtherNickname] = useState<string | null>(); // 상대방 닉네임
+  const [otherPoint, setOtherPoint] = useState<number>(0); // 상대방 포인트
   const [userReady, setUserReady] = useState(false); // 내 레디상테
 
-  const [ourReady, setOurReady] = useState(''); // 우리의 레디상태 (READY, UNREADY, NO_ONE_READY, ALLREADY)
+  const [readyState, setReadyState] = useState(''); // 우리의 레디상태 (READY, UNREADY, NO_ONE_READY, ALLREADY)
+
+  const [gameRoomState, setGameRoomState] = useState(''); // 우리의 레디상태 (READY, UNREADY, NO_ONE_READY, ALLREADY)
+
+  const [reStart, setReStart] = useState(false); // 다음 라운드 시작
+  const [roundEnd, setRoundEnd] = useState(false);
 
   const [userChoice, setUserChoice] = useState(false); // 게임을 나갈건지 재시작할지 결정
-  const [reStart, setReStart] = useState(false); // 다음 라운드 시작
+  const [otherCard, setOtherCard] = useState('');
+  const [roundPot, setRoundPoint] = useState('');
+  const [isRaise, setIsRaise] = useState(false);
+  const [currentPlayer, setCurrentPlayer] = useState<boolean | null>(null);
+  const [roundEndInfo, setRoundEndInfo] = useState({
+    roundLoser: '',
+    roundWinner: '',
+    roundPot: 0,
+  });
+
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
-
-  console.log(reStart, userChoice, userType);
 
   const userInfoDecode: {
     auth: string;
     exp: number;
     iat: number;
     nickname: string;
-    sub: 'string';
+    sub: string;
   } = jwtDecode(authToken!);
 
   const connect = () => {
@@ -87,16 +100,27 @@ const GameRoomPage = () => {
       console.log('payloadMessage -->', message);
 
       if (message.gameState) {
-        setOurReady(message.gameState);
+        setReadyState(message.gameState);
       }
       if (message.type === 'JOIN') {
         gameRoomInfoUpdate();
         setJoinNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
       }
-      if (message.gameState === 'START') {
-        // START요청 보내고 받았을 때,
-        setReStart(true); // 라운드 시작 요청
-        setUserChoice(false); // userChoice 초기화
+      if (message.type === 'LEAVE') {
+        gameRoomInfoUpdate();
+        setLeaveNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
+      }
+      if (message.currentPlayer) {
+        setCurrentPlayer(
+          message.currentPlayer === userInfoDecode.nickname ? true : false,
+        );
+      }
+      if (message.nextState === 'END') {
+        setRoundEnd(true);
+        setReStart(false); // 라운드 시작 초기화
+      }
+      if (message.pot) {
+        setRoundPoint(message.pot);
       }
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
@@ -108,9 +132,30 @@ const GameRoomPage = () => {
       const message: any = JSON.parse(payload.body);
       console.log('*** gameState payload -->', message);
       if (message.nextState === 'START') {
-        // 게임라운드 시작할 때,
         setReStart(true); // 라운드 시작
-        // setEndRound(false); // 라운드 종료 초기화
+      }
+      if (message.playerCard) {
+        setOtherCard(message.playerCard);
+      }
+      if (message.firstBet) {
+        setUserPoint((prevState) => prevState - message.firstBet);
+        setOtherPoint((prevState) => prevState - message.firstBet);
+        console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
+      }
+      if (message.roundPot) {
+        setRoundPoint(message.roundPot);
+      }
+      if (message.currentPlayer) {
+        setCurrentPlayer(
+          message.currentPlayer === userInfoDecode.nickname ? true : false,
+        );
+      }
+      if (message.nowState === 'END') {
+        setRoundEndInfo({
+          roundLoser: message.roundLoser,
+          roundWinner: message.roundWinner,
+          roundPot: message.roundPot,
+        });
       }
     } catch (error) {
       console.log('!!!!!error-paylad --->', error);
@@ -146,6 +191,8 @@ const GameRoomPage = () => {
   const gameRoomInfoUpdate = async () => {
     try {
       const result = await gameRoomInfo(Number(gameId));
+      console.log(result);
+      setGameRoomState(result.gameState);
       setRoomUserInfo(result);
     } catch (err) {
       console.log(err);
@@ -164,7 +211,23 @@ const GameRoomPage = () => {
     };
   }, []);
 
+  // useEffect(() => {
+  //   if (stompClient && reStart) {
+  //     stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+  //     setGameRoomState('');
+  //     setUserReady(false);
+  //   }
+  // }, [reStart]);
+
   useEffect(() => {
+    if (userInfoDecode.nickname !== leaveNickname) {
+      if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
+        setUserType('host');
+        setUserPoint(roomUserInfo?.hostPoints);
+        setOtherNickname('');
+        setOtherPoint(0);
+      }
+    }
     if (userInfoDecode.nickname === joinNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
         setUserType('host');
@@ -173,18 +236,65 @@ const GameRoomPage = () => {
       if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
         setUserType('guest');
         setUserPoint(roomUserInfo?.participantPoints);
-        setRelativeNickname(roomUserInfo?.hostNickname);
-        setRelativePoint(roomUserInfo?.hostPoints);
+        setOtherNickname(roomUserInfo?.hostNickname);
+        setOtherPoint(roomUserInfo?.hostPoints);
       }
     } else {
       if (roomUserInfo?.participantCount === 2) {
         setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
-        setRelativeNickname(roomUserInfo?.participantNickname);
-        setRelativePoint(roomUserInfo?.participantPoints);
+        setOtherNickname(roomUserInfo?.participantNickname);
+        setOtherPoint(roomUserInfo?.participantPoints);
       }
     }
   }, [roomUserInfo]);
+
+  useEffect(() => {
+    // ALL_READY가 들어올때 게임을 실행하는 Effect
+    if (readyState === 'ALL_READY') {
+      let time = 0;
+      const timer = setInterval(() => {
+        console.log(`${5 - time++} 이후 게임시작`);
+        if (time === 5) {
+          stompClient.send(
+            `/app/gameRoom/${gameId}/START`,
+            {},
+            JSON.stringify({}),
+          );
+          setGameRoomState('');
+          setUserReady(false);
+          clearInterval(timer);
+        }
+      }, 1000);
+    }
+    if (readyState === 'NO_ONE_READY') {
+      setUserReady(false);
+    }
+  }, [readyState]);
+
+  const otherState = useMemo(() => {
+    switch (readyState) {
+      case 'READY':
+        return userReady ? 'wait' : 'ready';
+      case 'UNREADY':
+        return userReady ? 'wait' : 'ready';
+      case 'ALL_READY':
+        return 'ready';
+      case 'NO_ONE_READY':
+        setUserReady(false);
+        return 'wait';
+      default:
+        currentPlayer ? 'wait' : 'choose';
+        return 'wait';
+    }
+  }, [readyState, currentPlayer]);
+
+  useEffect(() => {
+    setCurrentPlayer(null);
+    if (stompClient) {
+      stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
+    }
+  }, [roundEnd]);
 
   return (
     <GameWrap>
@@ -192,34 +302,29 @@ const GameRoomPage = () => {
       <GameRoom>
         <Player
           player="other"
-          nick={relativeNickname ? relativeNickname : '상대방을 기다리는 중..'}
-          point={relativePoint.toString()}
-          state={(() => {
-            switch (ourReady) {
-              case 'READY':
-                return userReady ? 'wait' : 'ready';
-              case 'UNREADY':
-                return userReady ? 'wait' : 'ready';
-              case 'ALL_READY':
-                return 'ready';
-              case 'NO_ONE_READY':
-                return 'false';
-              default:
-                return 'wait';
-            }
-          })()}
+          nick={otherNickname ? otherNickname : '상대방을 기다리는 중..'}
+          point={otherPoint.toString()}
+          state={otherState}
         />
         <MyState>
           <Player
             player="me"
             nick={userInfoDecode.nickname}
             point={userPoint.toString()}
-            state={userReady ? 'ready' : 'wait'}
+            state={userReady ? 'ready' : currentPlayer ? 'choose' : 'wait'}
           />
-          <Button onClickFnc={handleReadyButtonClick}>레디</Button>
-          <GameButton />
-          <BattingInput />
+          {gameRoomState === 'READY' ? (
+            <Button onClickFnc={handleReadyButtonClick}>레디</Button>
+          ) : currentPlayer ? (
+            <GameButton stompClient={stompClient} setIsRaise={setIsRaise} />
+          ) : (
+            ''
+          )}
+          {isRaise ? (
+            <BattingInput stompClient={stompClient} setIsRaise={setIsRaise} />
+          ) : null}
         </MyState>
+        <strong>{otherCard}</strong>
         <CardDeck>
           <RsultDeck>
             <p>나머지 덱</p>
@@ -238,9 +343,11 @@ const GameRoomPage = () => {
         </CardDeck>
         <BattingPoint>
           <span>배팅금액</span>
-          <p>10,000</p>
+          <p>{roundPot}</p>
         </BattingPoint>
+        <strong>card1</strong>
         <Chat />
+        <div>ddd</div>
       </GameRoom>
     </GameWrap>
   );
