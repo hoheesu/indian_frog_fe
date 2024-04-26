@@ -42,7 +42,7 @@ export const useJoinRoomMutation = () => {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: joinGameRoom,
-    onSuccess: async (data, roomNumber: number) => {
+    onSuccess: async (roomNumber: number) => {
       navigate(`/gameroom/${roomNumber}`);
     },
     onError: (error) => {

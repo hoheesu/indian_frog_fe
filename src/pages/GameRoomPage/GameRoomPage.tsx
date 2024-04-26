@@ -44,7 +44,7 @@ const GameRoomPage = () => {
   const [roundEnd, setRoundEnd] = useState(false);
   const [gameEnd, setGameEnd] = useState(false);
 
-  const [userChoice, setUserChoice] = useState(false); // 게임을 나갈건지 재시작할지 결정
+  // const [userChoice, setUserChoice] = useState(false); // 게임을 나갈건지 재시작할지 결정
   const [otherCard, setOtherCard] = useState('');
   const [roundPot, setRoundPoint] = useState('');
   const [isRaise, setIsRaise] = useState(false);
