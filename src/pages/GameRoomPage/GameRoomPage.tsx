@@ -26,13 +26,18 @@ interface GameRoomInfo {
   roomName: string;
 }
 
+interface Message {
+  sender: string;
+  content: string;
+  type: string;
+}
+
 const GameRoomPage = () => {
   const [stompClient, setStompClient] = useState<any>(null); //! 타입 명시
-
   const [roomUserInfo, setRoomUserInfo] = useState<GameRoomInfo>(); // 유저 타입 (host / guest)
   const [leaveNickname, setLeaveNickname] = useState(''); // 최근 참여자 닉네임
   const [joinNickname, setJoinNickname] = useState(''); // 최근 참여자 닉네임
-  // const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
+  const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
   const [userPoint, setUserPoint] = useState<number>(0); // 접속한 유저의 포인트
   const [otherNickname, setOtherNickname] = useState<string | null>(); // 상대방 닉네임
   const [otherPoint, setOtherPoint] = useState<number>(0); // 상대방 포인트
@@ -55,6 +60,8 @@ const GameRoomPage = () => {
     roundWinner: '',
     roundPot: 0,
   });
+
+  const [messageArea, setMessageArea] = useState<Message[]>([]);
 
   const [useSetGameEndInfo, useUserChoice] = useGameEndStore((state) => [
     state.setGameEndInfo,
@@ -109,13 +116,19 @@ const GameRoomPage = () => {
       if (message.gameState) {
         setReadyState(message.gameState);
       }
-      if (message.type === 'JOIN') {
-        gameRoomInfoUpdate();
-        setJoinNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
-      }
-      if (message.type === 'LEAVE') {
-        gameRoomInfoUpdate();
-        setLeaveNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
+      if (message.type === 'CHAT' || 'JOIN' || 'LEAVE') {
+        if (message.type === 'JOIN') {
+          gameRoomInfoUpdate();
+          setJoinNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
+        }
+        if (message.type === 'LEAVE') {
+          gameRoomInfoUpdate();
+          setLeaveNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
+        }
+        setMessageArea((prev) => {
+          const updatedMessages = [...prev, message];
+          return updatedMessages;
+        });
       }
       if (message.currentPlayer) {
         setCurrentPlayer(
@@ -203,8 +216,8 @@ const GameRoomPage = () => {
       { Authorization: authToken },
       JSON.stringify({ sender: userInfoDecode.nickname }),
     );
-    stompClient.disconnect();
     if (stompClient) {
+      stompClient.disconnect();
     }
     navigate('/main');
   };
@@ -245,10 +258,23 @@ const GameRoomPage = () => {
     };
   }, []);
 
+  const preventClose = (e: BeforeUnloadEvent) => {
+    e.preventDefault();
+    e.returnValue = '';
+  };
+  useEffect(() => {
+    (() => {
+      window.addEventListener('beforeunload', preventClose);
+    })();
+    return () => {
+      window.removeEventListener('beforeunload', preventClose);
+    };
+  }, []);
+
   useEffect(() => {
     if (userInfoDecode.nickname !== leaveNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
-        // setUserType('host');
+        setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
         setOtherNickname('');
         setOtherPoint(0);
@@ -256,18 +282,18 @@ const GameRoomPage = () => {
     }
     if (userInfoDecode.nickname === joinNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
-        // setUserType('host');
+        setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
       }
       if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
-        // setUserType('guest');
+        setUserType('guest');
         setUserPoint(roomUserInfo?.participantPoints);
         setOtherNickname(roomUserInfo?.hostNickname);
         setOtherPoint(roomUserInfo?.hostPoints);
       }
     } else {
       if (roomUserInfo?.participantCount === 2) {
-        // setUserType('host');
+        setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
         setOtherNickname(roomUserInfo?.participantNickname);
         setOtherPoint(roomUserInfo?.participantPoints);
@@ -278,20 +304,30 @@ const GameRoomPage = () => {
   useEffect(() => {
     // ALL_READY가 들어올때 게임을 실행하는 Effect
     if (readyState === 'ALL_READY') {
-      let time = 0;
-      const timer = setInterval(() => {
-        console.log(`${5 - time++} 이후 게임시작`);
-        if (time === 5) {
+      // let time = 0;
+      // const timer = setInterval(() => {
+      //   console.log(`${5 - time++} 이후 게임시작`);
+      //   if (time === 5) {
+      if (userType === 'guest') {
+        setTimeout(() => {
           stompClient.send(
             `/app/gameRoom/${gameId}/START`,
             {},
             JSON.stringify({}),
           );
-          setGameRoomState('');
-          setUserReady(false);
-          clearInterval(timer);
-        }
-      }, 1000);
+        }, 200);
+      } else {
+        stompClient.send(
+          `/app/gameRoom/${gameId}/START`,
+          {},
+          JSON.stringify({}),
+        );
+        // }
+        setGameRoomState('');
+        setUserReady(false);
+        //   clearInterval(timer);
+      }
+      // }, 1000);
     }
     if (readyState === 'NO_ONE_READY') {
       setUserReady(false);
@@ -323,15 +359,42 @@ const GameRoomPage = () => {
   useEffect(() => {
     setCurrentPlayer(null);
     if (stompClient && roundEnd) {
-      stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
+      if (userType === 'guest') {
+        setTimeout(() => {
+          stompClient.send(
+            `/app/gameRoom/${gameId}/END`,
+            {},
+            JSON.stringify({}),
+          );
+        }, 200);
+      } else {
+        stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
+      }
+      // stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
     }
   }, [roundEnd]);
 
   useEffect(() => {
     if (reStart) {
-      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+      if (userType === 'guest') {
+        setTimeout(() => {
+          stompClient.send(
+            `/app/gameRoom/${gameId}/START`,
+            {},
+            JSON.stringify({}),
+          );
+        }, 200);
+      } else {
+        stompClient.send(
+          `/app/gameRoom/${gameId}/START`,
+          {},
+          JSON.stringify({}),
+        );
+      }
+      // stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
     }
   }, [reStart]);
+
   useEffect(() => {
     if (gameEnd) {
       stompClient.send(
@@ -352,8 +415,12 @@ const GameRoomPage = () => {
           userChoice: useUserChoice,
         }),
       );
+      if (useUserChoice === 'LEAVE') {
+        handleLeaveButtonClick();
+      }
     }
   }, [useUserChoice]);
+
   return (
     <GameWrap>
       <Button onClickFnc={handleLeaveButtonClick}>나가기</Button>
@@ -404,7 +471,7 @@ const GameRoomPage = () => {
           <p>{roundPot}</p>
         </BattingPoint>
         <strong>card1</strong>
-        <Chat />
+        <Chat messageArea={messageArea} stompClient={stompClient} />
         <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
           <p>라운드 승자: {roundEndInfo.roundWinner}</p>
           <p>라운드 패자: {roundEndInfo.roundLoser}</p>

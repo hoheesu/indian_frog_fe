@@ -3,7 +3,6 @@ import { loginUser } from '../api/userAuthApi';
 import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
-
 import { chargePoint, updateProfile } from '../api/myPageApi';
 import useUserProfileStore from '../store/profile/useUserProfileStore';
 
@@ -42,7 +41,8 @@ export const useJoinRoomMutation = () => {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: joinGameRoom,
-    onSuccess: async (roomNumber: number) => {
+    onSuccess: (data, roomNumber: number) => {
+      console.log(data);
       navigate(`/gameroom/${roomNumber}`);
     },
     onError: (error) => {
