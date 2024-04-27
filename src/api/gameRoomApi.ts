@@ -34,7 +34,7 @@ export const joinGameRoom = async (gameRoomId: number) => {
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
-      return axiosError.response;
+      throw axiosError.response;
     }
   }
 };
@@ -44,6 +44,9 @@ export const gameRoomInfo = async (gameRoomId: number) => {
     const response = await authInstance.get(`/gameRoom/${gameRoomId}`);
     return response.data.data;
   } catch (error) {
-    throw error;
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      throw axiosError.response.data;
+    }
   }
 };

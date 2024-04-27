@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { loginUser } from '../api/userAuthApi';
-import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
+import { createGameRoom, gameRoomInfo, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
 import { chargePoint, updateProfile } from '../api/myPageApi';
@@ -41,12 +41,18 @@ export const useJoinRoomMutation = () => {
   const navigate = useNavigate();
   return useMutation({
     mutationFn: joinGameRoom,
-    onSuccess: (data, roomNumber: number) => {
-      console.log(data);
+    onSuccess: (_, roomNumber: number) => {
       navigate(`/gameroom/${roomNumber}`);
     },
-    onError: (error) => {
-      alert(error.message);
+    onError: (_, roomNumber: number) => {
+      (async () => {
+        try {
+          await gameRoomInfo(roomNumber);
+        } catch (error: any) {
+          alert(error.message);
+          navigate('/main');
+        }
+      })();
     },
   });
 };

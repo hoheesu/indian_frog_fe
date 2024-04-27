@@ -12,6 +12,7 @@ import Button from '../../components/layout/form/Button';
 import { gameRoomInfo } from '../../api/gameRoomApi';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
+import { history } from '../../utils/history';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -216,9 +217,7 @@ const GameRoomPage = () => {
       { Authorization: authToken },
       JSON.stringify({ sender: userInfoDecode.nickname }),
     );
-    if (stompClient) {
-      stompClient.disconnect();
-    }
+    stompClient.disconnect();
     navigate('/main');
   };
 
@@ -241,36 +240,51 @@ const GameRoomPage = () => {
       console.log(result);
       setGameRoomState(result.gameState);
       setRoomUserInfo(result);
+      return result;
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   };
 
   //^ useEffect
   useEffect(() => {
     //첫번째 마운트 상황에서 실행하는 Effect
-    connect();
+    (async () => {
+      try {
+        await gameRoomInfoUpdate();
+        connect();
+      } catch (error: any) {
+        if (stompClient) {
+          handleLeaveButtonClick();
+        }
+      }
+    })();
     return () => {
       if (stompClient) {
-        console.log('나 언마운트~');
         handleLeaveButtonClick();
       }
     };
   }, []);
 
-  const preventClose = (e: BeforeUnloadEvent) => {
-    e.preventDefault();
-    e.returnValue = '';
-  };
   useEffect(() => {
-    (() => {
-      window.addEventListener('beforeunload', preventClose);
-    })();
-    return () => {
-      window.removeEventListener('beforeunload', preventClose);
+    const listenBackEvent = () => {
+      stompClient.send(
+        `/app/${gameId}/leave`,
+        { Authorization: authToken },
+        JSON.stringify({ sender: userInfoDecode.nickname }),
+      );
+      stompClient.disconnect();
     };
-  }, []);
 
+    const unlistenHistoryEvent = history.listen(({ action }) => {
+      if (action === 'POP') {
+        listenBackEvent();
+        navigate('/main');
+      }
+    });
+
+    return unlistenHistoryEvent;
+  }, [connect]);
   useEffect(() => {
     if (userInfoDecode.nickname !== leaveNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
@@ -302,32 +316,10 @@ const GameRoomPage = () => {
   }, [roomUserInfo]);
 
   useEffect(() => {
-    // ALL_READY가 들어올때 게임을 실행하는 Effect
     if (readyState === 'ALL_READY') {
-      // let time = 0;
-      // const timer = setInterval(() => {
-      //   console.log(`${5 - time++} 이후 게임시작`);
-      //   if (time === 5) {
-      if (userType === 'guest') {
-        setTimeout(() => {
-          stompClient.send(
-            `/app/gameRoom/${gameId}/START`,
-            {},
-            JSON.stringify({}),
-          );
-        }, 200);
-      } else {
-        stompClient.send(
-          `/app/gameRoom/${gameId}/START`,
-          {},
-          JSON.stringify({}),
-        );
-        // }
-        setGameRoomState('');
-        setUserReady(false);
-        //   clearInterval(timer);
-      }
-      // }, 1000);
+      stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
+      setGameRoomState('');
+      setUserReady(false);
     }
     if (readyState === 'NO_ONE_READY') {
       setUserReady(false);
@@ -359,17 +351,7 @@ const GameRoomPage = () => {
   useEffect(() => {
     setCurrentPlayer(null);
     if (stompClient && roundEnd) {
-      if (userType === 'guest') {
-        setTimeout(() => {
-          stompClient.send(
-            `/app/gameRoom/${gameId}/END`,
-            {},
-            JSON.stringify({}),
-          );
-        }, 200);
-      } else {
-        stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
-      }
+      stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
       // stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
     }
   }, [roundEnd]);
@@ -391,7 +373,6 @@ const GameRoomPage = () => {
           JSON.stringify({}),
         );
       }
-      // stompClient.send(`/app/gameRoom/${gameId}/START`, {}, JSON.stringify({}));
     }
   }, [reStart]);
 
