@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
-import { useNavigate } from 'react-router-dom';
 
 function GameEndModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -9,7 +8,6 @@ function GameEndModal() {
     state.gameEndInfo,
     state.setUserChoice,
   ]);
-  const navigate = useNavigate();
   const [secondsLeft, setSecondsLeft] = useState(10);
 
   const handlePlayAgainButtonClick = () => {
