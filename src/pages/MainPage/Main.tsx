@@ -4,6 +4,7 @@ import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGetGameRoomsList } from '../../hooks/useQuery';
 import { useNavigate } from 'react-router-dom';
 import { useJoinRoomMutation } from '../../hooks/useMutation';
+import { LobbyContents } from './MainLobbyType';
 
 import IconJoinroom from '../../assets/images/icons/icon-joinroom.svg';
 import IconPlusroom from '../../assets/images/icons/icon-plusroom.svg';
@@ -19,21 +20,29 @@ function Main() {
     useSetIsModalClick('createRoom');
   };
 
-  const handleJoinRoomNumberOnClick = (roomNumber: number) => {
-    useJoinRoom.mutate(roomNumber);
-    navigate(`/gameroom/${roomNumber}`);
+  const handleJoinRoomNumberOnClick = (
+    roomNumber: number,
+    participantCount: number,
+  ) => {
+    if (participantCount < 2) {
+      useJoinRoom.mutate(roomNumber);
+      navigate(`/gameroom/${roomNumber}`);
+    } else {
+      alert(`${roomNumber}번 방은 인원이 가득찼습니다.`);
+    }
   };
+
   return (
     <RoomListsContainer>
       <RoomCardList>
         {gameRoomsList.data?.content
-          ? gameRoomsList.data?.content.map((gameRoom: any) => {
+          ? gameRoomsList.data?.content.map((gameRoom: LobbyContents) => {
               return (
                 <CardItem key={gameRoom.roomId}>
                   <ContentTop>
                     <RoomInfo>
                       <Rules>일반전</Rules>
-                      <span>개굴개굴조아맨</span>
+                      <span>{gameRoom.hostNickname}</span>
                       <span>{gameRoom.roomId}</span>
                     </RoomInfo>
                     <RoomName>
@@ -42,11 +51,14 @@ function Main() {
                       </h4>
                     </RoomName>
                   </ContentTop>
-                  <ContentBottom>
-                    <p>Loading</p>
+                  <ContentBottom usercount={gameRoom.participantCount}>
+                    <p>{gameRoom.participantCount} / 2</p>
                     <Button
                       onClickFnc={() => {
-                        handleJoinRoomNumberOnClick(gameRoom.roomId);
+                        handleJoinRoomNumberOnClick(
+                          gameRoom.roomId,
+                          gameRoom.participantCount,
+                        );
                       }}
                       isBorder={true}
                     >
@@ -155,14 +167,22 @@ const CardItem = styled.li`
     }
   }
 `;
-const ContentBottom = styled.div`
+interface ParticipantCount {
+  usercount: number;
+}
+const ContentBottom = styled.div<ParticipantCount>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
   background-color: #e6dbbb;
   > p {
-    background-color: #f9f4e0;
+    background-color: ${(props) =>
+      props.usercount === 1
+        ? '#f9f4e0'
+        : props.usercount === 2
+          ? 'var(--color-main)'
+          : 'var(--color-sub)'};
     padding: 8px 10px;
     border-radius: 50px;
     font-size: 12px;
