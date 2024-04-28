@@ -55,16 +55,14 @@ const Mypage = () => {
           <li>
             <ItemBox>
               <p>
-                {myPageInfo.data?.point <= 0 ? (
+                {myPageInfo.data?.point <= 30 ? (
                   <ArrowLink onClick={() => handleModalOpen('pointCharge')}>
                     포인트 충전
                   </ArrowLink>
                 ) : (
                   <ArrowLink
                     onClick={() => {
-                      alert(
-                        '포인트를 모두 소진했을 경우에만 충전이 가능합니다!',
-                      );
+                      alert('포인트가 30이하일 경우에만 충전이 가능합니다!');
                     }}
                   >
                     포인트 충전

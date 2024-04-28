@@ -1,5 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { loginUser } from '../api/userAuthApi';
+import {
+  emailCertified,
+  emailCertifiedCode,
+  findPassword,
+  loginUser,
+} from '../api/userAuthApi';
 import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
@@ -8,6 +13,7 @@ import { useHostUserInfoStore } from '../store/modal/HostUserInfo';
 import { chargePoint, updateProfile } from '../api/myPageApi';
 import useUserProfileStore from '../store/profile/useUserProfileStore';
 import { QUERY_KEYS } from './useQuery';
+import { getCookie } from '../utils/cookies';
 
 export const useLoginSubmitMutation = () => {
   const queryClient = useQueryClient();
@@ -15,6 +21,7 @@ export const useLoginSubmitMutation = () => {
     mutationFn: loginUser,
     onSuccess: (data) => {
       const accessToken = data?.headers.authorization;
+          console.log(getCookie('refreshToken'));
       localStorage.setItem('accessToken', accessToken);
       alert(data?.data.message);
       queryClient.invalidateQueries();
@@ -107,18 +114,43 @@ export const useUpdateProfileMutation = () => {
     },
   });
 };
-// export const useSnsLoginSubmitMutation = () => {
-//   // const queryClient = useQueryClient();
-//   return useMutation({
-//     mutationFn: snsLoginUser,
-//     onSuccess: () => {
-//       // const accessToken = data?.headers.authorization;
-//       // localStorage.setItem('accessToken', accessToken);
-//       // alert(data?.data.message);
-//       // queryClient.invalidateQueries();
-//     },
-//     onError: (error) => {
-//       alert(error.message);
-//     },
-//   });
-// };
+export const useEmailCertifiedMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: emailCertified,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+};
+
+export const useCertifiedCodeMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: emailCertifiedCode,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+    onError: () => {
+      alert('이미 인증이 완료되었습니다.');
+    },
+  });
+};
+export const useFindPasswordMutation = () => {
+  const queryClient = useQueryClient();
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  return useMutation({
+    mutationFn: findPassword,
+    onSuccess: () => {
+      alert('임시 비밀번호를 보냈습니다.');
+      useSetIsModalClick();
+      queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+};

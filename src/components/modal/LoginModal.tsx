@@ -16,8 +16,11 @@ import { useGetSnsLogin } from '../../hooks/useQuery';
 
 function LoginModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const handleModalOpen = (type?: string) => {
+    type ? useSetIsModalClick(type) : useSetIsModalClick();
+  };
+
   const useLoginSubmit = useLoginSubmitMutation();
-  // const useSnsLoginSubmit = useSnsLoginSubmitMutation();
   const [emailValid, setEmailValid] = useState(false);
   const [pwValid, setPwValid] = useState(false);
   const [userValid, setUserValid] = useState(true);
@@ -43,24 +46,22 @@ function LoginModal() {
     useSetIsModalClick();
   };
 
-  const handleToSignupModal = () => {
-    useSetIsModalClick('signup');
-  };
   useEffect(() => {
     if (emailValid && pwValid) {
       setUserValid(false);
     } else setUserValid(true);
   }, [loginInput]);
 
-  const { data, refetch } = useGetSnsLogin(snsName as string, {
+  const { data } = useGetSnsLogin(snsName as string, {
     enabled: !!snsName,
   });
   const handleSnsLoginClick = (name: string) => {
     setSnsName(name);
-    refetch();
+    const accessToken = data?.headers.authorization;
+
+    localStorage.setItem('accessToken', accessToken);
   };
   useEffect(() => {
-    console.log(data);
     if (data) {
       window.location.href = data;
     }
@@ -119,13 +120,17 @@ function LoginModal() {
           <p>로그인</p>
         </Button>
       </form>
-
-      {/* <Button isBorder={false} onClickFnc={handleLoginSubmit}>
-        <p>비밀번호 찾기</p>
-      </Button> */}
-      <Button isBorder={false} onClickFnc={handleToSignupModal}>
-        <p>아직 계정이 없으신가요?</p>
-      </Button>
+      <div>
+        <Button
+          isBorder={false}
+          onClickFnc={() => handleModalOpen('findPassword')}
+        >
+          <p>비밀번호 찾기</p>
+        </Button>
+        <Button isBorder={false} onClickFnc={() => handleModalOpen('signup')}>
+          <p>아직 계정이 없으신가요?</p>
+        </Button>
+      </div>
       <SnsLoginForm>
         <h3>간편하게 시작하기</h3>
         <ul>

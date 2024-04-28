@@ -42,7 +42,7 @@ function Main() {
                   <ContentTop>
                     <RoomInfo>
                       <Rules>일반전</Rules>
-                      <span>개굴개굴조아맨</span>
+                      <span>{gameRoom.hostNickname}</span>
                       <span>{gameRoom.roomId}</span>
                     </RoomInfo>
                     <RoomName>
@@ -52,7 +52,13 @@ function Main() {
                     </RoomName>
                   </ContentTop>
                   <ContentBottom>
-                    <p>Loading</p>
+                    <p>
+                      {gameRoom.gameState === 'READY'
+                        ? '준비중'
+                        : gameRoom.gameState === 'START'
+                          ? '게임시작'
+                          : null}
+                    </p>
                     <Button
                       onClickFnc={() => {
                         handleJoinRoomNumberOnClick(gameRoom.roomId);
@@ -172,7 +178,7 @@ const ContentBottom = styled.div`
   background-color: #e6dbbb;
   > p {
     background-color: #f9f4e0;
-    padding: 8px 10px;
+    padding: 10px 20px;
     border-radius: 50px;
     font-size: 12px;
     font-weight: 700;

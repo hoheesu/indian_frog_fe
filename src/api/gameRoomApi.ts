@@ -17,8 +17,13 @@ export const createGameRoom = async (roomInput: { roomName: string }) => {
 export const getGameRoomsList = async (pageNum: number) => {
   try {
     const response = await instance.get(`/gameRoom?page=${pageNum}`);
-    console.log(response);
+    console.log(response.data.data);
     return response.data.data;
+    // return {
+    //   items: response.data.data,
+    //   nextPage: pageNum + 1,
+    //   hasMore: response.data.data.size > 0,
+    // };
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {

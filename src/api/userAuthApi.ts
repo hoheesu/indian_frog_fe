@@ -43,11 +43,6 @@ export const signupUser = async (signupInfo: {
     });
     return response;
   } catch (error: any) {
-    // const axiosError = error as AxiosError<ErrorResponse>;
-    // if (axiosError.response) {
-    //   console.log(axiosError.response.data.status);
-    //   throw axiosError.response.data;
-    // }
     alert(error.response.data.message);
     throw error;
   }
@@ -92,6 +87,7 @@ export const refreshToken = async () => {
 export const getUserPoint = async () => {
   try {
     const { data } = await authInstance.get(`/point`);
+
     return data;
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
@@ -110,5 +106,49 @@ export const snsLoginUser = async (snsName: string) => {
       console.log(axiosError.response.data.status);
       throw axiosError.response.data;
     }
+  }
+};
+export const findPassword = async (email: string) => {
+  try {
+    const response = await instance.post(`/user/password-code?email=${email}`);
+    console.log(response);
+    return response;
+  } catch (error: any) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      console.log(axiosError.response.data.status);
+      throw axiosError.response.data;
+    }
+  }
+};
+export const emailCertified = async (email: string) => {
+  try {
+    const response = await instance.post(`/user/email-code?email=${email}`);
+    console.log(response);
+    return response;
+  } catch (error: any) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      console.log(axiosError.response.data.status);
+      throw axiosError.response.data;
+    }
+  }
+};
+interface EmailCodeParams {
+  email: string;
+  code: string;
+}
+export const emailCertifiedCode = async ({ email, code }: EmailCodeParams) => {
+  try {
+    const response = await instance.post(
+      `/user/email-auth?email=${email}&emailCode=${code}`,
+    );
+    return response.data.data;
+  } catch (error: any) {
+    const axiosError = error as AxiosError<{ status: string }>;
+    if (axiosError.response) {
+      throw axiosError.response.data;
+    }
+    throw error;
   }
 };

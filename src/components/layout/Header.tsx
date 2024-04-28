@@ -26,6 +26,7 @@ function Header() {
   useMemo(() => {
     loginUser;
   }, []);
+
   return (
     <HeaderContainer $location={location}>
       <HeaderInner>
@@ -74,9 +75,9 @@ function Header() {
               <span>
                 <img src={IconCoin} alt="" />
               </span>
-              {useUserPoint.data?.point < 0
+              {useUserPoint.data?.mtPoint < 0
                 ? 0
-                : formatNumber(useUserPoint.data?.point)}
+                : formatNumber(useUserPoint.data?.myPoint)}
             </p>
           </Button>
         ) : null}
@@ -101,7 +102,7 @@ function Header() {
             >
               <p>
                 <span>
-                  <img src={IconLogout} alt="" />
+                  <img src={IconLogin} alt="" />
                 </span>
                 LOG OUT
               </p>
@@ -115,7 +116,7 @@ function Header() {
             >
               <p>
                 <span>
-                  <img src={IconLogin} alt="" />
+                  <img src={IconLogout} alt="" />
                 </span>
                 LOG IN
               </p>

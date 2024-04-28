@@ -18,6 +18,14 @@ export const useGetGameRoomsList = (pageNum: number) => {
   });
 };
 
+// export const useGetGameRoomsList = ()=> {
+//   return useInfiniteQuery(
+//     [QUERY_KEYS.GameRoomsList], // 쿼리 키
+//     ({ pageParam = 1 }) => getGameRoomsList(pageParam), // 데이터 패칭 함수
+
+//   );
+// };
+
 export const useGetMypageInfo = () => {
   return useQuery({
     queryKey: [QUERY_KEYS.MyPageInfo, getMypageInfo],
