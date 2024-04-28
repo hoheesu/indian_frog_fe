@@ -11,7 +11,6 @@ function GameEndModal() {
   const [secondsLeft, setSecondsLeft] = useState(10);
 
   const handlePlayAgainButtonClick = () => {
-    useSetUserChoice('PLAY_AGAIN');
     useSetIsModalClick();
   };
   const handleLeaveButtonClick = () => {
@@ -36,8 +35,7 @@ function GameEndModal() {
 
   useEffect(() => {
     if (secondsLeft === 0) {
-      console.log('설마 너니?');
-      handleLeaveButtonClick();
+      useSetIsModalClick();
     }
   }, [secondsLeft]);
 

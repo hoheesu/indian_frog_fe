@@ -113,7 +113,6 @@ const GameRoomPage = () => {
     try {
       const message: any = await JSON.parse(payload.body);
       console.log('payloadMessage -->', message);
-
       if (message.gameState) {
         setReadyState(message.gameState);
       }
@@ -152,9 +151,6 @@ const GameRoomPage = () => {
     try {
       const message: any = JSON.parse(payload.body);
       console.log('*** gameState payload -->', message);
-      // if (message.nextState === 'START') {
-      //   setReStart(true); // 라운드 시작
-      // }
       if (message.playerCard) {
         setOtherCard(message.playerCard);
       }
@@ -193,6 +189,7 @@ const GameRoomPage = () => {
       }
       if (message.nextState === 'GAME_END') {
         setGameEnd(true);
+        setGameRoomState('READY');
       }
       if (message.nowState === 'GAME_END') {
         useSetIsModalClick('gameOver');
@@ -285,6 +282,7 @@ const GameRoomPage = () => {
 
     return unlistenHistoryEvent;
   }, [connect]);
+
   useEffect(() => {
     if (userInfoDecode.nickname !== leaveNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
@@ -388,14 +386,6 @@ const GameRoomPage = () => {
 
   useEffect(() => {
     if (gameEnd && useUserChoice) {
-      stompClient.send(
-        `/app/gameRoom/${gameId}/USER_CHOICE`,
-        {},
-        JSON.stringify({
-          nickname: userInfoDecode.nickname,
-          userChoice: useUserChoice,
-        }),
-      );
       if (useUserChoice === 'LEAVE') {
         handleLeaveButtonClick();
       }
