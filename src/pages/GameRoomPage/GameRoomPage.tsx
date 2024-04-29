@@ -298,29 +298,8 @@ const GameRoomPage = () => {
     }
   };
 
-  useCallback(() => {
-    const gameStateStorage: any = {
-      reStart: reStart,
-      roundEnd: roundEnd,
-      gameEnd: gameEnd,
-      otherGameState: otherGameState,
-      otherCard: otherCard,
-      roundPot: roundPot,
-      isRaise: isRaise,
-      currentPlayer: currentPlayer,
-    };
-    localStorage.setItem('gameStateStorage', JSON.stringify(gameStateStorage));
-  }, [
-    reStart,
-    roundEnd,
-    gameEnd,
-    otherGameState,
-    otherCard,
-    roundPot,
-    isRaise,
-    currentPlayer,
-  ]);
   //^ useEffect
+
   useEffect(() => {
     //첫번째 마운트 상황에서 실행하는 Effect
     (async () => {
@@ -333,33 +312,81 @@ const GameRoomPage = () => {
         }
       }
     })();
-    const preventClose = (e: any) => {
-      e.preventDefault();
-      e.returnValue = '';
-    };
-    window.addEventListener('beforeunload', preventClose);
-    if (localStorage.getItem('gameStateStorage')) {
-      const gameStateStorage = JSON.parse(
-        localStorage.getItem('gameStateStorage')!,
-      );
-      console.log(gameStateStorage);
-      setReStart(gameStateStorage.reStart);
-      setRoundEnd(gameStateStorage.roundEnd);
-      setGameEnd(gameStateStorage.gameEnd);
-      setOtherGameState(gameStateStorage.otherGameState);
-      setOtherCard(gameStateStorage.otherCard);
-      setRoundPoint(gameStateStorage.roundPot);
-      setIsRaise(gameStateStorage.isRaise);
-      // setCurrentPlayer(gameStateStorage.currentPlayer);
-    }
-    return () => {
-      if (stompClient) {
-        stompClient.disconnect();
-        handleLeaveButtonClick();
+
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault();
       }
-      window.removeEventListener('beforeunload', preventClose);
+    };
+
+    const sendToNotice = () => {
+      setMessageArea((prev) => {
+        const newMessage = {
+          sender: '',
+          content: '새로고침은 하지 말아주세요 ㅠㅠ',
+          type: 'reload',
+        };
+        const updatedMessages = [...prev, newMessage];
+        return updatedMessages;
+      });
+    };
+    sendToNotice();
+    setInterval(() => {
+      sendToNotice();
+    }, 30000);
+
+    window.addEventListener('keydown', handleKeyPress);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+      // sendToNotice();
     };
   }, []);
+
+  // useEffect(() => {
+  //   const gameStateToStore = {
+  //     roomUserInfo,
+  //     leaveNickname,
+  //     joinNickname,
+  //     userType,
+  //     userPoint,
+  //     otherNickname,
+  //     otherPoint,
+  //     userReady,
+  //     readyState,
+  //     gameRoomState,
+  //     reStart,
+  //     roundEnd,
+  //     gameEnd,
+  //     otherGameState,
+  //     otherCard,
+  //     roundPot,
+  //     isRaise,
+  //     currentPlayer,
+  //     roundEndInfo,
+  //   };
+  //   localStorage.setItem('gameState', JSON.stringify(gameStateToStore));
+  // }, [
+  //   roomUserInfo,
+  //   leaveNickname,
+  //   joinNickname,
+  //   userType,
+  //   userPoint,
+  //   otherNickname,
+  //   otherPoint,
+  //   userReady,
+  //   readyState,
+  //   gameRoomState,
+  //   reStart,
+  //   roundEnd,
+  //   gameEnd,
+  //   otherGameState,
+  //   otherCard,
+  //   roundPot,
+  //   isRaise,
+  //   currentPlayer,
+  //   roundEndInfo,
+  // ]);
 
   useEffect(() => {
     const listenBackEvent = () => {

@@ -59,6 +59,10 @@ const Chat = ({ messageArea, stompClient }: Props) => {
               <span style={{ color: 'red' }}>{message.content}</span>
               포인트 레이즈하셨습니다.
             </li>
+          ) : message.type === 'reload' ? (
+            <li className="notice">
+              <span style={{ color: 'red' }}>{message.content}</span>
+            </li>
           ) : (
             <li
               className={
