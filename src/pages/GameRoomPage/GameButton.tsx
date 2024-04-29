@@ -30,7 +30,7 @@ const GameButton = ({ setIsRaise, stompClient }: Props) => {
   };
 
   const handleRaiseButtonClick = () => {
-    setIsRaise((prevState) => !prevState);
+    setIsRaise(true);
   };
 
   const handleCheckButtonClick = () => {

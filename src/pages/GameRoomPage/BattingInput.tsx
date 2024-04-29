@@ -29,6 +29,10 @@ const BattingInput = ({ stompClient, setIsRaise }: Props) => {
     if (raisePoint < 1) {
       alert('포인트를 배팅하세요');
     } else {
+      console.log({
+        nickname: userInfoDecode.nickname,
+        point: raisePoint,
+      });
       stompClient.send(
         `/app/gameRoom/${gameId}/ACTION`,
         {},
@@ -38,20 +42,31 @@ const BattingInput = ({ stompClient, setIsRaise }: Props) => {
           point: raisePoint,
         }),
       );
-      setIsRaise((prevState) => !prevState);
+      setIsRaise(false);
     }
   };
 
   return (
     <BattingWrap>
-      <form onSubmit={(e) => e.preventDefault()}>
+      <form
+      // onSubmit={(e) => {
+      //   e.preventDefault();
+      //   handleRaiseSubmit();
+      // }}
+      >
         <Input
           type="number"
           value={raisePoint.toString()}
           onChangeFnc={handleRaisePointChange}
           placeholder="Raise할 배팅금액을 입력해주세요"
         />
-        <button onClick={handleRaiseSubmit}></button>
+        <button
+          type="submit"
+          onClick={(e) => {
+            e.preventDefault();
+            handleRaiseSubmit();
+          }}
+        ></button>
       </form>
     </BattingWrap>
   );

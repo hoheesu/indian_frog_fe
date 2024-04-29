@@ -49,6 +49,16 @@ const Chat = ({ messageArea, stompClient }: Props) => {
             <li className="notice">{message.sender}님이 접속하셨습니다.</li>
           ) : message.type === 'LEAVE' ? (
             <li className="notice">{message.sender}님이 퇴장하셨습니다.</li>
+          ) : message.type === 'CHECK' ? (
+            <li className="notice">{message.sender}님이 체크하셨습니다.</li>
+          ) : message.type === 'DIE' ? (
+            <li className="notice">{message.sender}님이 다이하셨습니다.</li>
+          ) : message.type === 'RAISE' ? (
+            <li className="notice">
+              {message.sender}님이{' '}
+              <span style={{ color: 'red' }}>{message.content}</span>
+              포인트 레이즈하셨습니다.
+            </li>
           ) : (
             <li
               className={

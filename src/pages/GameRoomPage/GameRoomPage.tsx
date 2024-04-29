@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
@@ -50,7 +50,8 @@ const GameRoomPage = () => {
   const [roundEnd, setRoundEnd] = useState(false);
   const [gameEnd, setGameEnd] = useState(false);
 
-  // const [userChoice, setUserChoice] = useState(false); // 게임을 나갈건지 재시작할지 결정
+  // const [myGameState, setMyGameState] = useState('');
+  const [otherGameState, setOtherGameState] = useState('wait');
   const [otherCard, setOtherCard] = useState('');
   const [roundPot, setRoundPoint] = useState('');
   const [isRaise, setIsRaise] = useState(false);
@@ -115,6 +116,27 @@ const GameRoomPage = () => {
       console.log('payloadMessage -->', message);
       if (message.gameState) {
         setReadyState(message.gameState);
+        setOtherGameState(() => {
+          switch (message.gameState) {
+            case 'READY':
+              return message.nickname === userInfoDecode.nickname
+                ? 'wait'
+                : 'ready';
+            case 'UNREADY':
+              return message.nickname === userInfoDecode.nickname
+                ? 'wait'
+                : 'ready';
+            case 'ALL_READY':
+              return 'ready';
+            case 'NO_ONE_READY':
+              return 'wait';
+            default:
+              return 'wait';
+          }
+        });
+        setRoundEnd(false);
+        setReStart(false); // 라운드 시작 초기화
+        setGameEnd(false);
       }
       if (message.type === 'CHAT' || 'JOIN' || 'LEAVE') {
         if (message.type === 'JOIN') {
@@ -130,7 +152,37 @@ const GameRoomPage = () => {
           return updatedMessages;
         });
       }
+      if (message.nowState === 'ACTION') {
+        message.previousPlayer === userInfoDecode.nickname
+          ? setUserPoint(message.myPoint)
+          : setOtherPoint(message.myPoint);
+        if (message.actionType === 'RAISE') {
+          setMessageArea((prev) => {
+            const newMessage = {
+              sender: message.previousPlayer,
+              content: message.nowBet,
+              type: message.actionType,
+            };
+            const updatedMessages = [...prev, newMessage];
+            return updatedMessages;
+          });
+        } else {
+          setMessageArea((prev) => {
+            const newMessage = {
+              sender: message.previousPlayer,
+              content: message.nowBet,
+              type: message.actionType,
+            };
+            const updatedMessages = [...prev, newMessage];
+            return updatedMessages;
+          });
+        }
+      }
+
       if (message.currentPlayer) {
+        setOtherGameState(
+          message.currentPlayer === userInfoDecode.nickname ? 'wait' : 'choose',
+        );
         setCurrentPlayer(
           message.currentPlayer === userInfoDecode.nickname ? true : false,
         );
@@ -155,14 +207,17 @@ const GameRoomPage = () => {
         setOtherCard(message.playerCard);
       }
       if (message.firstBet) {
-        setUserPoint((prevState) => prevState - message.firstBet);
-        setOtherPoint((prevState) => prevState - message.firstBet);
+        setUserPoint((prevState) => prevState - message.roundPot / 2);
+        setOtherPoint((prevState) => prevState - message.roundPot / 2);
         console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
       }
       if (message.roundPot) {
         setRoundPoint(message.roundPot);
       }
       if (message.currentPlayer) {
+        setOtherGameState(
+          message.currentPlayer === userInfoDecode.nickname ? 'wait' : 'choose',
+        );
         setCurrentPlayer(
           message.currentPlayer === userInfoDecode.nickname ? true : false,
         );
@@ -211,7 +266,7 @@ const GameRoomPage = () => {
   const handleLeaveButtonClick = () => {
     stompClient.send(
       `/app/${gameId}/leave`,
-      { Authorization: authToken },
+      {},
       JSON.stringify({ sender: userInfoDecode.nickname }),
     );
     stompClient.disconnect();
@@ -243,6 +298,28 @@ const GameRoomPage = () => {
     }
   };
 
+  useCallback(() => {
+    const gameStateStorage: any = {
+      reStart: reStart,
+      roundEnd: roundEnd,
+      gameEnd: gameEnd,
+      otherGameState: otherGameState,
+      otherCard: otherCard,
+      roundPot: roundPot,
+      isRaise: isRaise,
+      currentPlayer: currentPlayer,
+    };
+    localStorage.setItem('gameStateStorage', JSON.stringify(gameStateStorage));
+  }, [
+    reStart,
+    roundEnd,
+    gameEnd,
+    otherGameState,
+    otherCard,
+    roundPot,
+    isRaise,
+    currentPlayer,
+  ]);
   //^ useEffect
   useEffect(() => {
     //첫번째 마운트 상황에서 실행하는 Effect
@@ -256,10 +333,31 @@ const GameRoomPage = () => {
         }
       }
     })();
+    const preventClose = (e: any) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', preventClose);
+    if (localStorage.getItem('gameStateStorage')) {
+      const gameStateStorage = JSON.parse(
+        localStorage.getItem('gameStateStorage')!,
+      );
+      console.log(gameStateStorage);
+      setReStart(gameStateStorage.reStart);
+      setRoundEnd(gameStateStorage.roundEnd);
+      setGameEnd(gameStateStorage.gameEnd);
+      setOtherGameState(gameStateStorage.otherGameState);
+      setOtherCard(gameStateStorage.otherCard);
+      setRoundPoint(gameStateStorage.roundPot);
+      setIsRaise(gameStateStorage.isRaise);
+      // setCurrentPlayer(gameStateStorage.currentPlayer);
+    }
     return () => {
       if (stompClient) {
+        stompClient.disconnect();
         handleLeaveButtonClick();
       }
+      window.removeEventListener('beforeunload', preventClose);
     };
   }, []);
 
@@ -311,6 +409,7 @@ const GameRoomPage = () => {
         setOtherPoint(roomUserInfo?.participantPoints);
       }
     }
+    // setGameRoomState(roomUserInfo?.gameRoomState);
   }, [roomUserInfo]);
 
   useEffect(() => {
@@ -324,33 +423,10 @@ const GameRoomPage = () => {
     }
   }, [readyState]);
 
-  const otherState = useMemo(() => {
-    if (readyState) {
-      switch (readyState) {
-        case 'READY':
-          return userReady ? 'wait' : 'ready';
-        case 'UNREADY':
-          return userReady ? 'wait' : 'ready';
-        case 'ALL_READY':
-          return 'ready';
-        case 'NO_ONE_READY':
-          setUserReady(false);
-          return 'wait';
-        default:
-          return 'wait';
-      }
-    } else if (currentPlayer) {
-      return currentPlayer ? 'wait' : 'choose';
-    } else {
-      return 'wait';
-    }
-  }, [readyState, currentPlayer]);
-
   useEffect(() => {
-    setCurrentPlayer(null);
     if (stompClient && roundEnd) {
+      setCurrentPlayer(null);
       stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
-      // stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
     }
   }, [roundEnd]);
 
@@ -400,7 +476,7 @@ const GameRoomPage = () => {
           player="other"
           nick={otherNickname ? otherNickname : '상대방을 기다리는 중..'}
           point={otherPoint.toString()}
-          state={otherState}
+          state={otherGameState}
         />
         <MyState>
           <Player
@@ -413,9 +489,7 @@ const GameRoomPage = () => {
             <Button onClickFnc={handleReadyButtonClick}>레디</Button>
           ) : currentPlayer ? (
             <GameButton stompClient={stompClient} setIsRaise={setIsRaise} />
-          ) : (
-            ''
-          )}
+          ) : null}
           {isRaise ? (
             <BattingInput stompClient={stompClient} setIsRaise={setIsRaise} />
           ) : null}

@@ -35,7 +35,7 @@ function GameEndModal() {
 
   useEffect(() => {
     if (secondsLeft === 0) {
-      useSetIsModalClick();
+      handleLeaveButtonClick();
     }
   }, [secondsLeft]);
 
