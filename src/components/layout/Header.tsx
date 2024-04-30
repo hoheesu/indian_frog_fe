@@ -9,9 +9,8 @@ import IconLogin from '../../assets/images/icons/icon-login.svg';
 import IconLogout from '../../assets/images/icons/icon-logout.svg';
 import IconCoin from '../../assets/images/icons/icon-coin-rotate.svg';
 import IconMypage from '../../assets/images/icons/icon-mypage.svg';
+import IconHome from '../../assets/images/icons/icon-home.svg';
 import { useGetUserPoint } from '../../hooks/useQuery';
-import { useMemo } from 'react';
-import { loginUser } from '../../api/userAuthApi';
 import { formatNumber } from '../../utils/numberFormatCheck';
 function Header() {
   const location = useLocation().pathname;
@@ -22,20 +21,15 @@ function Header() {
   const authToken = localStorage.getItem('accessToken');
   const useUserPoint = useGetUserPoint();
   const navigate = useNavigate();
-
-  useMemo(() => {
-    loginUser;
-  }, []);
-
   return (
     <HeaderContainer $location={location}>
       <HeaderInner>
         <Button onClickFnc={() => navigate('/')} isBorder={false}>
           <p>
             <span>
-              <img src={IconHowto} alt="" />
+              <img src={IconHome} alt="" />
             </span>
-            MAIN
+            HOME
           </p>
         </Button>
         <Button onClickFnc={() => handleModalOpen('howto')} isBorder={false}>

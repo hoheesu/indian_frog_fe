@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { getGameRoomsList } from '../api/gameRoomApi';
 import { getMypageInfo, getRankingList } from '../api/myPageApi';
 import { getUserPoint, snsLoginUser } from '../api/userAuthApi';
@@ -11,20 +11,21 @@ export const QUERY_KEYS = {
   SnsLogin: 'snsLogin',
 };
 
-export const useGetGameRoomsList = (pageNum: number) => {
-  return useQuery({
-    queryKey: [QUERY_KEYS.GameRoomsList, pageNum],
-    queryFn: () => getGameRoomsList(pageNum),
+export const useGetGameRoomsList = () => {
+  return useInfiniteQuery({
+    queryKey: [QUERY_KEYS.GameRoomsList],
+    queryFn: ({ pageParam = 1 }) => getGameRoomsList(pageParam),
+    getNextPageParam: (lastPage: any) => {
+      if (!lastPage.isLast) return lastPage.nextPage;
+
+      return undefined;
+    },
+    initialPageParam: 0,
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    retry: 1,
   });
 };
-
-// export const useGetGameRoomsList = ()=> {
-//   return useInfiniteQuery(
-//     [QUERY_KEYS.GameRoomsList], // 쿼리 키
-//     ({ pageParam = 1 }) => getGameRoomsList(pageParam), // 데이터 패칭 함수
-
-//   );
-// };
 
 export const useGetMypageInfo = () => {
   return useQuery({

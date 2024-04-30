@@ -29,13 +29,20 @@ const Mypage = () => {
             </picture>
           </PictureWrap>
           <p>{myPageInfo.data?.nickName}</p>
-
-          <Button
-            onClickFnc={() => handleModalOpen('updateImg')}
-            isBorder={false}
-          >
-            <p>프로필 편집</p>
-          </Button>
+          <BtnWrap>
+            <Button
+              onClickFnc={() => handleModalOpen('updateImg')}
+              isBorder={false}
+            >
+              <p>프로필 편집</p>
+            </Button>
+            <Button
+              onClickFnc={() => handleModalOpen('changePassword')}
+              isBorder={false}
+            >
+              <p>비밀번호 변경</p>
+            </Button>
+          </BtnWrap>
         </ProfileWrap>
         <MyDetailInfoList>
           <li>
@@ -87,12 +94,43 @@ const Mypage = () => {
     </>
   );
 };
+const BtnWrap = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  button {
+    width: 100%;
+    min-width: 150px;
+    height: 55px;
+    border-radius: 30px;
+    background: #5a8900;
+    &:hover {
+      background: #81c008;
+    }
+    p {
+      padding: 5px 10px;
+      font-size: 18px;
+      font-weight: 500;
+      color: #fff;
+    }
+    & + button {
+      background: transparent;
+      border: 2px solid #5a8900;
+      &:hover {
+        background: transparent;
+      }
+      p {
+        color: #5a8900;
+      }
+    }
+  }
+`;
 const MyDetailInfoList = styled.ul`
   margin-top: 50px;
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 20px;
+  gap: 40px;
 `;
 const ArrowLink = styled.button`
   display: flex;
@@ -167,28 +205,13 @@ const ProfileWrap = styled.div`
   margin: 200px auto 0;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 25px;
   > p {
     font-family: 'NPSfontBold';
     font-size: 28px;
     font-weight: 600;
   }
-  button {
-    width: 100%;
-    max-width: 160px;
-    height: 50px;
-    border-radius: 30px;
-    background: #222;
-    &:hover {
-      background: #5a8900;
-    }
-    p {
-      padding: 5px 20px;
-      font-size: 20px;
-      font-weight: 500;
-      color: #fff;
-    }
-  }
+
   picture {
     display: inline-flex;
     align-items: center;

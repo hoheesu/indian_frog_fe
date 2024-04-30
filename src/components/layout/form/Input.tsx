@@ -1,13 +1,12 @@
 import { ChangeEvent, forwardRef } from 'react';
 
 interface InputPropsType {
-  type: string;
+  type: React.HTMLInputTypeAttribute;
   value: string;
   placeholder?: string;
   name?: string;
   disabled?: boolean;
   onChangeFnc: (e: ChangeEvent<HTMLInputElement>) => void;
-  ref?: React.Ref<HTMLInputElement>;
 }
 
 const Input = forwardRef<HTMLInputElement, InputPropsType>((props, ref) => {

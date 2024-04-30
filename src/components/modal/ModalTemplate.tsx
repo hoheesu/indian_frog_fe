@@ -9,7 +9,10 @@ import HowtoModal from './HowtoModal';
 import LogoutModal from './LogoutModal';
 import PointChargeModal from './PointChargeModal';
 import UpdateImgModal from './UpdateImgModal';
+import GameEndModal from './GameEndModal';
 import FindPasswordModal from './FindPasswordModal';
+import ChangePassWord from './ChangePassWord';
+import JoinRoomModal from './JoinRoomModal';
 
 function ModalTemplate() {
   const useIsModal = useIsModalStore((state) => state.isModal);
@@ -30,15 +33,20 @@ function ModalTemplate() {
               return <SignupModal />;
             case 'createRoom':
               return <CreateRoomModal />;
+            case 'joinRoom':
+              return <JoinRoomModal />;
             case 'howto':
               return <HowtoModal />;
             case 'pointCharge':
               return <PointChargeModal />;
             case 'updateImg':
               return <UpdateImgModal />;
+            case 'gameOver':
+              return <GameEndModal />;
             case 'findPassword':
               return <FindPasswordModal />;
-
+            case 'changePassword':
+              return <ChangePassWord />;
             default:
               return <p>{useIsModal}</p>;
           }

@@ -1,57 +1,80 @@
 import styled from 'styled-components';
 import Input from '../../components/layout/form/Input';
 import IconSend from '../../assets/images/icons/icon-send.svg';
+import { jwtDecode } from 'jwt-decode';
+import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 
-const Chat = () => {
+interface Message {
+  sender: string;
+  content: string;
+  type: string;
+}
+interface Props {
+  messageArea: Message[];
+  stompClient: any;
+}
+
+const Chat = ({ messageArea, stompClient }: Props) => {
+  const [messageContent, setMessageContent] = useState('');
+  const authToken = localStorage.getItem('accessToken');
+  const { gameId } = useParams(); // 게임방 아이디
+  const userInfoDecode: {
+    auth: string;
+    exp: number;
+    iat: number;
+    nickname: string;
+    sub: string;
+  } = jwtDecode(authToken!);
+
+  const handleMessageSubmit = () => {
+    if (messageContent.trim()) {
+      stompClient.send(
+        `/app/chat.sendMessage/${gameId}`,
+        {},
+        JSON.stringify({
+          sender: userInfoDecode.nickname,
+          content: messageContent,
+          type: 'CHAT',
+        }),
+      );
+      setMessageContent('');
+    }
+  };
+
   return (
     <ChatWrap>
-      <ChatList>
-        <li className="me">
-          <span>올챙이개구리적</span>
-          <p>님 잘하시네요</p>
-        </li>
-        <li className="me">
-          <span>올챙이개구리적</span>
-          <p>님 잘하시네요</p>
-        </li>
-        <li className="me">
-          <span>올챙이개구리적</span>
-          <p>님 잘하시네요</p>
-        </li>
-        <li className="me">
-          <span>올챙이개구리적</span>
-          <p>님 잘하시네요</p>
-        </li>
-        <li className="me">
-          <span>올챙이개구리적</span>
-          <p>님 잘하시네요</p>
-        </li>
-        <li className="other">
-          <span>모래알은반짝</span>
-          <p>ㄱㅅ합니다</p>
-        </li>
-        <li className="me">
-          <span>올챙이개구리적</span>
-          <p>ㅋㅋㅋㅋ</p>
-        </li>
-        <li className="me">
-          <span>올챙이개구리적</span>
-          <p>저 이번판 죽습니다.</p>
-        </li>
-        <li className="other">
-          <span>모래알은반짝</span>
-          <p>네 수고하셨습니다.</p>
-        </li>
-        <li className="notice">
-          올챙이개구리적 님이 100,000 포인트 배팅하셨습니다.
-        </li>
-      </ChatList>
+      {messageArea?.map((message, index) => (
+        <ChatList key={index}>
+          {message.type === 'JOIN' ? (
+            <li className="notice">{message.sender}님이 접속하셨습니다.</li>
+          ) : message.type === 'LEAVE' ? (
+            <li className="notice">{message.sender}님이 퇴장하셨습니다.</li>
+          ) : (
+            <li
+              className={
+                message.sender === userInfoDecode.nickname ? 'me' : 'other'
+              }
+            >
+              <span>{message.sender}</span>
+              <p>{message.content}</p>
+            </li>
+          )}
+        </ChatList>
+      ))}
       <ChatInput>
-        <form action="">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleMessageSubmit();
+          }}
+        >
           <Input
             type="text"
-            value={''}
-            onChangeFnc={() => {}}
+            value={messageContent}
+            onChangeFnc={(e: React.ChangeEvent<HTMLInputElement>) => {
+              setMessageContent(e.target.value);
+            }}
             placeholder="채팅을 입력해주세요"
           />
         </form>
@@ -69,13 +92,14 @@ const ChatWrap = styled.div`
     left: 0;
     width: 95%;
     height: 50px;
-    background: rgb(189, 236, 127);
+    /* background: rgb(189, 236, 127);
     background: linear-gradient(
       180deg,
       rgba(189, 236, 127, 1) 0%,
       rgba(189, 236, 127, 0) 100%
-    );
+    ); */
   }
+  padding-top: 50px;
   grid-area: 3/1;
   width: 100%;
   align-self: flex-end;

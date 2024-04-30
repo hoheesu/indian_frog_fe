@@ -4,16 +4,22 @@ import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGetGameRoomsList, useGetUserPoint } from '../../hooks/useQuery';
 import { useNavigate } from 'react-router-dom';
 import { useJoinRoomMutation } from '../../hooks/useMutation';
-
+import { LobbyContents } from './MainLobbyType';
 import IconJoinroom from '../../assets/images/icons/icon-joinroom.svg';
-// import IconPlusroom from '../../assets/images/icons/icon-plusroom.svg';
+import IconPlusroom from '../../assets/images/icons/icon-plusroom.svg';
 import ImgListleaf from '../../assets/images/img-listicon.svg';
 import ImgListleaf2 from '../../assets/images/img-listicon2.svg';
+import { useInView } from 'react-intersection-observer';
+import { useEffect, useMemo } from 'react';
 
 function Main() {
-  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const {
+    data: result,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = useGetGameRoomsList();
   const navigate = useNavigate();
-  const gameRoomsList = useGetGameRoomsList(0);
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const useJoinRoom = useJoinRoomMutation();
   const useGetPoint = useGetUserPoint();
   const handleCreateRoomOnclick = () => {
@@ -23,64 +29,93 @@ function Main() {
       useSetIsModalClick('createRoom');
     }
   };
-
-  const handleJoinRoomNumberOnClick = (roomNumber: number) => {
+  const handleJoinRoomOnclick = () => {
     if (useGetPoint.data.point === 0) {
       alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
     } else {
-      useJoinRoom.mutate(roomNumber);
-      navigate(`/gameroom/${roomNumber}`);
+      useSetIsModalClick('joinRoom');
     }
   };
+  const handleJoinRoomNumberOnClick = (
+    roomNumber: number,
+    participantCount: number,
+  ) => {
+    if (participantCount < 2) {
+      useJoinRoom.mutate(roomNumber);
+      navigate(`/gameroom/${roomNumber}`);
+    } else {
+      alert(`${roomNumber}번 방은 인원이 가득찼습니다.`);
+    }
+    if (useGetPoint.data.point === 0) {
+      alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
+    }
+  };
+
+  const roomLists = useMemo(() => {
+    let roomList: any[] = [];
+    result?.pages.forEach(({ result }) => {
+      roomList = [...roomList, ...result];
+    });
+    return roomList;
+  }, [result]);
+
+  const [ref, inView] = useInView();
+  useEffect(() => {
+    if (inView && result?.pages[0].hasNextPage) {
+      setTimeout(() => {
+        fetchNextPage();
+      }, 400);
+    }
+  }, [inView]);
+
   return (
     <RoomListsContainer>
       <RoomCardList>
-        {gameRoomsList.data?.content
-          ? gameRoomsList.data?.content.map((gameRoom: any) => {
-              return (
-                <CardItem key={gameRoom.roomId}>
-                  <ContentTop>
-                    <RoomInfo>
-                      <Rules>일반전</Rules>
-                      <span>{gameRoom.hostNickname}</span>
-                      <span>{gameRoom.roomId}</span>
-                    </RoomInfo>
-                    <RoomName>
-                      <h4>
-                        {gameRoom.roomName ? gameRoom.roomName : '임시제목'}
-                      </h4>
-                    </RoomName>
-                  </ContentTop>
-                  <ContentBottom>
-                    <p>
-                      {gameRoom.gameState === 'READY'
-                        ? '준비중'
-                        : gameRoom.gameState === 'START'
-                          ? '게임시작'
-                          : null}
-                    </p>
-                    <Button
-                      onClickFnc={() => {
-                        handleJoinRoomNumberOnClick(gameRoom.roomId);
-                      }}
-                      isBorder={true}
-                    >
-                      <p>게임 참여하기</p>
-                    </Button>
-                  </ContentBottom>
-                </CardItem>
-              );
-            })
-          : ''}
+        {roomLists.map((gameRoom: LobbyContents) => {
+          return (
+            <CardItem key={gameRoom.roomId}>
+              <ContentTop>
+                <RoomInfo>
+                  <Rules>일반전</Rules>
+                  <span>{gameRoom.hostNickname}</span>
+                  <span>{gameRoom.roomId}</span>
+                </RoomInfo>
+                <RoomName>
+                  <h4>{gameRoom.roomName ? gameRoom.roomName : '임시제목'}</h4>
+                </RoomName>
+              </ContentTop>
+              <ContentBottom $usercount={gameRoom.participantCount}>
+                <p>{gameRoom.participantCount} / 2</p>
+                <Button
+                  onClickFnc={() => {
+                    handleJoinRoomNumberOnClick(
+                      gameRoom.roomId,
+                      gameRoom.participantCount,
+                    );
+                  }}
+                  isBorder={true}
+                >
+                  <p>게임 참여하기</p>
+                </Button>
+              </ContentBottom>
+            </CardItem>
+          );
+        })}
       </RoomCardList>
+      {isFetchingNextPage ? (
+        <p>loading...</p>
+      ) : (
+        <LodingContent ref={ref}></LodingContent>
+      )}
+
       <ButtonsBox>
         <BoxInner>
-          {/* <Button onClickFnc={() => {}} isBorder={true}>
+          <Button onClickFnc={handleJoinRoomOnclick} isBorder={true}>
             <span>
               <img src={IconPlusroom} alt="" />
             </span>
             방 참여하기
-          </Button> */}
+          </Button>
           <Button onClickFnc={handleCreateRoomOnclick} isBorder={true}>
             <span>
               <img src={IconJoinroom} alt="" />
@@ -92,6 +127,15 @@ function Main() {
     </RoomListsContainer>
   );
 }
+const LodingContent = styled.div`
+  margin: 50px auto 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  font-size: 30px;
+  font-weight: 700;
+  color: var(--color-main);
+`;
 const RoomListsContainer = styled.div`
   position: relative;
   max-width: 1460px;
@@ -170,18 +214,27 @@ const CardItem = styled.li`
     }
   }
 `;
-const ContentBottom = styled.div`
+interface ParticipantCount {
+  $usercount: number;
+}
+const ContentBottom = styled.div<ParticipantCount>`
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
   background-color: #e6dbbb;
   > p {
-    background-color: #f9f4e0;
-    padding: 10px 20px;
+    background-color: ${(props) =>
+      props.$usercount === 1
+        ? '#b19e67'
+        : props.$usercount === 2
+          ? '#df6d00'
+          : '#dfa600'};
+    padding: 8px 15px;
     border-radius: 50px;
-    font-size: 12px;
+    font-size: 16px;
     font-weight: 700;
+    color: #fff;
   }
   button {
     background-color: var(--color-sub);

@@ -63,3 +63,21 @@ export const getRankingList = async () => {
     }
   }
 };
+export const changePassword = async (changePwInfo: {
+  originPassword: string;
+  updatedPassword: string;
+}) => {
+  try {
+    const { originPassword, updatedPassword } = changePwInfo;
+    const { data } = await authInstance.put('/password-change', {
+      originPassword,
+      updatedPassword,
+    });
+    return data;
+  } catch (error) {
+    const axiosError = error as AxiosError<ErrorResponse>;
+    if (axiosError.response) {
+      return axiosError.response;
+    }
+  }
+};

@@ -5,15 +5,12 @@ import {
   findPassword,
   loginUser,
 } from '../api/userAuthApi';
-import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
+import { createGameRoom, gameRoomInfo, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
-import { useGameRoomInfoStore } from '../store/modal/GameRoomInfoStore';
-import { useHostUserInfoStore } from '../store/modal/HostUserInfo';
-import { chargePoint, updateProfile } from '../api/myPageApi';
+import { changePassword, chargePoint, updateProfile } from '../api/myPageApi';
 import useUserProfileStore from '../store/profile/useUserProfileStore';
 import { QUERY_KEYS } from './useQuery';
-import { getCookie } from '../utils/cookies';
 
 export const useLoginSubmitMutation = () => {
   const queryClient = useQueryClient();
@@ -21,10 +18,11 @@ export const useLoginSubmitMutation = () => {
     mutationFn: loginUser,
     onSuccess: (data) => {
       const accessToken = data?.headers.authorization;
-          console.log(getCookie('refreshToken'));
       localStorage.setItem('accessToken', accessToken);
       alert(data?.data.message);
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.UsePoint],
+      });
     },
     onError: (error) => {
       alert(error.message);
@@ -36,17 +34,9 @@ export const useCreateRoomMutation = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
-  const useHostUserInfo = useHostUserInfoStore(
-    (state) => state.setHostUserInfo,
-  );
   return useMutation({
     mutationFn: createGameRoom,
     onSuccess: (data) => {
-      console.log(data?.data.data);
-      useHostUserInfo({
-        hostName: data?.data.data.hostName,
-        hostPoint: data?.data.data.myPoint,
-      });
       navigate(`/gameroom/${data?.data.data.roomId}`);
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GameRoomsList],
@@ -62,20 +52,25 @@ export const useCreateRoomMutation = () => {
 export const useJoinRoomMutation = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const useSetGameRoomInfo = useGameRoomInfoStore(
-    (state) => state.setIsGameInfo,
-  );
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   return useMutation({
     mutationFn: joinGameRoom,
-    onSuccess: async (data, roomNumber: number) => {
-      useSetGameRoomInfo(data);
+    onSuccess: (_, roomNumber: number) => {
       navigate(`/gameroom/${roomNumber}`);
+      useSetIsModalClick();
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GameRoomsList],
       });
     },
-    onError: (error) => {
-      alert(error.message);
+    onError: (_, roomNumber: number) => {
+      (async () => {
+        try {
+          await gameRoomInfo(roomNumber);
+        } catch (error: any) {
+          alert(error.message);
+          navigate('/main');
+        }
+      })();
     },
   });
 };
@@ -148,6 +143,25 @@ export const useFindPasswordMutation = () => {
       alert('임시 비밀번호를 보냈습니다.');
       useSetIsModalClick();
       queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+};
+export const useChangePasswordMutation = () => {
+  const queryClient = useQueryClient();
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  return useMutation({
+    mutationFn: changePassword,
+    onSuccess: (data) => {
+      if (data.passwordChange) {
+        alert('비밀번호가 변경되었습니다.');
+        useSetIsModalClick();
+        queryClient.invalidateQueries();
+      } else {
+        alert('비밀번호를 다시 확인해주세요');
+      }
     },
     onError: (error) => {
       alert(error.message);
