@@ -10,6 +10,7 @@ import LogoutModal from './LogoutModal';
 import PointChargeModal from './PointChargeModal';
 import UpdateImgModal from './UpdateImgModal';
 import GameEndModal from './GameEndModal';
+import StoryEndModal from './StoryEndModal';
 
 function ModalTemplate() {
   const useIsModal = useIsModalStore((state) => state.isModal);
@@ -38,6 +39,8 @@ function ModalTemplate() {
               return <UpdateImgModal />;
             case 'gameOver':
               return <GameEndModal />;
+            case 'storyOver':
+              return <StoryEndModal />;
             default:
               return <p>{useIsModal}</p>;
           }

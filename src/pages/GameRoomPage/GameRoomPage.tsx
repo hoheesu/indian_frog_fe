@@ -202,9 +202,6 @@ const GameRoomPage = () => {
       console.log('!!!!!error-paylad --->', error);
     }
   };
-  // useEffect(() => {
-  //   console.log('CARD: ==>', cardState.otherCard);
-  // });
 
   const gameRecevied = (payload: any) => {
     try {

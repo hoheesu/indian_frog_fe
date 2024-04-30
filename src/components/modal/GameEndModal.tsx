@@ -64,12 +64,12 @@ function GameEndModal() {
       <UserResult>
         <WinnerInfo>
           <p>WIN</p>
-          <p>{useGameEndInfo.winnerPoint}</p>
+          <p>{useGameEndInfo.gameWinner}</p>
           <p>+{point}</p>
         </WinnerInfo>
         <LoserInfo>
           <p>LOSE</p>
-          <p>{useGameEndInfo.loserPoint}</p>
+          <p>{useGameEndInfo.gameLoser}</p>
           <p>-{point}</p>
         </LoserInfo>
       </UserResult>
