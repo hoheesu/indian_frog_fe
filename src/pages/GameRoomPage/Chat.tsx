@@ -67,7 +67,7 @@ const Chat = ({ messageArea, stompClient }: Props) => {
               <div className="notice">{message.sender}님이 다이하셨습니다.</div>
             ) : message.type === 'RAISE' ? (
               <div className="notice">
-                {message.sender}님이{' '}
+                {message.sender}님이
                 <span style={{ color: 'red' }}>{message.content}</span>
                 포인트 레이즈하셨습니다.
               </div>
@@ -127,7 +127,6 @@ const ChatWrap = styled.div`
     );
   }
   padding-top: 10px;
-
   grid-area: 3/1;
   width: 100%;
   align-self: flex-end;

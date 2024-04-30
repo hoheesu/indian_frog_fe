@@ -70,10 +70,9 @@ const GameRoomPage = () => {
 
   const [messageArea, setMessageArea] = useState<Message[]>([]);
 
-  const [useSetGameEndInfo, useUserChoice] = useGameEndStore((state) => [
-    state.setGameEndInfo,
-    state.userChoice,
-  ]);
+  const [useSetGameEndInfo, useUserChoice, useSetUserChoice] = useGameEndStore(
+    (state) => [state.setGameEndInfo, state.userChoice, state.setUserChoice],
+  );
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
@@ -203,6 +202,9 @@ const GameRoomPage = () => {
       console.log('!!!!!error-paylad --->', error);
     }
   };
+  // useEffect(() => {
+  //   console.log('CARD: ==>', cardState.otherCard);
+  // });
 
   const gameRecevied = (payload: any) => {
     try {
@@ -239,7 +241,7 @@ const GameRoomPage = () => {
           roundPot: message.roundPot,
         });
         setCardState({
-          otherCard: cardState.otherCard,
+          ...cardState,
           userCard: message.myCard,
           cardState: true,
         });
@@ -316,23 +318,22 @@ const GameRoomPage = () => {
 
   useEffect(() => {
     //첫번째 마운트 상황에서 실행하는 Effect
+    connect();
     (async () => {
       try {
         await gameRoomInfoUpdate();
-        connect();
       } catch (error: any) {
         if (stompClient) {
           handleLeaveButtonClick();
         }
       }
     })();
-
     const handleKeyPress = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
         event.preventDefault();
       }
     };
-
+    useSetUserChoice('');
     const sendToNotice = () => {
       setMessageArea((prev) => {
         const newMessage = {
@@ -353,6 +354,9 @@ const GameRoomPage = () => {
 
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
+      if (stompClient) {
+        stompClient.disconnect();
+      }
     };
   }, []);
 
@@ -452,11 +456,21 @@ const GameRoomPage = () => {
 
   useEffect(() => {
     if (gameEnd) {
-      stompClient.send(
-        `/app/gameRoom/${gameId}/GAME_END`,
-        {},
-        JSON.stringify({}),
-      );
+      if (userType === 'guest') {
+        setTimeout(() => {
+          stompClient.send(
+            `/app/gameRoom/${gameId}/GAME_END`,
+            {},
+            JSON.stringify({}),
+          );
+        }, 200);
+      } else {
+        stompClient.send(
+          `/app/gameRoom/${gameId}/GAME_END`,
+          {},
+          JSON.stringify({}),
+        );
+      }
       setTimeout(() => {
         setCardState({
           cardState: false,
@@ -526,7 +540,6 @@ const GameRoomPage = () => {
           <span>배팅금액</span>
           <p>{roundPot}</p>
         </BattingPoint>
-        <strong>card1</strong>
         <Chat messageArea={messageArea} stompClient={stompClient} />
         <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
           <p>라운드 승자: {roundEndInfo.roundWinner}</p>
@@ -554,7 +567,7 @@ const SnackBar = styled.div<any>`
   transition: all 0.5s;
   z-index: 100;
   font-size: 20px;
-  box-shadow: 2px 3px 5px 0px;
+  box-shadow: 12px 13px 15px 0px;
   border: 4px solid var(--color-main);
 `;
 const BattingPoint = styled.div`

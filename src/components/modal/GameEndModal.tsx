@@ -5,7 +5,10 @@ import styled from 'styled-components';
 import Button from '../layout/form/Button';
 
 function GameEndModal() {
-  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const [useIsModal, useSetIsModalClick] = useIsModalStore((state) => [
+    state.isModal,
+    state.setIsModalClick,
+  ]);
   const [useGameEndInfo, useSetUserChoice] = useGameEndStore((state) => [
     state.gameEndInfo,
     state.setUserChoice,
@@ -23,7 +26,7 @@ function GameEndModal() {
   useEffect(() => {
     const timerId = setInterval(() => {
       setSecondsLeft((prevSeconds) => {
-        if (prevSeconds === 1) {
+        if (prevSeconds === 0) {
           clearInterval(timerId);
         }
         return prevSeconds - 1;
@@ -33,10 +36,10 @@ function GameEndModal() {
     return () => {
       clearInterval(timerId);
     };
-  }, [useSetIsModalClick]);
+  }, [useIsModal]);
 
   useEffect(() => {
-    if (secondsLeft === 1) {
+    if (secondsLeft === 0) {
       handleLeaveButtonClick();
     }
   }, [secondsLeft]);
@@ -61,12 +64,12 @@ function GameEndModal() {
       <UserResult>
         <WinnerInfo>
           <p>WIN</p>
-          <p>{useGameEndInfo.gameWinner}</p>
+          <p>{useGameEndInfo.winnerPoint}</p>
           <p>+{point}</p>
         </WinnerInfo>
         <LoserInfo>
           <p>LOSE</p>
-          <p>{useGameEndInfo.gameLoser}</p>
+          <p>{useGameEndInfo.loserPoint}</p>
           <p>-{point}</p>
         </LoserInfo>
       </UserResult>
