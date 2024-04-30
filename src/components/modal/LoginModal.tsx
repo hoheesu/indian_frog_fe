@@ -12,9 +12,14 @@ import styled from 'styled-components';
 import IconSnsNaver from '../../assets/images/icons/icon-sns-naver.svg';
 import IconSnsGoogle from '../../assets/images/icons/icon-sns-google.svg';
 import IconSnsKakao from '../../assets/images/icons/icon-sns-kakao.svg';
+import { useGetSnsLogin } from '../../hooks/useQuery';
 
 function LoginModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  const handleModalOpen = (type?: string) => {
+    type ? useSetIsModalClick(type) : useSetIsModalClick();
+  };
+
   const useLoginSubmit = useLoginSubmitMutation();
   const [emailValid, setEmailValid] = useState(false);
   const [pwValid, setPwValid] = useState(false);
@@ -23,7 +28,7 @@ function LoginModal() {
     email: '',
     password: '',
   });
-
+  const [snsName, setSnsName] = useState('');
   const handleInputOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginInput({ ...loginInput, [name]: value });
@@ -41,14 +46,26 @@ function LoginModal() {
     useSetIsModalClick();
   };
 
-  const handleToSignupModal = () => {
-    useSetIsModalClick('signup');
-  };
   useEffect(() => {
     if (emailValid && pwValid) {
       setUserValid(false);
     } else setUserValid(true);
   }, [loginInput]);
+
+  const { data } = useGetSnsLogin(snsName as string, {
+    enabled: !!snsName,
+  });
+  const handleSnsLoginClick = (name: string) => {
+    setSnsName(name);
+    const accessToken = data?.headers.authorization;
+
+    localStorage.setItem('accessToken', accessToken);
+  };
+  useEffect(() => {
+    if (data) {
+      window.location.href = data;
+    }
+  }, [handleSnsLoginClick]);
 
   return (
     <>
@@ -103,28 +120,41 @@ function LoginModal() {
           <p>로그인</p>
         </Button>
       </form>
-
-      {/* <Button isBorder={false} onClickFnc={handleLoginSubmit}>
-        <p>비밀번호 찾기</p>
-      </Button> */}
-      <Button isBorder={false} onClickFnc={handleToSignupModal}>
-        <p>아직 계정이 없으신가요?</p>
-      </Button>
+      <div>
+        <Button
+          isBorder={false}
+          onClickFnc={() => handleModalOpen('findPassword')}
+        >
+          <p>비밀번호 찾기</p>
+        </Button>
+        <Button isBorder={false} onClickFnc={() => handleModalOpen('signup')}>
+          <p>아직 계정이 없으신가요?</p>
+        </Button>
+      </div>
       <SnsLoginForm>
         <h3>간편하게 시작하기</h3>
         <ul>
           <li className="sns-naver">
-            <Button isBorder={false} onClickFnc={() => {}}>
+            <Button
+              isBorder={false}
+              onClickFnc={() => handleSnsLoginClick('naver')}
+            >
               <p>네이버로 시작하기</p>
             </Button>
           </li>
           <li className="sns-google">
-            <Button isBorder={false} onClickFnc={() => {}}>
+            <Button
+              isBorder={false}
+              onClickFnc={() => handleSnsLoginClick('google')}
+            >
               <p>구글로 시작하기</p>
             </Button>
           </li>
           <li className="sns-kakao">
-            <Button isBorder={false} onClickFnc={() => {}}>
+            <Button
+              isBorder={false}
+              onClickFnc={() => handleSnsLoginClick('kakao')}
+            >
               <p>카카오로 시작하기</p>
             </Button>
           </li>

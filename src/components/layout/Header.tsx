@@ -9,9 +9,9 @@ import IconLogin from '../../assets/images/icons/icon-login.svg';
 import IconLogout from '../../assets/images/icons/icon-logout.svg';
 import IconCoin from '../../assets/images/icons/icon-coin-rotate.svg';
 import IconMypage from '../../assets/images/icons/icon-mypage.svg';
+import IconHome from '../../assets/images/icons/icon-home.svg';
 import { useGetUserPoint } from '../../hooks/useQuery';
-import { useEffect } from 'react';
-import { loginUser } from '../../api/userAuthApi';
+import { formatNumber } from '../../utils/numberFormatCheck';
 function Header() {
   const location = useLocation().pathname;
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -21,19 +21,15 @@ function Header() {
   const authToken = localStorage.getItem('accessToken');
   const useUserPoint = useGetUserPoint();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    loginUser;
-  }, []);
   return (
     <HeaderContainer $location={location}>
       <HeaderInner>
         <Button onClickFnc={() => navigate('/')} isBorder={false}>
           <p>
             <span>
-              <img src={IconHowto} alt="" />
+              <img src={IconHome} alt="" />
             </span>
-            MAIN
+            HOME
           </p>
         </Button>
         <Button onClickFnc={() => handleModalOpen('howto')} isBorder={false}>
@@ -52,7 +48,14 @@ function Header() {
             THE MAKERS
           </p>
         </Button>
-        <Button onClickFnc={() => handleModalOpen('ranking')} isBorder={false}>
+        <Button
+          onClickFnc={() => {
+            authToken
+              ? handleModalOpen('ranking')
+              : alert('로그인 후 이용 가능합니다.');
+          }}
+          isBorder={false}
+        >
           <p>
             <span>
               <img src={IconRanking} alt="" />
@@ -66,7 +69,9 @@ function Header() {
               <span>
                 <img src={IconCoin} alt="" />
               </span>
-              {useUserPoint.data?.point}
+              {useUserPoint.data?.mtPoint < 0
+                ? 0
+                : formatNumber(useUserPoint.data?.myPoint)}
             </p>
           </Button>
         ) : null}
@@ -91,7 +96,7 @@ function Header() {
             >
               <p>
                 <span>
-                  <img src={IconLogout} alt="" />
+                  <img src={IconLogin} alt="" />
                 </span>
                 LOG OUT
               </p>
@@ -105,7 +110,7 @@ function Header() {
             >
               <p>
                 <span>
-                  <img src={IconLogin} alt="" />
+                  <img src={IconLogout} alt="" />
                 </span>
                 LOG IN
               </p>
@@ -124,7 +129,7 @@ const HeaderContainer = styled.div<{ $location: string }>`
   background-color: transparent;
   z-index: 100;
   ${({ $location }) =>
-    $location === '/main'
+    $location === '/main' || $location === '/ranking'
       ? css`
           background: #fffdee;
           border-bottom: 1px solid #eadfc2;

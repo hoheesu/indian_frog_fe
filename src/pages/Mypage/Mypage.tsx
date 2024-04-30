@@ -7,12 +7,14 @@ import IconArrowRight from '../../assets/images/icons/icon-arrow-right.svg';
 import IconRanking from '../../assets/images/icons/icon-ranking.svg';
 import IconCoin from '../../assets/images/icons/icon-coin-rotate.svg';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
+import { useNavigate } from 'react-router-dom';
 const Mypage = () => {
   const myPageInfo = useGetMypageInfo();
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const handleModalOpen = (type?: string) => {
     type ? useSetIsModalClick(type) : useSetIsModalClick();
   };
+  const navigate = useNavigate();
   return (
     <>
       <MypageWrap>
@@ -27,13 +29,20 @@ const Mypage = () => {
             </picture>
           </PictureWrap>
           <p>{myPageInfo.data?.nickName}</p>
-
-          <Button
-            onClickFnc={() => handleModalOpen('updateImg')}
-            isBorder={false}
-          >
-            <p>프로필 편집</p>
-          </Button>
+          <BtnWrap>
+            <Button
+              onClickFnc={() => handleModalOpen('updateImg')}
+              isBorder={false}
+            >
+              <p>프로필 편집</p>
+            </Button>
+            <Button
+              onClickFnc={() => handleModalOpen('changePassword')}
+              isBorder={false}
+            >
+              <p>비밀번호 변경</p>
+            </Button>
+          </BtnWrap>
         </ProfileWrap>
         <MyDetailInfoList>
           <li>
@@ -46,21 +55,21 @@ const Mypage = () => {
                 <span>{myPageInfo.data?.ranking}</span>위
               </p>
             </ItemBox>
-            <ArrowLink onClick={() => {}}>1 ~ 50위 보기</ArrowLink>
+            <ArrowLink onClick={() => navigate('/ranking')}>
+              전체 랭킹 보기
+            </ArrowLink>
           </li>
           <li>
             <ItemBox>
               <p>
-                {myPageInfo.data?.point <= 0 ? (
+                {myPageInfo.data?.point <= 30 ? (
                   <ArrowLink onClick={() => handleModalOpen('pointCharge')}>
                     포인트 충전
                   </ArrowLink>
                 ) : (
                   <ArrowLink
                     onClick={() => {
-                      alert(
-                        '포인트를 모두 소진했을 경우에만 충전이 가능합니다!',
-                      );
+                      alert('포인트가 30이하일 경우에만 충전이 가능합니다!');
                     }}
                   >
                     포인트 충전
@@ -71,7 +80,12 @@ const Mypage = () => {
                 <i>
                   <img src={IconCoin} alt="" />
                 </i>
-                <span>{formatNumber(myPageInfo.data?.point)}</span>
+                <span>
+                  {' '}
+                  {myPageInfo.data?.point < 0
+                    ? 0
+                    : formatNumber(myPageInfo.data?.point)}
+                </span>
               </p>
             </ItemBox>
           </li>
@@ -80,12 +94,43 @@ const Mypage = () => {
     </>
   );
 };
+const BtnWrap = styled.div`
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  button {
+    width: 100%;
+    min-width: 150px;
+    height: 55px;
+    border-radius: 30px;
+    background: #5a8900;
+    &:hover {
+      background: #81c008;
+    }
+    p {
+      padding: 5px 10px;
+      font-size: 18px;
+      font-weight: 500;
+      color: #fff;
+    }
+    & + button {
+      background: transparent;
+      border: 2px solid #5a8900;
+      &:hover {
+        background: transparent;
+      }
+      p {
+        color: #5a8900;
+      }
+    }
+  }
+`;
 const MyDetailInfoList = styled.ul`
   margin-top: 50px;
   display: flex;
   align-items: center;
   flex-direction: column;
-  gap: 20px;
+  gap: 40px;
 `;
 const ArrowLink = styled.button`
   display: flex;
@@ -98,9 +143,10 @@ const ArrowLink = styled.button`
   &:after {
     content: '';
     display: block;
-    width: 13px;
-    height: 13px;
-    background: url(${IconArrowRight});
+    width: 18px;
+    height: 18px;
+    background: url(${IconArrowRight}) no-repeat center;
+    background-size: 100%;
   }
   font-size: 18px;
   gap: 5px;
@@ -159,28 +205,13 @@ const ProfileWrap = styled.div`
   margin: 200px auto 0;
   align-items: center;
   justify-content: center;
-  gap: 20px;
+  gap: 25px;
   > p {
     font-family: 'NPSfontBold';
     font-size: 28px;
     font-weight: 600;
   }
-  button {
-    width: 100%;
-    max-width: 160px;
-    height: 50px;
-    border-radius: 30px;
-    background: #222;
-    &:hover {
-      background: #5a8900;
-    }
-    p {
-      padding: 5px 20px;
-      font-size: 20px;
-      font-weight: 500;
-      color: #fff;
-    }
-  }
+
   picture {
     display: inline-flex;
     align-items: center;

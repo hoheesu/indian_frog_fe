@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Input from '../../components/layout/form/Input';
+import IconSend from '../../assets/images/icons/icon-send.svg';
 import { jwtDecode } from 'jwt-decode';
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -142,7 +143,7 @@ const ChatInput = styled.div`
       height: 30px;
       background-color: #5a8900;
       border-radius: 50%;
-      background-image: url('/src/assets/images/icons/icon-send.svg');
+      background-image: url(${IconSend});
       background-size: 80%;
       background-repeat: no-repeat;
       background-position: center;

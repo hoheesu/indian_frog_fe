@@ -13,6 +13,8 @@ import { gameRoomInfo } from '../../api/gameRoomApi';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 import { history } from '../../utils/history';
+import ImgCardBack from '../../assets/images/img-card-back.png';
+import IconCoin from '../../assets/images/icons/icon-coin.svg';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -430,10 +432,7 @@ const GameRoomPage = () => {
           </RsultDeck>
           <CardList>
             <li>
-              <img src="src/assets/images/img-card-back.png" alt="" />
-            </li>
-            <li>
-              <img src="src/assets/images/img-card-back.png" alt="" />
+              <img src={ImgCardBack} alt="" />
             </li>
           </CardList>
         </CardDeck>
@@ -480,7 +479,7 @@ const BattingPoint = styled.div`
     top: -35px;
     left: 50%;
     transform: translateX(-50%);
-    background: url('src/assets/images/icons/icon-coin.svg') no-repeat center;
+    background: url(${IconCoin}) no-repeat center;
     background-size: 100%;
   }
   position: absolute;
@@ -542,12 +541,17 @@ const CardDeck = styled.div`
 const CardList = styled.ul`
   transform: translateY(360px);
   li {
+    width: 200px;
+    height: auto;
     position: absolute;
     top: 0;
     right: 90px;
     z-index: 2;
     transform: translateY(-50%) rotate(-20deg);
     filter: drop-shadow(-2px -2px 5px rgba(65, 65, 65, 0.1));
+    img {
+      width: 100%;
+    }
     &:nth-child(2n) {
       top: 30px;
       right: 100px;
