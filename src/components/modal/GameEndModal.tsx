@@ -1,6 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
+import styled from 'styled-components';
+import Button from '../layout/form/Button';
 
 function GameEndModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -21,7 +23,7 @@ function GameEndModal() {
   useEffect(() => {
     const timerId = setInterval(() => {
       setSecondsLeft((prevSeconds) => {
-        if (prevSeconds === 0) {
+        if (prevSeconds === 1) {
           clearInterval(timerId);
         }
         return prevSeconds - 1;
@@ -34,59 +36,125 @@ function GameEndModal() {
   }, [useSetIsModalClick]);
 
   useEffect(() => {
-    if (secondsLeft === 0) {
+    if (secondsLeft === 1) {
       handleLeaveButtonClick();
     }
   }, [secondsLeft]);
 
   const progress = (10 - secondsLeft) / 10; // 타이머 진행도 계산
-
+  const point = useMemo(
+    () =>
+      (useGameEndInfo.winnerPoint - useGameEndInfo.loserPoint)
+        .toString()
+        .replace(/\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g, ','),
+    [useGameEndInfo],
+  );
   return (
-    <div>
-      {useGameEndInfo.isUserWin ? <h3>YOU WIN!</h3> : <h3>YOU LOSE!</h3>}
-      <div>
-        <div
-          style={{
-            display: 'inline-block',
-            position: 'relative',
-            width: '200px',
-          }}
-        >
-          <div
-            style={{
-              position: 'absolute',
-              width: `${progress * 100}%`,
-              height: '20px',
-              backgroundColor: 'green',
-            }}
-          ></div>
-          <div
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '20px',
-              border: '1px solid black',
-            }}
-          ></div>
-        </div>
-        <p style={{ fontSize: '24px' }}>{secondsLeft} seconds left</p>
-      </div>
-      <ul>
-        <li>
+    <ResultModalContainer>
+      <ResultTitle>
+        {useGameEndInfo.isUserWin ? 'YOU WIN!' : 'YOU LOSE!'}
+      </ResultTitle>
+      <TimerContainer>
+        <TimerBar $time={progress * 100} />
+        <TimerWrap />
+      </TimerContainer>
+      <UserResult>
+        <WinnerInfo>
           <p>WIN</p>
           <p>{useGameEndInfo.gameWinner}</p>
-          <p>+{useGameEndInfo.winnerPoint}</p>
-        </li>
-        <li>
+          <p>+{point}</p>
+        </WinnerInfo>
+        <LoserInfo>
           <p>LOSE</p>
           <p>{useGameEndInfo.gameLoser}</p>
-          <p>+{useGameEndInfo.loserPoint}</p>
-        </li>
-      </ul>
-      <button onClick={handlePlayAgainButtonClick}>재게임</button>
-      <button onClick={handleLeaveButtonClick}>나가기</button>
-    </div>
+          <p>-{point}</p>
+        </LoserInfo>
+      </UserResult>
+      <ButtonWrapper>
+        <Button onClickFnc={handlePlayAgainButtonClick}>재게임</Button>
+        <Button onClickFnc={handleLeaveButtonClick}>나가기</Button>
+      </ButtonWrapper>
+    </ResultModalContainer>
   );
 }
-
+const ResultModalContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  row-gap: 30px;
+  align-items: center;
+  width: 500px;
+`;
+const ResultTitle = styled.h3`
+  font-size: 50px;
+  text-align: center;
+  font-weight: bold;
+  color: var(--color-main);
+`;
+const TimerContainer = styled.div`
+  display: inline-block;
+  position: relative;
+  width: 100%;
+  height: 20px;
+`;
+interface TimerBarType {
+  $time: number;
+}
+const TimerBar = styled.div<TimerBarType>`
+  position: absolute;
+  width: ${(props) => props.$time}%;
+  height: 100%;
+  background-color: var(--color-main);
+  border-radius: 10px;
+  z-index: 2;
+`;
+const TimerWrap = styled.div`
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: #eadfc2;
+  border-radius: 10px;
+  z-index: 1;
+`;
+const UserResult = styled.ul`
+  width: 100%;
+  border-radius: 20px;
+  overflow: hidden;
+  & > li {
+    display: grid;
+    grid-template-columns: 1fr 2fr 1fr;
+    padding: 20px 60px;
+    p {
+      text-align: center;
+      font-size: 24px;
+    }
+  }
+`;
+const WinnerInfo = styled.li`
+  background-color: #99d95f;
+`;
+const LoserInfo = styled.li`
+  background-color: #6b6852;
+  color: #fff;
+`;
+const ButtonWrapper = styled.div`
+  display: flex;
+  width: 100%;
+  gap: 10%;
+  & > button {
+    width: 45%;
+    height: 60px;
+    border-radius: 30px;
+    font-size: 25px;
+    font-weight: bold;
+    &:nth-child(1) {
+      background-color: var(--color-main);
+      color: #fff;
+    }
+    &:nth-child(2) {
+      border: 4px solid var(--color-main);
+      color: var(--color-main);
+    }
+  }
+`;
 export default GameEndModal;

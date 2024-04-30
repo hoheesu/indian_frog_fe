@@ -13,6 +13,7 @@ import { gameRoomInfo } from '../../api/gameRoomApi';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 import { history } from '../../utils/history';
+import CardImages from './CardImages';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -52,7 +53,11 @@ const GameRoomPage = () => {
 
   // const [myGameState, setMyGameState] = useState('');
   const [otherGameState, setOtherGameState] = useState('wait');
-  const [otherCard, setOtherCard] = useState('');
+  const [cardState, setCardState] = useState({
+    cardState: false,
+    otherCard: '',
+    userCard: '',
+  });
   const [roundPot, setRoundPoint] = useState('');
   const [isRaise, setIsRaise] = useState(false);
   const [currentPlayer, setCurrentPlayer] = useState<boolean | null>(null);
@@ -203,8 +208,12 @@ const GameRoomPage = () => {
     try {
       const message: any = JSON.parse(payload.body);
       console.log('*** gameState payload -->', message);
-      if (message.playerCard) {
-        setOtherCard(message.playerCard);
+      if (message.otherCard) {
+        setCardState({
+          ...cardState,
+          otherCard: message.otherCard,
+          cardState: true,
+        });
       }
       if (message.firstBet) {
         setUserPoint((prevState) => prevState - message.roundPot / 2);
@@ -228,6 +237,11 @@ const GameRoomPage = () => {
           roundLoser: message.roundLoser,
           roundWinner: message.roundWinner,
           roundPot: message.roundPot,
+        });
+        setCardState({
+          otherCard: cardState.otherCard,
+          userCard: message.myCard,
+          cardState: true,
         });
         setTimeout(() => {
           setRoundEndInfo({
@@ -339,54 +353,8 @@ const GameRoomPage = () => {
 
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
-      // sendToNotice();
     };
   }, []);
-
-  // useEffect(() => {
-  //   const gameStateToStore = {
-  //     roomUserInfo,
-  //     leaveNickname,
-  //     joinNickname,
-  //     userType,
-  //     userPoint,
-  //     otherNickname,
-  //     otherPoint,
-  //     userReady,
-  //     readyState,
-  //     gameRoomState,
-  //     reStart,
-  //     roundEnd,
-  //     gameEnd,
-  //     otherGameState,
-  //     otherCard,
-  //     roundPot,
-  //     isRaise,
-  //     currentPlayer,
-  //     roundEndInfo,
-  //   };
-  //   localStorage.setItem('gameState', JSON.stringify(gameStateToStore));
-  // }, [
-  //   roomUserInfo,
-  //   leaveNickname,
-  //   joinNickname,
-  //   userType,
-  //   userPoint,
-  //   otherNickname,
-  //   otherPoint,
-  //   userReady,
-  //   readyState,
-  //   gameRoomState,
-  //   reStart,
-  //   roundEnd,
-  //   gameEnd,
-  //   otherGameState,
-  //   otherCard,
-  //   roundPot,
-  //   isRaise,
-  //   currentPlayer,
-  //   roundEndInfo,
-  // ]);
 
   useEffect(() => {
     const listenBackEvent = () => {
@@ -459,6 +427,11 @@ const GameRoomPage = () => {
 
   useEffect(() => {
     if (reStart) {
+      setCardState({
+        cardState: false,
+        otherCard: '',
+        userCard: '',
+      });
       if (userType === 'guest') {
         setTimeout(() => {
           stompClient.send(
@@ -484,12 +457,20 @@ const GameRoomPage = () => {
         {},
         JSON.stringify({}),
       );
+      setTimeout(() => {
+        setCardState({
+          cardState: false,
+          otherCard: '',
+          userCard: '',
+        });
+      }, 9000);
     }
   }, [gameEnd]);
 
   useEffect(() => {
     if (gameEnd && useUserChoice) {
       if (useUserChoice === 'LEAVE') {
+        console.log('나가기');
         handleLeaveButtonClick();
       }
     }
@@ -513,7 +494,11 @@ const GameRoomPage = () => {
             state={userReady ? 'ready' : currentPlayer ? 'choose' : 'wait'}
           />
           {gameRoomState === 'READY' ? (
-            <Button onClickFnc={handleReadyButtonClick}>레디</Button>
+            <ReadyButton $userReady={userReady}>
+              <Button onClickFnc={handleReadyButtonClick}>
+                {userReady ? 'UnReady' : 'Ready'}
+              </Button>
+            </ReadyButton>
           ) : currentPlayer ? (
             <GameButton stompClient={stompClient} setIsRaise={setIsRaise} />
           ) : null}
@@ -521,14 +506,13 @@ const GameRoomPage = () => {
             <BattingInput stompClient={stompClient} setIsRaise={setIsRaise} />
           ) : null}
         </MyState>
-        <strong>{otherCard}</strong>
+        <OtherCard $cardState={cardState.cardState}>
+          <CardImages cardNumber={cardState.otherCard} />
+        </OtherCard>
+        <UserCard $cardState={cardState.cardState}>
+          <CardImages cardNumber={cardState.userCard} />
+        </UserCard>
         <CardDeck>
-          <RsultDeck>
-            <p>나머지 덱</p>
-            <p>
-              <span>10</span>장
-            </p>
-          </RsultDeck>
           <CardList>
             <li>
               <img src="src/assets/images/img-card-back.png" alt="" />
@@ -569,7 +553,9 @@ const SnackBar = styled.div<any>`
   background-color: #fff;
   transition: all 0.5s;
   z-index: 100;
+  font-size: 20px;
   box-shadow: 2px 3px 5px 0px;
+  border: 4px solid var(--color-main);
 `;
 const BattingPoint = styled.div`
   &::before {
@@ -609,33 +595,6 @@ const BattingPoint = styled.div`
     font-weight: 700;
   }
 `;
-const RsultDeck = styled.div`
-  p {
-    font-weight: 500;
-    color: #56533d;
-    font-size: 18px;
-  }
-  span {
-    font-size: 45px;
-    font-weight: 700;
-    margin-right: 5px;
-    color: #222;
-  }
-  position: absolute;
-  top: 70px;
-  right: 0;
-  background: rgba(255, 255, 255, 0.4);
-  display: flex;
-  gap: 5px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 150px;
-  height: 150px;
-  padding: 20px;
-  border-radius: 50%;
-  border: 7px solid #fff;
-`;
 const CardDeck = styled.div`
   position: relative;
   grid-area: 1/3;
@@ -674,6 +633,7 @@ const GameWrap = styled.div`
 `;
 const GameRoom = styled.div`
   display: grid;
+  position: relative;
   grid-template-columns: 400px 1fr 400px;
   grid-template-rows: 1fr 1fr 1fr;
   padding: 100px 20px;
@@ -682,6 +642,46 @@ const GameRoom = styled.div`
   max-width: 1440px;
   min-width: 1200px;
   height: 100%;
+`;
+interface CardType {
+  $cardState: boolean;
+}
+const OtherCard = styled.div<CardType>`
+  position: absolute;
+  top: 100px;
+  ${(props) => (props.$cardState ? `right: 50%;` : ` right: 100px;`)}
+  transform: translateX(50%);
+  transition: 0.5s;
+`;
+const UserCard = styled.div<CardType>`
+  position: absolute;
+  top: 100px;
+  ${(props) =>
+    props.$cardState
+      ? `right: 50%; top: calc(100% - 400px);`
+      : `right: 100px; `}
+  transform: translateX(50%);
+  transition: 0.5s;
+`;
+interface ReadyState {
+  $userReady: boolean;
+}
+const ReadyButton = styled.div<ReadyState>`
+  & > button {
+    margin-top: 15px;
+    border-radius: 50px;
+    width: 100%;
+    align-items: center;
+    height: 80px;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 50px;
+    ${(props) =>
+      props.$userReady
+        ? 'background-color: #cd7522; border: 4px solid #fff; color: #fff;'
+        : 'background-color: #fff; border: 4px solid #cd7522; color: #cd7522;'}
+  }
+  transition: all 0.3s;
 `;
 
 export default GameRoomPage;
