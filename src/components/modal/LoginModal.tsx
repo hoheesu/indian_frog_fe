@@ -52,13 +52,11 @@ function LoginModal() {
     } else setUserValid(true);
   }, [loginInput]);
 
-  const { data } = useGetSnsLogin(snsName as string, {
-    enabled: !!snsName,
-  });
+  const { data } = useGetSnsLogin(snsName);
   const handleSnsLoginClick = (name: string) => {
     setSnsName(name);
     const accessToken = data?.headers.authorization;
-
+    alert(accessToken);
     localStorage.setItem('accessToken', accessToken);
   };
   useEffect(() => {
@@ -131,7 +129,7 @@ function LoginModal() {
           <p>아직 계정이 없으신가요?</p>
         </Button>
       </div>
-      <SnsLoginForm>
+      {/* <SnsLoginForm>
         <h3>간편하게 시작하기</h3>
         <ul>
           <li className="sns-naver">
@@ -159,76 +157,76 @@ function LoginModal() {
             </Button>
           </li>
         </ul>
-      </SnsLoginForm>
+      </SnsLoginForm> */}
     </>
   );
 }
-const SnsLoginForm = styled.div`
-  margin-top: 40px;
-  padding-top: 40px;
-  border-top: 1px solid #eeeeee;
-  h3 {
-    font-size: 18px;
-    font-weight: 700;
-    color: #555;
-  }
-  ul {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    li {
-      height: 60px;
-      width: 100%;
-      text-align: center;
-      border-radius: 10px;
-      &.sns-naver {
-        background: #03c75a;
-        p {
-          &::before {
-            background: url(${IconSnsNaver});
-          }
-          color: #fff;
-        }
-      }
-      &.sns-google {
-        background: #ececec;
-        p {
-          &::before {
-            background: url(${IconSnsGoogle});
-          }
-          color: #56533d;
-        }
-      }
-      &.sns-kakao {
-        background: #fee500;
-        p {
-          &::before {
-            background: url(${IconSnsKakao});
-          }
-          color: #181600;
-        }
-      }
-      button {
-        height: 100%;
-        width: 100%;
-        p {
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          font-size: 16px;
-          font-weight: 800;
-          &::before {
-            content: '';
-            display: block;
-            width: 27px;
-            height: 27px;
-          }
-        }
-      }
-    }
-  }
-`;
+// const SnsLoginForm = styled.div`
+//   margin-top: 40px;
+//   padding-top: 40px;
+//   border-top: 1px solid #eeeeee;
+//   h3 {
+//     font-size: 18px;
+//     font-weight: 700;
+//     color: #555;
+//   }
+//   ul {
+//     margin-top: 20px;
+//     display: flex;
+//     flex-direction: column;
+//     gap: 15px;
+//     li {
+//       height: 60px;
+//       width: 100%;
+//       text-align: center;
+//       border-radius: 10px;
+//       &.sns-naver {
+//         background: #03c75a;
+//         p {
+//           &::before {
+//             background: url(${IconSnsNaver});
+//           }
+//           color: #fff;
+//         }
+//       }
+//       &.sns-google {
+//         background: #ececec;
+//         p {
+//           &::before {
+//             background: url(${IconSnsGoogle});
+//           }
+//           color: #56533d;
+//         }
+//       }
+//       &.sns-kakao {
+//         background: #fee500;
+//         p {
+//           &::before {
+//             background: url(${IconSnsKakao});
+//           }
+//           color: #181600;
+//         }
+//       }
+//       button {
+//         height: 100%;
+//         width: 100%;
+//         p {
+//           width: 100%;
+//           display: flex;
+//           align-items: center;
+//           justify-content: center;
+//           gap: 10px;
+//           font-size: 16px;
+//           font-weight: 800;
+//           &::before {
+//             content: '';
+//             display: block;
+//             width: 27px;
+//             height: 27px;
+//           }
+//         }
+//       }
+//     }
+//   }
+// `;
 export default LoginModal;
