@@ -12,6 +12,8 @@ import IconMypage from '../../assets/images/icons/icon-mypage.svg';
 import IconHome from '../../assets/images/icons/icon-home.svg';
 import { useGetUserPoint } from '../../hooks/useQuery';
 import { formatNumber } from '../../utils/numberFormatCheck';
+import MusicButton from './MusicButton';
+
 function Header() {
   const location = useLocation().pathname;
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -77,6 +79,7 @@ function Header() {
         ) : null}
         {authToken ? (
           <UserMemberBtns>
+            <MusicButton />
             <Button
               onClickFnc={() => {
                 navigate('/mypage');
@@ -104,6 +107,7 @@ function Header() {
           </UserMemberBtns>
         ) : (
           <UserMemberBtns>
+            <MusicButton />
             <Button
               onClickFnc={() => handleModalOpen('login')}
               isBorder={false}
