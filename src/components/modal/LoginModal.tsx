@@ -8,10 +8,10 @@ import {
   passwordValidCheck,
 } from '../../utils/inputValidCheck';
 import { useLoginSubmitMutation } from '../../hooks/useMutation';
-import styled from 'styled-components';
-import IconSnsNaver from '../../assets/images/icons/icon-sns-naver.svg';
-import IconSnsGoogle from '../../assets/images/icons/icon-sns-google.svg';
-import IconSnsKakao from '../../assets/images/icons/icon-sns-kakao.svg';
+// import styled from 'styled-components';
+// import IconSnsNaver from '../../assets/images/icons/icon-sns-naver.svg';
+// import IconSnsGoogle from '../../assets/images/icons/icon-sns-google.svg';
+// import IconSnsKakao from '../../assets/images/icons/icon-sns-kakao.svg';
 import { useGetSnsLogin } from '../../hooks/useQuery';
 
 function LoginModal() {
