@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
-import styled, { css, keyframes } from 'styled-components';
 import Player from './Player';
 import Chat from './Chat';
 import GameButton from './GameButton';
@@ -691,6 +690,8 @@ interface CardType {
 const OtherCard = styled.div<CardType>`
   position: absolute;
   top: 20%;
+  transition: 0.5s;
+  filter: drop-shadow(10px 6px 6px rgba(0, 0, 0, 0.1));
   ${({ $cardState }) =>
     $cardState
       ? css`
@@ -700,8 +701,6 @@ const OtherCard = styled.div<CardType>`
           transform: translateX(-50%);
         `
       : ` right: 100px;`}
-  transition: 0.5s;
-  filter: drop-shadow(10px 6px 6px rgba(0, 0, 0, 0.1));
 `;
 const UserCard = styled(OtherCard)<CardType>`
   ${({ $cardState }) =>
@@ -713,9 +712,6 @@ const UserCard = styled(OtherCard)<CardType>`
           top: unset;
         `
       : ` right: 100px;`}
-
-  transition: 0.5s;
-  filter: drop-shadow(10px 6px 6px rgba(0, 0, 0, 0.1));
 `;
 interface ReadyState {
   $userReady: boolean;
