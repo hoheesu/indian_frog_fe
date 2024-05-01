@@ -7,6 +7,7 @@ interface InputPropsType {
   name?: string;
   disabled?: boolean;
   maxValue?: number;
+  maxBet?: number;
   onChangeFnc: (e: ChangeEvent<HTMLInputElement>) => void;
 }
 
