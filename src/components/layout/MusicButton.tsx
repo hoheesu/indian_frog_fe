@@ -13,18 +13,16 @@ function MusicButton() {
       <button onClick={() => setIsControls((prev) => !prev)}>
         <img src={musicPlay} />
       </button>
-      <iframe>
-        <AudioCotroller
-          src={
-            location.pathname.substring(1, 9) === 'gameroom'
-              ? indianFrogMainMusic1
-              : indianFrogMainMusic2
-          }
-          autoPlay
-          controls={isControls}
-          loop={true}
-        ></AudioCotroller>
-      </iframe>
+      <AudioCotroller
+        src={
+          location.pathname.substring(1, 9) === 'gameroom'
+            ? indianFrogMainMusic1
+            : indianFrogMainMusic2
+        }
+        autoPlay
+        controls={isControls}
+        loop={true}
+      ></AudioCotroller>
     </PlayButtonContainer>
   );
 }
