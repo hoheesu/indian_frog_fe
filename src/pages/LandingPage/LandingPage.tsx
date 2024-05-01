@@ -14,7 +14,7 @@ function LandingPage() {
           <img src={ImgLogo} alt="" />
         </H1>
 
-        <Button isBorder={true} onClickFnc={() => navigate('/main')}>
+        <Button isBorder={true} onClickFnc={() => navigate('/gamestory')}>
           <p>
             <img src={ImgStart} alt="" />
           </p>

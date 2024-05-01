@@ -34,10 +34,11 @@ authInstance.interceptors.response.use(
         originalRequest.headers['Authorization'] = `${newAccessToken}`;
         return authInstance(originalRequest);
       } catch (refreshError) {
-        console.log(refreshError);
-        return Promise.reject(refreshError);
+        localStorage.removeItem('accessToken');
+        alert('로그인을 다시 해주세요');
+        throw Promise.reject(refreshError);
       }
     }
-    return Promise.reject(error);
+    throw Promise.reject(error);
   },
 );

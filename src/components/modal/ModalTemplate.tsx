@@ -10,6 +10,7 @@ import LogoutModal from './LogoutModal';
 import PointChargeModal from './PointChargeModal';
 import UpdateImgModal from './UpdateImgModal';
 import GameEndModal from './GameEndModal';
+import StoryEndModal from './StoryEndModal';
 import FindPasswordModal from './FindPasswordModal';
 import ChangePassWord from './ChangePassWord';
 import JoinRoomModal from './JoinRoomModal';
@@ -43,6 +44,8 @@ function ModalTemplate() {
               return <UpdateImgModal />;
             case 'gameOver':
               return <GameEndModal />;
+            case 'storyOver':
+              return <StoryEndModal />;
             case 'findPassword':
               return <FindPasswordModal />;
             case 'changePassword':
