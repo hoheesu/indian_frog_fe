@@ -228,8 +228,8 @@ const GameRoomPage = () => {
         });
       }
       if (message.firstBet) {
-        setUserPoint((prevState) => prevState - message.roundPot / 2);
-        setOtherPoint((prevState) => prevState - message.roundPot / 2);
+        setUserPoint(message.myPoint - message.roundPot / 2);
+        setOtherPoint(message.otherPoint - message.roundPot / 2);
         console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
       }
       if (message.roundPot) {
@@ -256,6 +256,13 @@ const GameRoomPage = () => {
           userCard: message.myCard,
           cardState: true,
         });
+        if (message.roundWinner === userInfoDecode.nickname) {
+          setUserPoint(message.winnerPoint);
+          setOtherPoint(message.loserPoint);
+        } else {
+          setUserPoint(message.loserPoint);
+          setOtherPoint(message.winnerPoint);
+        }
         setTimeout(() => {
           setRoundEndInfo({
             roundEnd: false,
