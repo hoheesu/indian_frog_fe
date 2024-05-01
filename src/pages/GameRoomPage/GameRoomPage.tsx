@@ -273,7 +273,7 @@ const GameRoomPage = () => {
             setReStart(true);
             setRoundEnd(false);
           }
-        }, 10000);
+        }, 7000);
       }
       if (message.nextState === 'GAME_END') {
         setGameEnd(true);
