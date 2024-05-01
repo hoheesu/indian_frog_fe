@@ -15,6 +15,7 @@ import { history } from '../../utils/history';
 import CardImages from './CardImages';
 import IconCoin from '../../assets/images/icons/icon-coin.svg';
 import exitButton from '../../assets/images/icons/exitButton.png';
+import styled, { css } from 'styled-components';
 
 interface GameRoomInfo {
   hostImageUrl: string;
