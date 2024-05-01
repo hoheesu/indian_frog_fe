@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
@@ -497,19 +497,24 @@ const GameRoomPage = () => {
       }
     }
   }, [useUserChoice]);
-
+const maxBetPoint = useMemo(() => {
+  return Math.min(userPoint, otherPoint);
+}, [userPoint, otherPoint]);
+  
   return (
     <GameWrap>
       <GameRoom>
-        <LeaveButtonWrapper>
-          <Button onClickFnc={handleLeaveButtonClick}>
-            <img src={exitButton} alt="" />
-          </Button>
-        </LeaveButtonWrapper>
-        <GameRoomInfo>
-          <p>일반전</p>
-          <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
-        </GameRoomInfo>
+        <GameHeaderBtns>
+          <LeaveButton>
+            <Button onClickFnc={handleLeaveButtonClick}>
+              <img src={exitButton} alt="" />
+            </Button>
+          </LeaveButton>
+          <GameRoomInfo>
+            <p>일반전</p>
+            <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
+          </GameRoomInfo>
+        </GameHeaderBtns>
         <Player
           player="other"
           nick={otherNickname ? otherNickname : '상대방을 기다리는 중..'}
@@ -533,7 +538,11 @@ const GameRoomPage = () => {
             <GameButton stompClient={stompClient} setIsRaise={setIsRaise} />
           ) : null}
           {isRaise ? (
-            <BattingInput stompClient={stompClient} setIsRaise={setIsRaise} />
+            <BattingInput
+              maxBetPoint={maxBetPoint}
+              stompClient={stompClient}
+              setIsRaise={setIsRaise}
+            />
           ) : null}
         </MyState>
         <OtherCard $cardState={cardState.cardState}>
@@ -566,7 +575,35 @@ const GameRoomPage = () => {
     </GameWrap>
   );
 };
-
+const GameHeaderBtns = styled.div`
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+const LeaveButton = styled.div``;
+const GameRoomInfo = styled.div`
+  padding: 5px 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fffdee;
+  gap: 10px;
+  font-size: 20px;
+  border-radius: 50px;
+  & > p:nth-child(1) {
+    padding: 7px 10px;
+    background-color: var(--color-main);
+    border-radius: 30px;
+    color: #fff;
+  }
+  & > p:nth-last-child(1) {
+    margin-right: 7px;
+  }
+`;
 const SnackBar = styled.div<any>`
   position: absolute;
   /* bottom: 50%; */
@@ -676,7 +713,7 @@ const GameRoom = styled.div`
   padding: 100px 20px;
   position: relative;
   margin: 0 auto;
-  max-width: 1440px;
+  max-width: 1460px;
   min-width: 1200px;
   height: 100%;
 `;
@@ -722,31 +759,5 @@ const ReadyButton = styled.div<ReadyState>`
   }
   transition: all 0.3s;
 `;
-const GameRoomInfo = styled.div`
-  position: absolute;
-  top: 0;
-  right: 10px;
-  padding: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #fffdee;
-  gap: 10px;
-  font-size: 20px;
-  border-radius: 50px;
-  & > p:nth-child(1) {
-    padding: 7px 10px;
-    background-color: var(--color-main);
-    border-radius: 30px;
-    color: #fff;
-  }
-  & > p:nth-last-child(1) {
-    margin-right: 7px;
-  }
-`;
-const LeaveButtonWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 10px;
-`;
+
 export default GameRoomPage;

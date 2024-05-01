@@ -13,7 +13,7 @@ import story13_1 from '../../assets/images/story/story13_image1.png';
 import story18_1 from '../../assets/images/story/story18_image1.png';
 import story22_1 from '../../assets/images/story/story22_image1.png';
 import rockImg from '../../assets/images/story/rock.png';
-import skipIcon from '../../assets/images/icons/skip-icon.png';
+import skipIcon from '../../assets/images/icons/icon-skip.svg';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 
 function GameStoryPage() {
@@ -76,103 +76,121 @@ function GameStoryPage() {
 
   return (
     <StoryContainer>
-      <button onClick={handleNext}>
-        <TextContent>
-          <div>
-            <p>
-              {text}
-              <img src={textCursor} />
-            </p>
-          </div>
-          <Speaker
-            className={
-              storySpeaker[currentIndex] === 0
-                ? 'commentary'
+      <StoryBox>
+        <SkipButton
+          onClick={() => {
+            useSetIsModalClick('storyOver');
+          }}
+        >
+          Skip
+          <img src={skipIcon} alt="" />
+        </SkipButton>
+        <StoryBoxBtn onClick={handleNext}>
+          <TextContent>
+            <div>
+              <p>
+                {text}
+                <img src={textCursor} />
+              </p>
+            </div>
+            <Speaker
+              className={
+                storySpeaker[currentIndex] === 0
+                  ? 'commentary'
+                  : storySpeaker[currentIndex] === 1
+                    ? 'indian-frog'
+                    : 'well-frog'
+              }
+            >
+              {!storySpeaker[currentIndex] ? (
+                <img src={rockImg} alt="" />
+              ) : null}
+              {!storySpeaker[currentIndex]
+                ? '해설 개굴'
                 : storySpeaker[currentIndex] === 1
-                  ? 'indian-frog'
-                  : 'well-frog'
-            }
-          >
-            {!storySpeaker[currentIndex] ? <img src={rockImg} alt="" /> : null}
-            {!storySpeaker[currentIndex]
-              ? '해설 개굴'
-              : storySpeaker[currentIndex] === 1
-                ? '인디안 개구리'
-                : '우물안 개구리'}
-          </Speaker>
-          <SpeakerCharacter>
-            <img
-              src={(() => {
-                switch (currentIndex + 1) {
-                  case 2:
-                    return story2_1;
-                  case 4:
-                    return story4_1;
-                  case 6:
-                    return story6_1;
-                  case 7:
-                    return story4_1;
-                  case 8:
-                    return story8_1;
-                  case 9:
-                    return story8_1;
-                  case 10:
-                    return story10_1;
-                  case 11:
-                    return story8_1;
-                  case 13:
-                    return story13_1;
-                  case 14:
-                    return story13_1;
-                  case 15:
-                    return story10_1;
-                  case 16:
-                    return story13_1;
-                  case 18:
-                    return story18_1;
-                  case 19:
-                    return story4_1;
-                  case 22:
-                    return story22_1;
-                }
-              })()}
-              alt=""
-            />
-          </SpeakerCharacter>
-          <WellFrogImage>
-            <img
-              src={currentIndex === 7 || currentIndex === 8 ? wellFrog : ''}
-              alt=""
-            />
-          </WellFrogImage>
-          <WellImage>
-            <img
-              src={currentIndex === 0 || currentIndex === 21 ? '' : wellImage}
-              alt=""
-            />
-          </WellImage>
-        </TextContent>
-      </button>
-      <SkipButton
-        onClick={() => {
-          useSetIsModalClick('storyOver');
-        }}
-      >
-        Skip
-        <img src={skipIcon} alt="" />
-      </SkipButton>
+                  ? '인디안 개구리'
+                  : '우물안 개구리'}
+            </Speaker>
+            <SpeakerCharacter>
+              <img
+                src={(() => {
+                  switch (currentIndex + 1) {
+                    case 2:
+                      return story2_1;
+                    case 4:
+                      return story4_1;
+                    case 6:
+                      return story6_1;
+                    case 7:
+                      return story4_1;
+                    case 8:
+                      return story8_1;
+                    case 9:
+                      return story8_1;
+                    case 10:
+                      return story10_1;
+                    case 11:
+                      return story8_1;
+                    case 13:
+                      return story13_1;
+                    case 14:
+                      return story13_1;
+                    case 15:
+                      return story10_1;
+                    case 16:
+                      return story13_1;
+                    case 18:
+                      return story18_1;
+                    case 19:
+                      return story4_1;
+                    case 22:
+                      return story22_1;
+                  }
+                })()}
+                alt=""
+              />
+            </SpeakerCharacter>
+            <WellFrogImage>
+              <img
+                src={currentIndex === 7 || currentIndex === 8 ? wellFrog : ''}
+                alt=""
+              />
+            </WellFrogImage>
+            <WellImage>
+              <img
+                src={currentIndex === 0 || currentIndex === 21 ? '' : wellImage}
+                alt=""
+              />
+            </WellImage>
+          </TextContent>
+        </StoryBoxBtn>
+      </StoryBox>
     </StoryContainer>
   );
 }
 
 const StoryContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
   width: 100vw;
   height: 100vh;
   background-image: url(${storyBackground});
   background-size: cover;
   background-position: bottom;
 `;
-
+const StoryBox = styled.div`
+  position: relative;
+  width: 100%;
+  max-width: 1460px;
+  margin: 80px auto;
+  padding: 0 20px;
+`;
+const StoryBoxBtn = styled.button`
+  position: relative;
+  width: 100%;
+  z-index: 10;
+`;
 const boxFade = keyframes`
  0% {
     visibility: visible;
@@ -186,27 +204,24 @@ const boxFade = keyframes`
 `;
 
 const TextContent = styled.div`
-  position: absolute;
-  left: 50%;
-  bottom: 100px;
-  transform: translateX(-50%);
-  width: 80%;
+  width: 100%;
   height: 200px;
   & > div:nth-child(1) {
-    position: absolute;
+    padding: 30px;
     display: flex;
     width: 100%;
     height: 100%;
     border: 10px solid #decfaa;
     border-radius: 30px;
     background-color: #fff;
-    /* padding-top: 100px; */
-    justify-content: center;
     align-items: center;
-    z-index: 2;
+    justify-content: center;
     & > p {
       white-space: pre-line;
       font-size: 30px;
+      text-align: left;
+      color: #375401;
+      line-height: 1.5;
       & > img {
         margin-left: 20px;
         animation: ${boxFade} 1s step-start infinite;
@@ -217,14 +232,16 @@ const TextContent = styled.div`
 
 const Speaker = styled.div`
   position: absolute;
-  padding: 20px;
+  padding: 20px 40px;
+  min-width: 200px;
   font-size: 30px;
-  top: 0;
-  left: 30px;
-  transform: translateY(-50%);
+  left: 4%;
+  top: -50px;
   z-index: 3;
   border-radius: 30px;
   color: #fff;
+  font-weight: 500;
+  font-family: 'NPSfontBold';
   &.commentary {
     background-color: #4f4f4f;
     & > img {
@@ -242,37 +259,41 @@ const Speaker = styled.div`
 `;
 const SpeakerCharacter = styled.div`
   position: absolute;
-  top: 0;
-  left: 30px;
+  top: -230px;
+  left: 6.8%;
   z-index: 1;
-  transform: translateY(-110%);
 `;
 const WellFrogImage = styled.div`
   position: absolute;
   top: 0;
-  left: 250px;
+  left: 30%;
   z-index: 1;
   transform: translateY(-110%);
 `;
 const WellImage = styled.div`
   position: absolute;
-  top: 0;
-  left: 450px;
-  z-index: 1;
-  transform: translateY(-90%);
+  top: -180px;
+  left: 50%;
+  z-index: -1;
 `;
 const SkipButton = styled.button`
-  position: absolute;
-  right: 200px;
-  bottom: 350px;
+  position: relative;
+  z-index: 20;
   display: flex;
   justify-content: center;
   align-items: center;
+  min-width: 140px;
+  margin-left: auto;
+  margin-bottom: 30px;
   color: #fff;
   font-size: 30px;
   padding: 10px 20px;
   border-radius: 100px;
-  background-color: #7eb737;
+  background-color: var(--color-main);
+  border: 3px solid #fff;
+  &:hover {
+    background-color: #81c008;
+  }
 `;
 
 export default GameStoryPage;

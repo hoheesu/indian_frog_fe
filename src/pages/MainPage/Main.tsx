@@ -22,15 +22,16 @@ function Main() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const useJoinRoom = useJoinRoomMutation();
   const useGetPoint = useGetUserPoint();
+
   const handleCreateRoomOnclick = () => {
-    if (useGetPoint.data.point === 0) {
+    if (useGetPoint.data.myPoint === 0) {
       alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
     } else {
       useSetIsModalClick('createRoom');
     }
   };
   const handleJoinRoomOnclick = () => {
-    if (useGetPoint.data.point === 0) {
+    if (useGetPoint.data.myPoint === 0) {
       alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
     } else {
       useSetIsModalClick('joinRoom');
@@ -40,14 +41,14 @@ function Main() {
     roomNumber: number,
     participantCount: number,
   ) => {
-    if (participantCount < 2) {
+    if (useGetPoint.data.myPoint === 0) {
+      alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
+      navigate(`/main`);
+    } else if (participantCount < 2) {
       useJoinRoom.mutate(roomNumber);
       navigate(`/gameroom/${roomNumber}`);
     } else {
       alert(`${roomNumber}번 방은 인원이 가득찼습니다.`);
-    }
-    if (useGetPoint.data.point === 0) {
-      alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
     }
   };
 
