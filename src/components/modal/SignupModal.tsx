@@ -204,13 +204,11 @@ function SignupModal() {
             onChangeFnc={handleInputOnchange}
           />
           {!pwValid ? (
-            <p>
-              대문자, 소문자, 특수문자, 숫자를 포함하여 8 ~15자리로 작성해주세요
-            </p>
+            <p>영문자, 특수문자, 숫자를 포함하여 8 ~ 15자리로 작성해주세요</p>
           ) : (
-            <p> </p>
+            <p></p>
           )}
-          <p> </p>
+          <p></p>
         </div>
         <div>
           <label>비밀번호 확인</label>
