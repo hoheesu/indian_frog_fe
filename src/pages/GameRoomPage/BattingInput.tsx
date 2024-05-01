@@ -24,7 +24,12 @@ const BattingInput = ({ maxBetPoint, stompClient, setIsRaise }: Props) => {
   } = jwtDecode(authToken!);
 
   const handleRaisePointChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setRaisePoint(Number(e.target.value));
+    const newValue = parseInt(e.target.value);
+    if (newValue > maxBetPoint) {
+      setRaisePoint(maxBetPoint);
+    } else {
+      setRaisePoint(newValue);
+    }
   };
 
   const handleRaiseSubmit = () => {

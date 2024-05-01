@@ -55,10 +55,11 @@ function LoginModal() {
   const { data } = useGetSnsLogin(snsName);
   const handleSnsLoginClick = (name: string) => {
     setSnsName(name);
-    const accessToken = data?.headers.authorization;
-    alert(accessToken);
-    localStorage.setItem('accessToken', accessToken);
+    // const accessToken = data?.headers.authorization;
+
+    // localStorage.setItem('accessToken', accessToken);
   };
+
   useEffect(() => {
     if (data) {
       window.location.href = data;

@@ -1,19 +1,26 @@
 import { useState } from 'react';
 import styled from 'styled-components';
-import indianFrogMainMusic from '../../assets/audio/IndianFrog_ver1.1.mp3';
+import indianFrogMainMusic1 from '../../assets/audio/IndianFrog_ver1.1.mp3';
+import indianFrogMainMusic2 from '../../assets/audio/indianfrog_ver2.mp3';
 import musicPlay from '../../assets/images/icons/musicPlay.svg';
+import { useLocation } from 'react-router-dom';
 
 function MusicButton() {
-  const [isPlay, setIsPlay] = useState(true);
+  const [isControls, setIsControls] = useState(false);
+  const location = useLocation();
   return (
     <PlayButtonContainer>
-      <button onClick={() => setIsPlay((prev) => !prev)}>
+      <button onClick={() => setIsControls((prev) => !prev)}>
         <img src={musicPlay} />
       </button>
       <AudioCotroller
-        src={indianFrogMainMusic}
-        controls={isPlay}
-        // autoPlay
+        src={
+          location.pathname.substring(1, 9) === 'gameroom'
+            ? indianFrogMainMusic1
+            : indianFrogMainMusic2
+        }
+        autoPlay
+        controls={isControls}
         loop={true}
       ></AudioCotroller>
     </PlayButtonContainer>
