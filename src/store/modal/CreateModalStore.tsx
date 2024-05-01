@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 
 interface UseIsModalStoreType {
-  isModal: boolean;
-  setIsModalClick: () => void;
+  isModal: boolean | string;
+  setIsModalClick: (modalType?: string) => void;
 }
 
 export const useIsModalStore = create<UseIsModalStoreType>((set) => ({
-  isModal: false, // state
-  setIsModalClick: () =>
-    set((state: { isModal: boolean }) => ({ isModal: !state.isModal })),
+  isModal: false,
+  setIsModalClick: (modalType: string | boolean = false) => {
+    set(() => ({
+      isModal: modalType ? modalType : false,
+    }));
+  },
 }));

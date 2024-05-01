@@ -1,30 +1,26 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import GlobalStyles from './assets/styles/GlobalStyles';
-import ModalLayout from './components/modal/ModalLayout';
+import GlobalFonts from './assets/styles/GlobalFonts';
+import ModalPortal from './components/modal/ModalPortal';
 import Header from './components/layout/Header';
-import styled from 'styled-components';
 import { useIsModalStore } from './store/modal/CreateModalStore';
-
+import ModalTemplate from './components/modal/ModalTemplate';
 function App() {
   const useIsModal = useIsModalStore((state) => state.isModal);
+  const location = useLocation();
   return (
     <>
+      <GlobalFonts />
       <GlobalStyles />
-      <Header />
-      <MainContainer>
-        <Outlet />
-      </MainContainer>
+      {location.pathname.substring(1, 9) !== 'gameroom' ? <Header /> : null}
+      <Outlet />
       {useIsModal && (
-        <ModalLayout>
-          {/* <CreateModal /> */}
-          <p>모달 테스트</p>
-        </ModalLayout>
+        <ModalPortal>
+          <ModalTemplate />
+        </ModalPortal>
       )}
     </>
   );
 }
-const MainContainer = styled.div`
-  padding-top: 100px;
-`;
 
 export default App;
