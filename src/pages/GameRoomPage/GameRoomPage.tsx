@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
@@ -70,9 +70,7 @@ const GameRoomPage = () => {
     roundWinner: '',
     roundPot: 0,
   });
-
   const [messageArea, setMessageArea] = useState<Message[]>([]);
-
   const [useSetGameEndInfo, useUserChoice, useSetUserChoice] = useGameEndStore(
     (state) => [state.setGameEndInfo, state.userChoice, state.setUserChoice],
   );
