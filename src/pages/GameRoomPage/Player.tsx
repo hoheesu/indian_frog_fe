@@ -60,7 +60,7 @@ const Player: React.FC<PlayerProps> = ({
               </PlayerInfo>
             </TopArea>
             <BottomArea>
-              <Timer>00:00</Timer>
+              {/* <Timer>00:00</Timer> */}
               <Status>
                 {state === 'ready'
                   ? 'Ready'
@@ -153,14 +153,12 @@ const PlayerProfile = withPlayer(styled.div<WithPlayerProps>`
   justify-content: center;
   align-items: center;
   border-radius: 50%;
-  background: ${({ player }) =>
-    player === 'other'
-      ? 'conic-gradient(#8dd012 277deg, #e3d5b3 0deg)'
-      : 'conic-gradient(#CD7522 277deg, #e3d5b3 0deg)'};
+  border: ${({ player }) =>
+    player === 'other' ? ' 3px solid #8dd012' : '3px solid #CD7522'};
   overflow: hidden;
   img {
-    width: 100px;
-    height: 100px;
+    width: 120px;
+    height: 120px;
     object-fit: fill;
     background: #fff;
     border-radius: 50%;
