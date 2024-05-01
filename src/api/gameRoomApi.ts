@@ -16,13 +16,19 @@ export const createGameRoom = async (roomInput: { roomName: string }) => {
 
 export const getGameRoomsList = async (pageNum: number) => {
   try {
-    const response = await instance.get(`/gameRoom?page=${pageNum}`);
-    console.log(response);
-    return response.data.data;
+    const { data } = await instance.get(`/gameRoom?page=${pageNum}`);
+    console.log(data.data);
+
+    return {
+      result: data.data.content,
+      nextPage: pageNum + 1,
+      isLast: data.data.last,
+      hasNextPage: data.data.numberOfElements === 15,
+    };
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
-      return axiosError.response;
+      return axiosError.response.data;
     }
   }
 };
@@ -32,10 +38,7 @@ export const joinGameRoom = async (gameRoomId: number) => {
     const response = await authInstance.post(`/gameRoom/${gameRoomId}/join`);
     return response.data;
   } catch (error) {
-    const axiosError = error as AxiosError<ErrorResponse>;
-    if (axiosError.response) {
-      throw axiosError.response;
-    }
+    throw error;
   }
 };
 

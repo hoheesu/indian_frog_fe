@@ -1,10 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { loginUser } from '../api/userAuthApi';
+import {
+  emailCertified,
+  emailCertifiedCode,
+  findPassword,
+  loginUser,
+} from '../api/userAuthApi';
 import { createGameRoom, gameRoomInfo, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
-import { chargePoint, updateProfile } from '../api/myPageApi';
+import { changePassword, chargePoint, updateProfile } from '../api/myPageApi';
 import useUserProfileStore from '../store/profile/useUserProfileStore';
+import { QUERY_KEYS } from './useQuery';
 
 export const useLoginSubmitMutation = () => {
   const queryClient = useQueryClient();
@@ -14,7 +20,9 @@ export const useLoginSubmitMutation = () => {
       const accessToken = data?.headers.authorization;
       localStorage.setItem('accessToken', accessToken);
       alert(data?.data.message);
-      queryClient.invalidateQueries();
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.UsePoint],
+      });
     },
     onError: (error) => {
       alert(error.message);
@@ -24,11 +32,15 @@ export const useLoginSubmitMutation = () => {
 
 export const useCreateRoomMutation = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   return useMutation({
     mutationFn: createGameRoom,
     onSuccess: (data) => {
       navigate(`/gameroom/${data?.data.data.roomId}`);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GameRoomsList],
+      });
       useSetIsModalClick();
     },
     onError: (error) => {
@@ -38,11 +50,17 @@ export const useCreateRoomMutation = () => {
 };
 
 export const useJoinRoomMutation = () => {
+  const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   return useMutation({
     mutationFn: joinGameRoom,
     onSuccess: (_, roomNumber: number) => {
       navigate(`/gameroom/${roomNumber}`);
+      useSetIsModalClick();
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GameRoomsList],
+      });
     },
     onError: (_, roomNumber: number) => {
       (async () => {
@@ -53,6 +71,8 @@ export const useJoinRoomMutation = () => {
           navigate('/main');
         }
       })();
+      alert('로그인 후 이용해주세요.');
+      useSetIsModalClick('login');
     },
   });
 };
@@ -82,7 +102,68 @@ export const useUpdateProfileMutation = () => {
     mutationFn: updateProfile,
     onSuccess: (data: { userImgUrl: string }) => {
       setUserImgUrl(data.userImgUrl);
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.MyPageInfo],
+      });
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+};
+export const useEmailCertifiedMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: emailCertified,
+    onSuccess: () => {
       queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+};
+
+export const useCertifiedCodeMutation = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: emailCertifiedCode,
+    onSuccess: () => {
+      queryClient.invalidateQueries();
+    },
+    onError: () => {
+      alert('이미 인증이 완료되었습니다.');
+    },
+  });
+};
+export const useFindPasswordMutation = () => {
+  const queryClient = useQueryClient();
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  return useMutation({
+    mutationFn: findPassword,
+    onSuccess: () => {
+      alert('임시 비밀번호를 보냈습니다.');
+      useSetIsModalClick();
+      queryClient.invalidateQueries();
+    },
+    onError: (error) => {
+      alert(error.message);
+    },
+  });
+};
+export const useChangePasswordMutation = () => {
+  const queryClient = useQueryClient();
+  const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
+  return useMutation({
+    mutationFn: changePassword,
+    onSuccess: (data) => {
+      if (data.passwordChange) {
+        alert('비밀번호가 변경되었습니다.');
+        useSetIsModalClick();
+        queryClient.invalidateQueries();
+      } else {
+        alert('비밀번호를 다시 확인해주세요');
+      }
     },
     onError: (error) => {
       alert(error.message);

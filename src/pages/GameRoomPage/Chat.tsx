@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Input from '../../components/layout/form/Input';
+import IconSend from '../../assets/images/icons/icon-send.svg';
 import { jwtDecode } from 'jwt-decode';
 import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
@@ -37,6 +38,10 @@ const Chat = ({ messageArea, stompClient }: Props) => {
 
   useEffect(scrollToBottom, [messageArea]);
 
+  useEffect(() => {
+    console.log(messageArea);
+  }, [messageArea]);
+
   const handleMessageSubmit = () => {
     if (messageContent.trim()) {
       stompClient.send(
@@ -68,7 +73,7 @@ const Chat = ({ messageArea, stompClient }: Props) => {
             ) : message.type === 'RAISE' ? (
               <div className="notice">
                 {message.sender}님이
-                <span style={{ color: 'red' }}>{message.content}</span>
+                <span style={{ color: 'red' }}>"{message.content}"</span>
                 포인트 레이즈하셨습니다.
               </div>
             ) : message.type === 'reload' ? (
@@ -139,7 +144,7 @@ const ChatList = styled.ul`
   overflow-y: auto;
   li > div {
     display: flex;
-    gap: 20px;
+    gap: 5px;
     span,
     p {
       color: #6b6852;
@@ -170,7 +175,7 @@ const ChatInput = styled.div`
       height: 30px;
       background-color: #5a8900;
       border-radius: 50%;
-      background-image: url('/src/assets/images/icons/icon-send.svg');
+      background-image: url(${IconSend});
       background-size: 80%;
       background-repeat: no-repeat;
       background-position: center;

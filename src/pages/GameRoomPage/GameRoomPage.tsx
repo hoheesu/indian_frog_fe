@@ -14,6 +14,9 @@ import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 import { history } from '../../utils/history';
 import CardImages from './CardImages';
+import ImgCardBack from '../../assets/images/img-card-back.png';
+import IconCoin from '../../assets/images/icons/icon-coin.svg';
+import exitButton from '../../assets/images/icons/exitButton.png';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -142,7 +145,11 @@ const GameRoomPage = () => {
         setReStart(false); // 라운드 시작 초기화
         setGameEnd(false);
       }
-      if (message.type === 'CHAT' || 'JOIN' || 'LEAVE') {
+      if (
+        message.type === 'CHAT' ||
+        message.type === 'JOIN' ||
+        message.type === 'LEAVE'
+      ) {
         if (message.type === 'JOIN') {
           gameRoomInfoUpdate();
           setJoinNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
@@ -170,7 +177,10 @@ const GameRoomPage = () => {
             const updatedMessages = [...prev, newMessage];
             return updatedMessages;
           });
-        } else {
+        } else if (
+          message.actionType === 'CHECK' ||
+          message.actionType === 'DIE'
+        ) {
           setMessageArea((prev) => {
             const newMessage = {
               sender: message.previousPlayer,
@@ -182,7 +192,6 @@ const GameRoomPage = () => {
           });
         }
       }
-
       if (message.currentPlayer) {
         setOtherGameState(
           message.currentPlayer === userInfoDecode.nickname ? 'wait' : 'choose',
@@ -335,17 +344,19 @@ const GameRoomPage = () => {
       setMessageArea((prev) => {
         const newMessage = {
           sender: '',
-          content: '새로고침은 하지 말아주세요 ㅠㅠ',
+          content: '[안내]: 새로고침시 게임 진행에 이상이 생길 수 있습니다',
           type: 'reload',
         };
         const updatedMessages = [...prev, newMessage];
         return updatedMessages;
       });
     };
+
     sendToNotice();
+
     setInterval(() => {
       sendToNotice();
-    }, 30000);
+    }, 120000);
 
     window.addEventListener('keydown', handleKeyPress);
 
@@ -489,8 +500,16 @@ const GameRoomPage = () => {
 
   return (
     <GameWrap>
-      <Button onClickFnc={handleLeaveButtonClick}>나가기</Button>
       <GameRoom>
+        <LeaveButtonWrapper>
+          <Button onClickFnc={handleLeaveButtonClick}>
+            <img src={exitButton} alt="" />
+          </Button>
+        </LeaveButtonWrapper>
+        <GameRoomInfo>
+          <p>일반전</p>
+          <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
+        </GameRoomInfo>
         <Player
           player="other"
           nick={otherNickname ? otherNickname : '상대방을 기다리는 중..'}
@@ -526,10 +545,7 @@ const GameRoomPage = () => {
         <CardDeck>
           <CardList>
             <li>
-              <img src="src/assets/images/img-card-back.png" alt="" />
-            </li>
-            <li>
-              <img src="src/assets/images/img-card-back.png" alt="" />
+              <img src={ImgCardBack} alt="" />
             </li>
           </CardList>
         </CardDeck>
@@ -538,34 +554,40 @@ const GameRoomPage = () => {
           <p>{roundPot}</p>
         </BattingPoint>
         <Chat messageArea={messageArea} stompClient={stompClient} />
-        <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
-          <p>라운드 승자: {roundEndInfo.roundWinner}</p>
-          <p>라운드 패자: {roundEndInfo.roundLoser}</p>
-          <p>라운드 배팅: {roundEndInfo.roundPot.toString()}</p>
-        </SnackBar>
       </GameRoom>
+      <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
+        {/* <p>WINNER : hoheesu1</p>
+        <p>LOSER : hoheesu2</p>
+        <p>POINT : 1000</p> */}
+        <p>라운드 승자 : {roundEndInfo.roundWinner}</p>
+        <p>라운드 패자 : {roundEndInfo.roundLoser}</p>
+        <p>라운드 배팅 : {roundEndInfo.roundPot.toString()}</p>
+      </SnackBar>
     </GameWrap>
   );
 };
 
 const SnackBar = styled.div<any>`
   position: absolute;
-  display: flex;
-  bottom: ${(props) => (props.$roundEndInfo ? '100px' : '-100px')};
+  /* bottom: 50%; */
   left: 50%;
-  width: 500px;
-  height: 100px;
+  bottom: ${(props) => (props.$roundEndInfo ? '50%' : '-100px')};
+  transform: translate(-50%, 60%);
+  display: flex;
+  width: 350px;
+  height: 175px;
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  transform: translateX(-50%);
-  border-radius: 10px;
-  background-color: #fff;
+  row-gap: 15px;
+  border-radius: 30px;
+  background-color: #fffdee;
   transition: all 0.5s;
   z-index: 100;
-  font-size: 20px;
-  box-shadow: 12px 13px 15px 0px;
-  border: 4px solid var(--color-main);
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 0 20px #68af1da9;
+  border: 5px solid #68af1d;
 `;
 const BattingPoint = styled.div`
   &::before {
@@ -577,7 +599,7 @@ const BattingPoint = styled.div`
     top: -35px;
     left: 50%;
     transform: translateX(-50%);
-    background: url('src/assets/images/icons/icon-coin.svg') no-repeat center;
+    background: url(${IconCoin}) no-repeat center;
     background-size: 100%;
   }
   position: absolute;
@@ -612,12 +634,17 @@ const CardDeck = styled.div`
 const CardList = styled.ul`
   transform: translateY(360px);
   li {
+    width: 200px;
+    height: auto;
     position: absolute;
     top: 0;
     right: 90px;
     z-index: 2;
     transform: translateY(-50%) rotate(-20deg);
     filter: drop-shadow(-2px -2px 5px rgba(65, 65, 65, 0.1));
+    img {
+      width: 100%;
+    }
     &:nth-child(2n) {
       top: 30px;
       right: 100px;
@@ -632,7 +659,7 @@ const MyState = styled.div`
 `;
 const GameWrap = styled.div`
   position: relative;
-  padding-top: 100px;
+  padding-top: 20px;
   background: linear-gradient(
     180deg,
     rgba(163, 231, 111, 1) 0%,
@@ -642,8 +669,8 @@ const GameWrap = styled.div`
   overflow: hidden;
 `;
 const GameRoom = styled.div`
-  display: grid;
   position: relative;
+  display: grid;
   grid-template-columns: 400px 1fr 400px;
   grid-template-rows: 1fr 1fr 1fr;
   padding: 100px 20px;
@@ -662,6 +689,7 @@ const OtherCard = styled.div<CardType>`
   ${(props) => (props.$cardState ? `right: 50%;` : ` right: 100px;`)}
   transform: translateX(50%);
   transition: 0.5s;
+  filter: drop-shadow(10px 6px 6px #00000081);
 `;
 const UserCard = styled.div<CardType>`
   position: absolute;
@@ -672,6 +700,7 @@ const UserCard = styled.div<CardType>`
       : `right: 100px; `}
   transform: translateX(50%);
   transition: 0.5s;
+  filter: drop-shadow(10px 6px 6px #00000081);
 `;
 interface ReadyState {
   $userReady: boolean;
@@ -688,10 +717,36 @@ const ReadyButton = styled.div<ReadyState>`
     border-radius: 50px;
     ${(props) =>
       props.$userReady
-        ? 'background-color: #cd7522; border: 4px solid #fff; color: #fff;'
+        ? 'background-color: #cd7522; border: 4px solid #a95f1b; color: #fff;'
         : 'background-color: #fff; border: 4px solid #cd7522; color: #cd7522;'}
   }
   transition: all 0.3s;
 `;
-
+const GameRoomInfo = styled.div`
+  position: absolute;
+  top: 0;
+  right: 10px;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fffdee;
+  gap: 10px;
+  font-size: 20px;
+  border-radius: 50px;
+  & > p:nth-child(1) {
+    padding: 7px 10px;
+    background-color: var(--color-main);
+    border-radius: 30px;
+    color: #fff;
+  }
+  & > p:nth-last-child(1) {
+    margin-right: 7px;
+  }
+`;
+const LeaveButtonWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 10px;
+`;
 export default GameRoomPage;
