@@ -2,7 +2,7 @@ import styled from 'styled-components';
 import Input from '../../components/layout/form/Input';
 import IconSend from '../../assets/images/icons/icon-send.svg';
 import { jwtDecode } from 'jwt-decode';
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 interface Message {
@@ -27,6 +27,21 @@ const Chat = ({ messageArea, stompClient }: Props) => {
     sub: string;
   } = jwtDecode(authToken!);
 
+  const chatEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    const chatDiv = chatEndRef.current?.parentElement;
+    if (chatDiv) {
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+  };
+
+  useEffect(scrollToBottom, [messageArea]);
+
+  useEffect(() => {
+    console.log(messageArea);
+  }, [messageArea]);
+
   const handleMessageSubmit = () => {
     if (messageContent.trim()) {
       stompClient.send(
@@ -44,24 +59,41 @@ const Chat = ({ messageArea, stompClient }: Props) => {
 
   return (
     <ChatWrap>
-      {messageArea?.map((message, index) => (
-        <ChatList key={index}>
-          {message.type === 'JOIN' ? (
-            <li className="notice">{message.sender}님이 접속하셨습니다.</li>
-          ) : message.type === 'LEAVE' ? (
-            <li className="notice">{message.sender}님이 퇴장하셨습니다.</li>
-          ) : (
-            <li
-              className={
-                message.sender === userInfoDecode.nickname ? 'me' : 'other'
-              }
-            >
-              <span>{message.sender}</span>
-              <p>{message.content}</p>
-            </li>
-          )}
-        </ChatList>
-      ))}
+      <ChatList>
+        {messageArea?.map((message, index) => (
+          <li key={index}>
+            {message.type === 'JOIN' ? (
+              <div className="notice">{message.sender}님이 접속하셨습니다.</div>
+            ) : message.type === 'LEAVE' ? (
+              <div className="notice">{message.sender}님이 퇴장하셨습니다.</div>
+            ) : message.type === 'CHECK' ? (
+              <div className="notice">{message.sender}님이 체크하셨습니다.</div>
+            ) : message.type === 'DIE' ? (
+              <div className="notice">{message.sender}님이 다이하셨습니다.</div>
+            ) : message.type === 'RAISE' ? (
+              <div className="notice">
+                {message.sender}님이
+                <span style={{ color: 'red' }}>"{message.content}"</span>
+                포인트 레이즈하셨습니다.
+              </div>
+            ) : message.type === 'reload' ? (
+              <div className="notice">
+                <span style={{ color: 'red' }}>{message.content}</span>
+              </div>
+            ) : (
+              <div
+                className={
+                  message.sender === userInfoDecode.nickname ? 'me' : 'other'
+                }
+              >
+                <span>{message.sender}</span>
+                <p>{message.content}</p>
+              </div>
+            )}
+          </li>
+        ))}
+        <div ref={chatEndRef} />
+      </ChatList>
       <ChatInput>
         <form
           onSubmit={(e) => {
@@ -92,27 +124,27 @@ const ChatWrap = styled.div`
     left: 0;
     width: 95%;
     height: 50px;
-    /* background: rgb(189, 236, 127);
+    background: rgb(189, 236, 127);
     background: linear-gradient(
       180deg,
       rgba(189, 236, 127, 1) 0%,
       rgba(189, 236, 127, 0) 100%
-    ); */
+    );
   }
-  padding-top: 50px;
+  padding-top: 10px;
   grid-area: 3/1;
   width: 100%;
   align-self: flex-end;
 `;
 const ChatList = styled.ul`
-  max-height: 300px;
+  height: 300px;
   display: flex;
   flex-direction: column;
   gap: 20px;
   overflow-y: auto;
-  li {
+  li > div {
     display: flex;
-    gap: 20px;
+    gap: 5px;
     span,
     p {
       color: #6b6852;

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
@@ -13,8 +13,10 @@ import { gameRoomInfo } from '../../api/gameRoomApi';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 import { history } from '../../utils/history';
+import CardImages from './CardImages';
 import ImgCardBack from '../../assets/images/img-card-back.png';
 import IconCoin from '../../assets/images/icons/icon-coin.svg';
+import exitButton from '../../assets/images/icons/exitButton.png';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -52,8 +54,13 @@ const GameRoomPage = () => {
   const [roundEnd, setRoundEnd] = useState(false);
   const [gameEnd, setGameEnd] = useState(false);
 
-  // const [userChoice, setUserChoice] = useState(false); // 게임을 나갈건지 재시작할지 결정
-  const [otherCard, setOtherCard] = useState('');
+  // const [myGameState, setMyGameState] = useState('');
+  const [otherGameState, setOtherGameState] = useState('wait');
+  const [cardState, setCardState] = useState({
+    cardState: false,
+    otherCard: '',
+    userCard: '',
+  });
   const [roundPot, setRoundPoint] = useState('');
   const [isRaise, setIsRaise] = useState(false);
   const [currentPlayer, setCurrentPlayer] = useState<boolean | null>(null);
@@ -66,10 +73,9 @@ const GameRoomPage = () => {
 
   const [messageArea, setMessageArea] = useState<Message[]>([]);
 
-  const [useSetGameEndInfo, useUserChoice] = useGameEndStore((state) => [
-    state.setGameEndInfo,
-    state.userChoice,
-  ]);
+  const [useSetGameEndInfo, useUserChoice, useSetUserChoice] = useGameEndStore(
+    (state) => [state.setGameEndInfo, state.userChoice, state.setUserChoice],
+  );
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
@@ -117,8 +123,33 @@ const GameRoomPage = () => {
       console.log('payloadMessage -->', message);
       if (message.gameState) {
         setReadyState(message.gameState);
+        setOtherGameState(() => {
+          switch (message.gameState) {
+            case 'READY':
+              return message.nickname === userInfoDecode.nickname
+                ? 'wait'
+                : 'ready';
+            case 'UNREADY':
+              return message.nickname === userInfoDecode.nickname
+                ? 'wait'
+                : 'ready';
+            case 'ALL_READY':
+              return 'ready';
+            case 'NO_ONE_READY':
+              return 'wait';
+            default:
+              return 'wait';
+          }
+        });
+        setRoundEnd(false);
+        setReStart(false); // 라운드 시작 초기화
+        setGameEnd(false);
       }
-      if (message.type === 'CHAT' || 'JOIN' || 'LEAVE') {
+      if (
+        message.type === 'CHAT' ||
+        message.type === 'JOIN' ||
+        message.type === 'LEAVE'
+      ) {
         if (message.type === 'JOIN') {
           gameRoomInfoUpdate();
           setJoinNickname(message.sender); // joinNickname에 들어온 유저의 닉네임 넣어주기
@@ -132,7 +163,39 @@ const GameRoomPage = () => {
           return updatedMessages;
         });
       }
+      if (message.nowState === 'ACTION') {
+        message.previousPlayer === userInfoDecode.nickname
+          ? setUserPoint(message.myPoint)
+          : setOtherPoint(message.myPoint);
+        if (message.actionType === 'RAISE') {
+          setMessageArea((prev) => {
+            const newMessage = {
+              sender: message.previousPlayer,
+              content: message.nowBet,
+              type: message.actionType,
+            };
+            const updatedMessages = [...prev, newMessage];
+            return updatedMessages;
+          });
+        } else if (
+          message.actionType === 'CHECK' ||
+          message.actionType === 'DIE'
+        ) {
+          setMessageArea((prev) => {
+            const newMessage = {
+              sender: message.previousPlayer,
+              content: message.nowBet,
+              type: message.actionType,
+            };
+            const updatedMessages = [...prev, newMessage];
+            return updatedMessages;
+          });
+        }
+      }
       if (message.currentPlayer) {
+        setOtherGameState(
+          message.currentPlayer === userInfoDecode.nickname ? 'wait' : 'choose',
+        );
         setCurrentPlayer(
           message.currentPlayer === userInfoDecode.nickname ? true : false,
         );
@@ -153,18 +216,25 @@ const GameRoomPage = () => {
     try {
       const message: any = JSON.parse(payload.body);
       console.log('*** gameState payload -->', message);
-      if (message.playerCard) {
-        setOtherCard(message.playerCard);
+      if (message.otherCard) {
+        setCardState({
+          ...cardState,
+          otherCard: message.otherCard,
+          cardState: true,
+        });
       }
       if (message.firstBet) {
-        setUserPoint((prevState) => prevState - message.firstBet);
-        setOtherPoint((prevState) => prevState - message.firstBet);
+        setUserPoint((prevState) => prevState - message.roundPot / 2);
+        setOtherPoint((prevState) => prevState - message.roundPot / 2);
         console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
       }
       if (message.roundPot) {
         setRoundPoint(message.roundPot);
       }
       if (message.currentPlayer) {
+        setOtherGameState(
+          message.currentPlayer === userInfoDecode.nickname ? 'wait' : 'choose',
+        );
         setCurrentPlayer(
           message.currentPlayer === userInfoDecode.nickname ? true : false,
         );
@@ -175,6 +245,11 @@ const GameRoomPage = () => {
           roundLoser: message.roundLoser,
           roundWinner: message.roundWinner,
           roundPot: message.roundPot,
+        });
+        setCardState({
+          ...cardState,
+          userCard: message.myCard,
+          cardState: true,
         });
         setTimeout(() => {
           setRoundEndInfo({
@@ -213,7 +288,7 @@ const GameRoomPage = () => {
   const handleLeaveButtonClick = () => {
     stompClient.send(
       `/app/${gameId}/leave`,
-      { Authorization: authToken },
+      {},
       JSON.stringify({ sender: userInfoDecode.nickname }),
     );
     stompClient.disconnect();
@@ -246,21 +321,49 @@ const GameRoomPage = () => {
   };
 
   //^ useEffect
+
   useEffect(() => {
     //첫번째 마운트 상황에서 실행하는 Effect
+    connect();
     (async () => {
       try {
         await gameRoomInfoUpdate();
-        connect();
       } catch (error: any) {
         if (stompClient) {
           handleLeaveButtonClick();
         }
       }
     })();
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+        event.preventDefault();
+      }
+    };
+    useSetUserChoice('');
+    const sendToNotice = () => {
+      setMessageArea((prev) => {
+        const newMessage = {
+          sender: '',
+          content: '[안내]: 새로고침시 게임 진행에 이상이 생길 수 있습니다',
+          type: 'reload',
+        };
+        const updatedMessages = [...prev, newMessage];
+        return updatedMessages;
+      });
+    };
+
+    sendToNotice();
+
+    setInterval(() => {
+      sendToNotice();
+    }, 120000);
+
+    window.addEventListener('keydown', handleKeyPress);
+
     return () => {
+      window.removeEventListener('keydown', handleKeyPress);
       if (stompClient) {
-        handleLeaveButtonClick();
+        stompClient.disconnect();
       }
     };
   }, []);
@@ -313,6 +416,7 @@ const GameRoomPage = () => {
         setOtherPoint(roomUserInfo?.participantPoints);
       }
     }
+    // setGameRoomState(roomUserInfo?.gameRoomState);
   }, [roomUserInfo]);
 
   useEffect(() => {
@@ -326,38 +430,20 @@ const GameRoomPage = () => {
     }
   }, [readyState]);
 
-  const otherState = useMemo(() => {
-    if (readyState) {
-      switch (readyState) {
-        case 'READY':
-          return userReady ? 'wait' : 'ready';
-        case 'UNREADY':
-          return userReady ? 'wait' : 'ready';
-        case 'ALL_READY':
-          return 'ready';
-        case 'NO_ONE_READY':
-          setUserReady(false);
-          return 'wait';
-        default:
-          return 'wait';
-      }
-    } else if (currentPlayer) {
-      return currentPlayer ? 'wait' : 'choose';
-    } else {
-      return 'wait';
-    }
-  }, [readyState, currentPlayer]);
-
   useEffect(() => {
-    setCurrentPlayer(null);
     if (stompClient && roundEnd) {
+      setCurrentPlayer(null);
       stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
-      // stompClient.send(`/app/gameRoom/${gameId}/END`, {}, JSON.stringify({}));
     }
   }, [roundEnd]);
 
   useEffect(() => {
     if (reStart) {
+      setCardState({
+        cardState: false,
+        otherCard: '',
+        userCard: '',
+      });
       if (userType === 'guest') {
         setTimeout(() => {
           stompClient.send(
@@ -378,17 +464,35 @@ const GameRoomPage = () => {
 
   useEffect(() => {
     if (gameEnd) {
-      stompClient.send(
-        `/app/gameRoom/${gameId}/GAME_END`,
-        {},
-        JSON.stringify({}),
-      );
+      if (userType === 'guest') {
+        setTimeout(() => {
+          stompClient.send(
+            `/app/gameRoom/${gameId}/GAME_END`,
+            {},
+            JSON.stringify({}),
+          );
+        }, 200);
+      } else {
+        stompClient.send(
+          `/app/gameRoom/${gameId}/GAME_END`,
+          {},
+          JSON.stringify({}),
+        );
+      }
+      setTimeout(() => {
+        setCardState({
+          cardState: false,
+          otherCard: '',
+          userCard: '',
+        });
+      }, 9000);
     }
   }, [gameEnd]);
 
   useEffect(() => {
     if (gameEnd && useUserChoice) {
       if (useUserChoice === 'LEAVE') {
+        console.log('나가기');
         handleLeaveButtonClick();
       }
     }
@@ -396,13 +500,21 @@ const GameRoomPage = () => {
 
   return (
     <GameWrap>
-      <Button onClickFnc={handleLeaveButtonClick}>나가기</Button>
       <GameRoom>
+        <LeaveButtonWrapper>
+          <Button onClickFnc={handleLeaveButtonClick}>
+            <img src={exitButton} alt="" />
+          </Button>
+        </LeaveButtonWrapper>
+        <GameRoomInfo>
+          <p>일반전</p>
+          <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
+        </GameRoomInfo>
         <Player
           player="other"
           nick={otherNickname ? otherNickname : '상대방을 기다리는 중..'}
           point={otherPoint.toString()}
-          state={otherState}
+          state={otherGameState}
         />
         <MyState>
           <Player
@@ -412,24 +524,25 @@ const GameRoomPage = () => {
             state={userReady ? 'ready' : currentPlayer ? 'choose' : 'wait'}
           />
           {gameRoomState === 'READY' ? (
-            <Button onClickFnc={handleReadyButtonClick}>레디</Button>
+            <ReadyButton $userReady={userReady}>
+              <Button onClickFnc={handleReadyButtonClick}>
+                {userReady ? 'UnReady' : 'Ready'}
+              </Button>
+            </ReadyButton>
           ) : currentPlayer ? (
             <GameButton stompClient={stompClient} setIsRaise={setIsRaise} />
-          ) : (
-            ''
-          )}
+          ) : null}
           {isRaise ? (
             <BattingInput stompClient={stompClient} setIsRaise={setIsRaise} />
           ) : null}
         </MyState>
-        <strong>{otherCard}</strong>
+        <OtherCard $cardState={cardState.cardState}>
+          <CardImages cardNumber={cardState.otherCard} />
+        </OtherCard>
+        <UserCard $cardState={cardState.cardState}>
+          <CardImages cardNumber={cardState.userCard} />
+        </UserCard>
         <CardDeck>
-          <RsultDeck>
-            <p>나머지 덱</p>
-            <p>
-              <span>10</span>장
-            </p>
-          </RsultDeck>
           <CardList>
             <li>
               <img src={ImgCardBack} alt="" />
@@ -440,34 +553,41 @@ const GameRoomPage = () => {
           <span>배팅금액</span>
           <p>{roundPot}</p>
         </BattingPoint>
-        <strong>card1</strong>
         <Chat messageArea={messageArea} stompClient={stompClient} />
-        <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
-          <p>라운드 승자: {roundEndInfo.roundWinner}</p>
-          <p>라운드 패자: {roundEndInfo.roundLoser}</p>
-          <p>라운드 배팅: {roundEndInfo.roundPot.toString()}</p>
-        </SnackBar>
       </GameRoom>
+      <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
+        {/* <p>WINNER : hoheesu1</p>
+        <p>LOSER : hoheesu2</p>
+        <p>POINT : 1000</p> */}
+        <p>라운드 승자 : {roundEndInfo.roundWinner}</p>
+        <p>라운드 패자 : {roundEndInfo.roundLoser}</p>
+        <p>라운드 배팅 : {roundEndInfo.roundPot.toString()}</p>
+      </SnackBar>
     </GameWrap>
   );
 };
 
 const SnackBar = styled.div<any>`
   position: absolute;
-  display: flex;
-  bottom: ${(props) => (props.$roundEndInfo ? '100px' : '-100px')};
+  /* bottom: 50%; */
   left: 50%;
-  width: 500px;
-  height: 100px;
+  bottom: ${(props) => (props.$roundEndInfo ? '50%' : '-100px')};
+  transform: translate(-50%, 60%);
+  display: flex;
+  width: 350px;
+  height: 175px;
   justify-content: center;
   flex-direction: column;
   align-items: center;
-  transform: translateX(-50%);
-  border-radius: 10px;
-  background-color: #fff;
+  row-gap: 15px;
+  border-radius: 30px;
+  background-color: #fffdee;
   transition: all 0.5s;
   z-index: 100;
-  box-shadow: 2px 3px 5px 0px;
+  font-size: 18px;
+  font-weight: bold;
+  box-shadow: 0 0 20px #68af1da9;
+  border: 5px solid #68af1d;
 `;
 const BattingPoint = styled.div`
   &::before {
@@ -507,33 +627,6 @@ const BattingPoint = styled.div`
     font-weight: 700;
   }
 `;
-const RsultDeck = styled.div`
-  p {
-    font-weight: 500;
-    color: #56533d;
-    font-size: 18px;
-  }
-  span {
-    font-size: 45px;
-    font-weight: 700;
-    margin-right: 5px;
-    color: #222;
-  }
-  position: absolute;
-  top: 70px;
-  right: 0;
-  background: rgba(255, 255, 255, 0.4);
-  display: flex;
-  gap: 5px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  width: 150px;
-  height: 150px;
-  padding: 20px;
-  border-radius: 50%;
-  border: 7px solid #fff;
-`;
 const CardDeck = styled.div`
   position: relative;
   grid-area: 1/3;
@@ -566,7 +659,7 @@ const MyState = styled.div`
 `;
 const GameWrap = styled.div`
   position: relative;
-  padding-top: 100px;
+  padding-top: 20px;
   background: linear-gradient(
     180deg,
     rgba(163, 231, 111, 1) 0%,
@@ -576,6 +669,7 @@ const GameWrap = styled.div`
   overflow: hidden;
 `;
 const GameRoom = styled.div`
+  position: relative;
   display: grid;
   grid-template-columns: 400px 1fr 400px;
   grid-template-rows: 1fr 1fr 1fr;
@@ -586,5 +680,73 @@ const GameRoom = styled.div`
   min-width: 1200px;
   height: 100%;
 `;
-
+interface CardType {
+  $cardState: boolean;
+}
+const OtherCard = styled.div<CardType>`
+  position: absolute;
+  top: 100px;
+  ${(props) => (props.$cardState ? `right: 50%;` : ` right: 100px;`)}
+  transform: translateX(50%);
+  transition: 0.5s;
+  filter: drop-shadow(10px 6px 6px #00000081);
+`;
+const UserCard = styled.div<CardType>`
+  position: absolute;
+  top: 100px;
+  ${(props) =>
+    props.$cardState
+      ? `right: 50%; top: calc(100% - 400px);`
+      : `right: 100px; `}
+  transform: translateX(50%);
+  transition: 0.5s;
+  filter: drop-shadow(10px 6px 6px #00000081);
+`;
+interface ReadyState {
+  $userReady: boolean;
+}
+const ReadyButton = styled.div<ReadyState>`
+  & > button {
+    margin-top: 15px;
+    border-radius: 50px;
+    width: 100%;
+    align-items: center;
+    height: 80px;
+    font-size: 24px;
+    font-weight: 700;
+    border-radius: 50px;
+    ${(props) =>
+      props.$userReady
+        ? 'background-color: #cd7522; border: 4px solid #a95f1b; color: #fff;'
+        : 'background-color: #fff; border: 4px solid #cd7522; color: #cd7522;'}
+  }
+  transition: all 0.3s;
+`;
+const GameRoomInfo = styled.div`
+  position: absolute;
+  top: 0;
+  right: 10px;
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fffdee;
+  gap: 10px;
+  font-size: 20px;
+  border-radius: 50px;
+  & > p:nth-child(1) {
+    padding: 7px 10px;
+    background-color: var(--color-main);
+    border-radius: 30px;
+    color: #fff;
+  }
+  & > p:nth-last-child(1) {
+    margin-right: 7px;
+  }
+`;
+const LeaveButtonWrapper = styled.div`
+  position: absolute;
+  top: 0;
+  left: 10px;
+`;
 export default GameRoomPage;
