@@ -97,6 +97,7 @@ export const getUserPoint = async () => {
     }
   }
 };
+
 export const snsLoginUser = async (snsName: string) => {
   try {
     const response = await instance.get(`/oauth2/url/${snsName}`);
@@ -109,6 +110,7 @@ export const snsLoginUser = async (snsName: string) => {
     }
   }
 };
+
 export const findPassword = async (email: string) => {
   try {
     const response = await instance.post(`/user/password-code?email=${email}`);

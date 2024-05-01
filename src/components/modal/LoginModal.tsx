@@ -57,10 +57,11 @@ function LoginModal() {
   });
   const handleSnsLoginClick = (name: string) => {
     setSnsName(name);
-    const accessToken = data?.headers.authorization;
+    // const accessToken = data?.headers.authorization;
 
-    localStorage.setItem('accessToken', accessToken);
+    // localStorage.setItem('accessToken', accessToken);
   };
+
   useEffect(() => {
     if (data) {
       window.location.href = data;
