@@ -99,7 +99,11 @@ export const getUserPoint = async () => {
 };
 export const snsLoginUser = async (snsName: string) => {
   try {
-    const response = await instance.get(`/oauth2/url/${snsName}`);
+    const response = await instance.get(`/oauth2/url/${snsName}`, {
+      withCredentials: true,
+    });
+    const accessToken = response?.headers.authorization;
+    localStorage.setItem('accessToken', accessToken);
     return response.data.url;
   } catch (error: any) {
     const axiosError = error as AxiosError<ErrorResponse>;
