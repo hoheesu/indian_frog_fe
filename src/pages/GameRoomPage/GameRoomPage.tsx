@@ -228,9 +228,8 @@ const GameRoomPage = () => {
         });
       }
       if (message.firstBet) {
-        setUserPoint(message.myPoint - message.roundPot / 2);
-        setOtherPoint(message.otherPoint - message.roundPot / 2);
-        console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
+        setUserPoint(message.myPoint);
+        setOtherPoint(message.otherPoint);
       }
       if (message.roundPot) {
         setRoundPoint(message.roundPot);
@@ -274,7 +273,7 @@ const GameRoomPage = () => {
             setReStart(true);
             setRoundEnd(false);
           }
-        }, 5000);
+        }, 10000);
       }
       if (message.nextState === 'GAME_END') {
         setGameEnd(true);
@@ -576,9 +575,6 @@ const GameRoomPage = () => {
         <Chat messageArea={messageArea} stompClient={stompClient} />
       </GameRoom>
       <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
-        {/* <p>WINNER : hoheesu1</p>
-        <p>LOSER : hoheesu2</p>
-        <p>POINT : 1000</p> */}
         <p>라운드 승자 : {roundEndInfo.roundWinner}</p>
         <p>라운드 패자 : {roundEndInfo.roundLoser}</p>
         <p>라운드 배팅 : {roundEndInfo.roundPot.toString()}</p>
@@ -586,6 +582,7 @@ const GameRoomPage = () => {
     </GameWrap>
   );
 };
+
 const GameHeaderBtns = styled.div`
   position: absolute;
   top: 0;

@@ -22,7 +22,7 @@ function MembersModal() {
               <img src={ImgCharacter01} alt="" />
             </ImageBox>
             <h3>오진선</h3>
-            <p>FE</p>
+            <p>BE</p>
           </Link>
         </li>
         <li>

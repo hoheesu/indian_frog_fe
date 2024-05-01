@@ -58,7 +58,7 @@ function Main() {
         navigate(`/main`);
       } else if (0 < participantCount && participantCount < 2) {
         useJoinRoom.mutate(roomNumber);
-        navigate(`/gameroom/${roomNumber}`);
+        // navigate(`/gameroom/${roomNumber}`);
       } else if (participantCount >= 2) {
         alert(`${roomNumber}번 방은 인원이 가득찼습니다.`);
       } else if (0 === participantCount) {

@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import { AxiosError, isAxiosError } from 'axios';
 import { authInstance, instance } from './axios';
 import { ErrorResponse } from 'react-router-dom';
 
@@ -36,9 +36,15 @@ export const getGameRoomsList = async (pageNum: number) => {
 export const joinGameRoom = async (gameRoomId: number) => {
   try {
     const response = await authInstance.post(`/gameRoom/${gameRoomId}/join`);
-    return response.data;
-  } catch (error) {
-    throw error;
+    if (response.status === 200) {
+      return response.data;
+    }
+    if (response.status === 400) {
+      console.log(response);
+      throw response;
+    }
+  } catch (error: any) {
+    throw error.response.data.message;
   }
 };
 
@@ -46,10 +52,11 @@ export const gameRoomInfo = async (gameRoomId: number) => {
   try {
     const response = await authInstance.get(`/gameRoom/${gameRoomId}`);
     return response.data.data;
-  } catch (error) {
+  } catch (error: any) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
       throw axiosError.response.data;
     }
+    throw error?.response?.data.message;
   }
 };
