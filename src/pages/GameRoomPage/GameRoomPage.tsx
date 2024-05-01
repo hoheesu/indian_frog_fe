@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
-import styled from 'styled-components';
 import Player from './Player';
 import Chat from './Chat';
 import GameButton from './GameButton';
@@ -14,9 +13,9 @@ import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 import { history } from '../../utils/history';
 import CardImages from './CardImages';
-import ImgCardBack from '../../assets/images/img-card-back.png';
 import IconCoin from '../../assets/images/icons/icon-coin.svg';
 import exitButton from '../../assets/images/icons/exitButton.png';
+import styled, { css } from 'styled-components';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -497,10 +496,10 @@ const GameRoomPage = () => {
       }
     }
   }, [useUserChoice]);
-const maxBetPoint = useMemo(() => {
-  return Math.min(userPoint, otherPoint);
-}, [userPoint, otherPoint]);
-  
+  const maxBetPoint = useMemo(() => {
+    return Math.min(userPoint, otherPoint);
+  }, [userPoint, otherPoint]);
+
   return (
     <GameWrap>
       <GameRoom>
@@ -551,13 +550,7 @@ const maxBetPoint = useMemo(() => {
         <UserCard $cardState={cardState.cardState}>
           <CardImages cardNumber={cardState.userCard} />
         </UserCard>
-        <CardDeck>
-          <CardList>
-            <li>
-              <img src={ImgCardBack} alt="" />
-            </li>
-          </CardList>
-        </CardDeck>
+
         <BattingPoint>
           <span>배팅금액</span>
           <p>{roundPot}</p>
@@ -664,32 +657,7 @@ const BattingPoint = styled.div`
     font-weight: 700;
   }
 `;
-const CardDeck = styled.div`
-  position: relative;
-  grid-area: 1/3;
-`;
-const CardList = styled.ul`
-  transform: translateY(360px);
-  li {
-    width: 200px;
-    height: auto;
-    position: absolute;
-    top: 0;
-    right: 90px;
-    z-index: 2;
-    transform: translateY(-50%) rotate(-20deg);
-    filter: drop-shadow(-2px -2px 5px rgba(65, 65, 65, 0.1));
-    img {
-      width: 100%;
-    }
-    &:nth-child(2n) {
-      top: 30px;
-      right: 100px;
-      transform: translateY(-50%) rotate(-30deg);
-      z-index: 1;
-    }
-  }
-`;
+
 const MyState = styled.div`
   grid-area: 3/3;
   align-self: flex-end;
@@ -710,7 +678,7 @@ const GameRoom = styled.div`
   display: grid;
   grid-template-columns: 400px 1fr 400px;
   grid-template-rows: 1fr 1fr 1fr;
-  padding: 100px 20px;
+  padding: 130px 20px;
   position: relative;
   margin: 0 auto;
   max-width: 1460px;
@@ -722,22 +690,29 @@ interface CardType {
 }
 const OtherCard = styled.div<CardType>`
   position: absolute;
-  top: 100px;
-  ${(props) => (props.$cardState ? `right: 50%;` : ` right: 100px;`)}
-  transform: translateX(50%);
+  top: 20%;
   transition: 0.5s;
-  filter: drop-shadow(10px 6px 6px #00000081);
+  filter: drop-shadow(10px 6px 6px rgba(0, 0, 0, 0.1));
+  ${({ $cardState }) =>
+    $cardState
+      ? css`
+          left: 50%;
+          right: unset;
+          top: 130px;
+          transform: translateX(-50%);
+        `
+      : ` right: 100px;`}
 `;
-const UserCard = styled.div<CardType>`
-  position: absolute;
-  top: 100px;
-  ${(props) =>
-    props.$cardState
-      ? `right: 50%; top: calc(100% - 400px);`
-      : `right: 100px; `}
-  transform: translateX(50%);
-  transition: 0.5s;
-  filter: drop-shadow(10px 6px 6px #00000081);
+const UserCard = styled(OtherCard)<CardType>`
+  ${({ $cardState }) =>
+    $cardState
+      ? css`
+          left: 50%;
+          transform: translateX(-50%);
+          bottom: 100px;
+          top: unset;
+        `
+      : ` right: 100px;`}
 `;
 interface ReadyState {
   $userReady: boolean;
