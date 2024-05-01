@@ -179,7 +179,6 @@ const ChatInput = styled.div`
       background-size: 80%;
       background-repeat: no-repeat;
       background-position: center;
-      cursor: pointer;
     }
   }
   input {

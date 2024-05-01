@@ -6,11 +6,12 @@ import { useParams } from 'react-router-dom';
 import { ChangeEvent, useState } from 'react';
 
 interface Props {
+  maxBetPoint: number;
   setIsRaise: React.Dispatch<React.SetStateAction<boolean>>;
   stompClient: any;
 }
 
-const BattingInput = ({ stompClient, setIsRaise }: Props) => {
+const BattingInput = ({ maxBetPoint, stompClient, setIsRaise }: Props) => {
   const [raisePoint, setRaisePoint] = useState(0);
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
@@ -23,7 +24,12 @@ const BattingInput = ({ stompClient, setIsRaise }: Props) => {
   } = jwtDecode(authToken!);
 
   const handleRaisePointChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setRaisePoint(Number(e.target.value));
+    const newValue = parseInt(e.target.value);
+    if (newValue > maxBetPoint) {
+      setRaisePoint(maxBetPoint);
+    } else {
+      setRaisePoint(newValue);
+    }
   };
 
   const handleRaiseSubmit = () => {
@@ -49,13 +55,9 @@ const BattingInput = ({ stompClient, setIsRaise }: Props) => {
 
   return (
     <BattingWrap>
-      <form
-      // onSubmit={(e) => {
-      //   e.preventDefault();
-      //   handleRaiseSubmit();
-      // }}
-      >
+      <form>
         <Input
+          maxValue={maxBetPoint}
           type="number"
           value={raisePoint.toString()}
           onChangeFnc={handleRaisePointChange}
@@ -102,6 +104,11 @@ const BattingWrap = styled.div`
     border: 4px solid #bfec80;
     &::-webkit-inner-spin-button {
       appearance: none;
+    }
+    & + button {
+      position: absolute;
+      top: -99999px;
+      right: -99999px;
     }
   }
 `;

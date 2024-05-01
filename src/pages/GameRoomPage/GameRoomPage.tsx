@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
@@ -17,6 +17,7 @@ import CardImages from './CardImages';
 import ImgCardBack from '../../assets/images/img-card-back.png';
 import IconCoin from '../../assets/images/icons/icon-coin.svg';
 import exitButton from '../../assets/images/icons/exitButton.png';
+import MusicButton from '../../components/layout/MusicButton';
 
 interface GameRoomInfo {
   hostImageUrl: string;
@@ -44,7 +45,9 @@ const GameRoomPage = () => {
   const [joinNickname, setJoinNickname] = useState(''); // 최근 참여자 닉네임
   const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
   const [userPoint, setUserPoint] = useState<number>(0); // 접속한 유저의 포인트
+  const [userImg, setUserImg] = useState<string | null>();
   const [otherNickname, setOtherNickname] = useState<string | null>(); // 상대방 닉네임
+  const [otherImg, setOtherImg] = useState<string | null>();
   const [otherPoint, setOtherPoint] = useState<number>(0); // 상대방 포인트
   const [userReady, setUserReady] = useState(false); // 내 레디상테
 
@@ -78,6 +81,10 @@ const GameRoomPage = () => {
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
+
+  const maxBetPoint = useMemo(() => {
+    return Math.min(userPoint, otherPoint);
+  }, [userPoint, otherPoint]);
 
   const userInfoDecode: {
     auth: string;
@@ -246,6 +253,7 @@ const GameRoomPage = () => {
         });
         setCardState({
           ...cardState,
+          otherCard: cardState.otherCard,
           userCard: message.myCard,
           cardState: true,
         });
@@ -399,19 +407,24 @@ const GameRoomPage = () => {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
         setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
+        setUserImg(roomUserInfo?.hostImageUrl);
       }
       if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
         setUserType('guest');
         setUserPoint(roomUserInfo?.participantPoints);
+        setUserImg(roomUserInfo?.participantImageUrl);
         setOtherNickname(roomUserInfo?.hostNickname);
         setOtherPoint(roomUserInfo?.hostPoints);
+        setOtherImg(roomUserInfo?.hostImageUrl);
       }
     } else {
       if (roomUserInfo?.participantCount === 2) {
         setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
+        setUserImg(roomUserInfo?.hostImageUrl);
         setOtherNickname(roomUserInfo?.participantNickname);
         setOtherPoint(roomUserInfo?.participantPoints);
+        setOtherImg(roomUserInfo?.participantImageUrl);
       }
     }
     // setGameRoomState(roomUserInfo?.gameRoomState);
@@ -499,20 +512,24 @@ const GameRoomPage = () => {
   return (
     <GameWrap>
       <GameRoom>
-        <LeaveButtonWrapper>
-          <Button onClickFnc={handleLeaveButtonClick}>
-            <img src={exitButton} alt="" />
-          </Button>
-        </LeaveButtonWrapper>
-        <GameRoomInfo>
-          <p>일반전</p>
-          <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
-        </GameRoomInfo>
+        <GameHeaderBtns>
+          <LeaveButton>
+            <Button onClickFnc={handleLeaveButtonClick}>
+              <img src={exitButton} alt="" />
+            </Button>
+          </LeaveButton>
+          <MusicButton />
+          <GameRoomInfo>
+            <p>일반전</p>
+            <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
+          </GameRoomInfo>
+        </GameHeaderBtns>
         <Player
           player="other"
           nick={otherNickname ? otherNickname : '상대방을 기다리는 중..'}
           point={otherPoint.toString()}
           state={otherGameState}
+          imageUrl={otherImg}
         />
         <MyState>
           <Player
@@ -520,6 +537,7 @@ const GameRoomPage = () => {
             nick={userInfoDecode.nickname}
             point={userPoint.toString()}
             state={userReady ? 'ready' : currentPlayer ? 'choose' : 'wait'}
+            imageUrl={userImg}
           />
           {gameRoomState === 'READY' ? (
             <ReadyButton $userReady={userReady}>
@@ -531,7 +549,11 @@ const GameRoomPage = () => {
             <GameButton stompClient={stompClient} setIsRaise={setIsRaise} />
           ) : null}
           {isRaise ? (
-            <BattingInput stompClient={stompClient} setIsRaise={setIsRaise} />
+            <BattingInput
+              maxBetPoint={maxBetPoint}
+              stompClient={stompClient}
+              setIsRaise={setIsRaise}
+            />
           ) : null}
         </MyState>
         <OtherCard $cardState={cardState.cardState}>
@@ -564,7 +586,41 @@ const GameRoomPage = () => {
     </GameWrap>
   );
 };
-
+const GameHeaderBtns = styled.div`
+  position: absolute;
+  top: 0;
+  width: 100%;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  & > div {
+    &:nth-child(2) {
+      margin-left: auto;
+    }
+  }
+`;
+const LeaveButton = styled.div``;
+const GameRoomInfo = styled.div`
+  padding: 5px 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #fffdee;
+  gap: 10px;
+  font-size: 20px;
+  border-radius: 50px;
+  & > p:nth-child(1) {
+    padding: 7px 10px;
+    background-color: var(--color-main);
+    border-radius: 30px;
+    color: #fff;
+  }
+  & > p:nth-last-child(1) {
+    margin-right: 7px;
+  }
+`;
 const SnackBar = styled.div<any>`
   position: absolute;
   /* bottom: 50%; */
@@ -674,7 +730,7 @@ const GameRoom = styled.div`
   padding: 100px 20px;
   position: relative;
   margin: 0 auto;
-  max-width: 1440px;
+  max-width: 1460px;
   min-width: 1200px;
   height: 100%;
 `;
@@ -720,31 +776,5 @@ const ReadyButton = styled.div<ReadyState>`
   }
   transition: all 0.3s;
 `;
-const GameRoomInfo = styled.div`
-  position: absolute;
-  top: 0;
-  right: 10px;
-  padding: 15px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #fffdee;
-  gap: 10px;
-  font-size: 20px;
-  border-radius: 50px;
-  & > p:nth-child(1) {
-    padding: 7px 10px;
-    background-color: var(--color-main);
-    border-radius: 30px;
-    color: #fff;
-  }
-  & > p:nth-last-child(1) {
-    margin-right: 7px;
-  }
-`;
-const LeaveButtonWrapper = styled.div`
-  position: absolute;
-  top: 0;
-  left: 10px;
-`;
+
 export default GameRoomPage;

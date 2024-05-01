@@ -85,9 +85,10 @@ export const refreshToken = async () => {
   }
 };
 export const getUserPoint = async () => {
+  const isLoggedIn = localStorage.getItem('accessToken');
+  if (!isLoggedIn) return {};
   try {
     const { data } = await authInstance.get(`/point`);
-
     return data;
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
