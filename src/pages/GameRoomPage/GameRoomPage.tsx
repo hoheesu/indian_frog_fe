@@ -227,7 +227,7 @@ const GameRoomPage = () => {
           cardState: true,
         });
       }
-      if (message.firstBet) {
+      if (message.firstBet || message.firstBet === 0) {
         setUserPoint(message.myPoint);
         setOtherPoint(message.otherPoint);
       }

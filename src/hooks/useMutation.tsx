@@ -5,13 +5,12 @@ import {
   findPassword,
   loginUser,
 } from '../api/userAuthApi';
-import { createGameRoom, gameRoomInfo, joinGameRoom } from '../api/gameRoomApi';
+import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
 import { changePassword, chargePoint, updateProfile } from '../api/myPageApi';
 import useUserProfileStore from '../store/profile/useUserProfileStore';
 import { QUERY_KEYS } from './useQuery';
-import { AxiosError } from 'axios';
 
 export const useLoginSubmitMutation = () => {
   const queryClient = useQueryClient();
