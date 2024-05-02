@@ -12,7 +12,7 @@ import { useLoginSubmitMutation } from '../../hooks/useMutation';
 // import IconSnsNaver from '../../assets/images/icons/icon-sns-naver.svg';
 // import IconSnsGoogle from '../../assets/images/icons/icon-sns-google.svg';
 // import IconSnsKakao from '../../assets/images/icons/icon-sns-kakao.svg';
-import { useGetSnsLogin } from '../../hooks/useQuery';
+// import { useGetSnsLogin } from '../../hooks/useQuery';
 
 function LoginModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -28,7 +28,7 @@ function LoginModal() {
     email: '',
     password: '',
   });
-  const [snsName, setSnsName] = useState('');
+  // const [snsName, setSnsName] = useState('');
   const handleInputOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginInput({ ...loginInput, [name]: value });
@@ -52,18 +52,18 @@ function LoginModal() {
     } else setUserValid(true);
   }, [loginInput]);
 
-  const { data } = useGetSnsLogin(snsName);
-  const handleSnsLoginClick = (name: string) => {
-    setSnsName(name);
-    const accessToken = data?.headers.authorization;
-    alert(accessToken);
-    localStorage.setItem('accessToken', accessToken);
-  };
-  useEffect(() => {
-    if (data) {
-      window.location.href = data;
-    }
-  }, [handleSnsLoginClick]);
+  // const { data } = useGetSnsLogin(snsName);
+  // const handleSnsLoginClick = (name: string) => {
+  //   setSnsName(name);
+  //   const accessToken = data?.headers.authorization;
+  //   alert(accessToken);
+  //   localStorage.setItem('accessToken', accessToken);
+  // };
+  // useEffect(() => {
+  //   if (data) {
+  //     window.location.href = data;
+  //   }
+  // }, [handleSnsLoginClick]);
 
   return (
     <>

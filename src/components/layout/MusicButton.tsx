@@ -1,16 +1,24 @@
-import { useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import styled from 'styled-components';
 import indianFrogMainMusic from '../../assets/audio/IndianFrog_ver1.1.mp3';
 import musicPlay from '../../assets/images/icons/musicPlay.svg';
 
 function MusicButton() {
   const [isPlay, setIsPlay] = useState(true);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.1;
+    }
+  }, []);
   return (
     <PlayButtonContainer>
       <button onClick={() => setIsPlay((prev) => !prev)}>
         <img src={musicPlay} />
       </button>
       <AudioCotroller
+        typeof="audio/mp3"
+        ref={audioRef}
         src={indianFrogMainMusic}
         controls={isPlay}
         // autoPlay

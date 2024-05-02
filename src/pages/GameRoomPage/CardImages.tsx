@@ -77,8 +77,16 @@ function CardImages({ cardNumber }: CardProps) {
   );
 }
 const CardWrapper = styled.div`
+  @media (max-height: 900px) {
+    height: 250px;
+  }
+  @media (max-height: 700px) {
+    height: 200px;
+  }
+  height: 300px;
+  transition: height 0.1s ease-in;
   img {
-    height: 300px;
+    height: 100%;
   }
 `;
 
