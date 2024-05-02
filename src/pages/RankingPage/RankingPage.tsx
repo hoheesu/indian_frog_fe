@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { useGetRankingList } from '../../hooks/useQuery';
 import { formatNumber } from '../../utils/numberFormatCheck';
-import ImgDefaultProfile from '../../assets/images/img-character.svg';
+import ImgRandomProfile01 from '../../assets/images/img-randomProfile01.svg';
 import IconCrown from '../../assets/images/icons/icon-crown.svg';
 
 const RankingPage = () => {
@@ -34,7 +34,7 @@ const RankingPage = () => {
             <p>
               <ProfileImg>
                 {rankings.userImg === null ? (
-                  <img src={ImgDefaultProfile}></img>
+                  <img src={ImgRandomProfile01}></img>
                 ) : (
                   <img src={rankings.userImg}></img>
                 )}
@@ -51,7 +51,7 @@ const RankingPage = () => {
           <p>
             <ProfileImg>
               {rankingInfo?.userImg === null ? (
-                <img src={ImgDefaultProfile}></img>
+                <img src={ImgRandomProfile01}></img>
               ) : (
                 <img src={rankingInfo?.userImg}></img>
               )}

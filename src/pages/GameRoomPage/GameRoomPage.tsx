@@ -577,9 +577,15 @@ const GameRoomPage = () => {
         <Chat messageArea={messageArea} stompClient={stompClient} />
       </GameRoom>
       <SnackBar $roundEndInfo={roundEndInfo.roundEnd}>
-        <p>라운드 승자 : {roundEndInfo.roundWinner}</p>
-        <p>라운드 패자 : {roundEndInfo.roundLoser}</p>
-        <p>라운드 배팅 : {roundEndInfo.roundPot.toString()}</p>
+        {/* <p>WINNER : hoheesu1</p>
+        <p>LOSER : hoheesu2</p>
+        <p>POINT : 1000</p> */}
+        <h3>라운드 결과</h3>
+        <p className="winner">라운드 승자 : {roundEndInfo.roundWinner}</p>
+        <p className="loser">라운드 패자 : {roundEndInfo.roundLoser}</p>
+        <p className="batting">
+          라운드 배팅 : {roundEndInfo.roundPot.toString()}
+        </p>
       </SnackBar>
     </GameWrap>
   );
@@ -587,7 +593,7 @@ const GameRoomPage = () => {
 
 const GameHeaderBtns = styled.div`
   position: absolute;
-  top: 0;
+  top: 20px;
   width: 100%;
   padding: 0 20px;
   display: flex;
@@ -621,23 +627,48 @@ const GameRoomInfo = styled.div`
   }
 `;
 const SnackBar = styled.div<any>`
+  h3 {
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    font-family: 'NPSfontBold';
+  }
+  > p {
+    font-family: 'NPSfontRegular';
+    padding: 10px 20px;
+    width: 100%;
+    color: #fff;
+    border-radius: 10px;
+    &.winner {
+      background: var(--color-main);
+    }
+    &.loser {
+      background: #999;
+    }
+    &.batting {
+      text-align: center;
+      color: #222;
+    }
+  }
+  gap: 10px;
   position: absolute;
-  /* bottom: 50%; */
+  bottom: 50%;
   left: 50%;
   bottom: ${(props) => (props.$roundEndInfo ? '50%' : '-100px')};
   transform: translate(-50%, 60%);
+  padding: 20px;
   display: flex;
-  width: 350px;
-  height: 175px;
+  min-width: 350px;
   justify-content: center;
   flex-direction: column;
-  align-items: center;
-  row-gap: 15px;
+  align-items: flex-start;
   border-radius: 30px;
   background-color: #fffdee;
   transition: all 0.5s;
   z-index: 100;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   box-shadow: 0 0 20px #68af1da9;
   border: 5px solid #68af1d;
@@ -655,6 +686,7 @@ const BattingPoint = styled.div`
     background: url(${IconCoin}) no-repeat center;
     background-size: 100%;
   }
+
   position: absolute;
   top: 50%;
   left: 50%;
@@ -670,6 +702,7 @@ const BattingPoint = styled.div`
   background: #cd7522;
   border-radius: 20px;
   border: 5px solid #95500f;
+  transition: all .1s ease-in;
   span {
     font-size: 20px;
     color: #fff;
@@ -679,15 +712,24 @@ const BattingPoint = styled.div`
     color: #fff;
     font-weight: 700;
   }
+  @media (max-height: 700px) {
+    height: 110px;
+    min-width:200px;
+    & > span {
+      font-size: 16px;
+    }
+    & > p {
+      font-size: 30px;
+    }
+  }
 `;
 
 const MyState = styled.div`
-  grid-area: 3/3;
+  grid-area: 2/3;
   align-self: flex-end;
 `;
 const GameWrap = styled.div`
   position: relative;
-  padding-top: 20px;
   background: linear-gradient(
     180deg,
     rgba(163, 231, 111, 1) 0%,
@@ -697,10 +739,14 @@ const GameWrap = styled.div`
   overflow: hidden;
 `;
 const GameRoom = styled.div`
+  @media (max-height: 900px) {
+    padding: 130px 20px 40px;
+  }
   position: relative;
   display: grid;
   grid-template-columns: 400px 1fr 400px;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: min(0px) 1fr;
+  gap: 20px;
   padding: 130px 20px;
   position: relative;
   margin: 0 auto;
@@ -714,28 +760,34 @@ interface CardType {
 const OtherCard = styled.div<CardType>`
   position: absolute;
   top: 20%;
-  transition: 0.5s;
+  transition: all 0.2s;
   filter: drop-shadow(10px 6px 6px rgba(0, 0, 0, 0.1));
   ${({ $cardState }) =>
     $cardState
       ? css`
           left: 50%;
           right: unset;
-          top: 130px;
-          transform: translateX(-50%);
+          top: 3%;
+          transform: translateX(-50%) rotate(0);
         `
-      : ` right: 100px;`}
+      : `right: 80px;
+        transform: rotate(-2deg) translateX(0%);
+      `}
 `;
 const UserCard = styled(OtherCard)<CardType>`
   ${({ $cardState }) =>
     $cardState
       ? css`
           left: 50%;
-          transform: translateX(-50%);
-          bottom: 100px;
+          transform: translateX(-50%) rotate(0);
+          bottom: 3%;
           top: unset;
         `
-      : ` right: 100px;`}
+      : ` 
+    right: 100px;
+    transform: rotate(-10deg)  translateX(0%);
+      
+      `}
 `;
 interface ReadyState {
   $userReady: boolean;
