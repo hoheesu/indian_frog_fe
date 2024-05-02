@@ -88,7 +88,6 @@ const Player: React.FC<PlayerProps> = ({
 const PlayerBox = styled.div`
   position: relative;
   width: 100%;
-  max-width: 400px;
   z-index: 1;
 `;
 const BoxInner = withPlayer(styled.div<WithPlayerProps>`
@@ -132,6 +131,9 @@ const PlayerBadge = withPlayer(styled.em<WithPlayerProps>`
 `);
 
 const TopArea = styled.div`
+  @media (max-height: 900px) {
+    padding: 30px 20px 20px;
+  }
   display: flex;
   align-items: center;
   gap: 30px;
@@ -159,9 +161,18 @@ const PlayerProfile = withPlayer(styled.div<WithPlayerProps>`
   img {
     width: 120px;
     height: 120px;
-    object-fit: fill;
+    object-fit: cover;
     background: #fff;
     border-radius: 50%;
+  }
+  @media (max-height: 900px) {
+    width: 90px;
+    height: 90px;
+    > img {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+    }
   }
 `);
 const PlayerInfo = styled.div`

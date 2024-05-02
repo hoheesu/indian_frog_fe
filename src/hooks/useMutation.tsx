@@ -149,6 +149,7 @@ export const useChangePasswordMutation = () => {
   return useMutation({
     mutationFn: changePassword,
     onSuccess: (data) => {
+      
       if (data.passwordChange) {
         alert('비밀번호가 변경되었습니다.');
         useSetIsModalClick();
