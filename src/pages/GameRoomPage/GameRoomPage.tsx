@@ -275,10 +275,12 @@ const GameRoomPage = () => {
           }
         }, 7000);
       }
+
       if (message.nextState === 'GAME_END') {
         setGameEnd(true);
         setGameRoomState('READY');
       }
+
       if (message.nowState === 'GAME_END') {
         useSetIsModalClick('gameOver');
         useSetGameEndInfo({
