@@ -5,7 +5,7 @@ import {
   findPassword,
   loginUser,
 } from '../api/userAuthApi';
-import { createGameRoom, gameRoomInfo, joinGameRoom } from '../api/gameRoomApi';
+import { createGameRoom, joinGameRoom } from '../api/gameRoomApi';
 import { useNavigate } from 'react-router-dom';
 import { useIsModalStore } from '../store/modal/CreateModalStore';
 import { changePassword, chargePoint, updateProfile } from '../api/myPageApi';
@@ -55,24 +55,16 @@ export const useJoinRoomMutation = () => {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   return useMutation({
     mutationFn: joinGameRoom,
-    onSuccess: (_, roomNumber: number) => {
+    onSuccess: (data, roomNumber: number) => {
+      console.log('성공', data);
       navigate(`/gameroom/${roomNumber}`);
       useSetIsModalClick();
       queryClient.invalidateQueries({
         queryKey: [QUERY_KEYS.GameRoomsList],
       });
     },
-    onError: (_, roomNumber: number) => {
-      (async () => {
-        try {
-          await gameRoomInfo(roomNumber);
-        } catch (error: any) {
-          alert(error.message);
-          navigate('/main');
-        }
-      })();
-      alert('로그인 후 이용해주세요.');
-      useSetIsModalClick('login');
+    onError: (error: any) => {
+      alert(error);
     },
   });
 };

@@ -15,6 +15,7 @@ import { history } from '../../utils/history';
 import CardImages from './CardImages';
 import IconCoin from '../../assets/images/icons/icon-coin.svg';
 import exitButton from '../../assets/images/icons/exitButton.png';
+import MusicButton from '../../components/layout/MusicButton';
 import styled, { css } from 'styled-components';
 
 interface GameRoomInfo {
@@ -43,7 +44,9 @@ const GameRoomPage = () => {
   const [joinNickname, setJoinNickname] = useState(''); // 최근 참여자 닉네임
   const [userType, setUserType] = useState(''); // 유저 타입 (host / guest)
   const [userPoint, setUserPoint] = useState<number>(0); // 접속한 유저의 포인트
+  const [userImg, setUserImg] = useState<string | null>();
   const [otherNickname, setOtherNickname] = useState<string | null>(); // 상대방 닉네임
+  const [otherImg, setOtherImg] = useState<string | null>();
   const [otherPoint, setOtherPoint] = useState<number>(0); // 상대방 포인트
   const [userReady, setUserReady] = useState(false); // 내 레디상테
 
@@ -69,9 +72,7 @@ const GameRoomPage = () => {
     roundWinner: '',
     roundPot: 0,
   });
-
   const [messageArea, setMessageArea] = useState<Message[]>([]);
-
   const [useSetGameEndInfo, useUserChoice, useSetUserChoice] = useGameEndStore(
     (state) => [state.setGameEndInfo, state.userChoice, state.setUserChoice],
   );
@@ -79,6 +80,10 @@ const GameRoomPage = () => {
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
+
+  const maxBetPoint = useMemo(() => {
+    return Math.min(userPoint, otherPoint);
+  }, [userPoint, otherPoint]);
 
   const userInfoDecode: {
     auth: string;
@@ -222,10 +227,9 @@ const GameRoomPage = () => {
           cardState: true,
         });
       }
-      if (message.firstBet) {
-        setUserPoint((prevState) => prevState - message.roundPot / 2);
-        setOtherPoint((prevState) => prevState - message.roundPot / 2);
-        console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
+      if (message.firstBet || message.firstBet === 0) {
+        setUserPoint(message.myPoint);
+        setOtherPoint(message.otherPoint);
       }
       if (message.roundPot) {
         setRoundPoint(message.roundPot);
@@ -247,9 +251,17 @@ const GameRoomPage = () => {
         });
         setCardState({
           ...cardState,
+          otherCard: message.otherCard,
           userCard: message.myCard,
           cardState: true,
         });
+        if (message.roundWinner === userInfoDecode.nickname) {
+          setUserPoint(message.winnerPoint);
+          setOtherPoint(message.loserPoint);
+        } else {
+          setUserPoint(message.loserPoint);
+          setOtherPoint(message.winnerPoint);
+        }
         setTimeout(() => {
           setRoundEndInfo({
             roundEnd: false,
@@ -261,7 +273,7 @@ const GameRoomPage = () => {
             setReStart(true);
             setRoundEnd(false);
           }
-        }, 5000);
+        }, 7000);
       }
       if (message.nextState === 'GAME_END') {
         setGameEnd(true);
@@ -400,19 +412,24 @@ const GameRoomPage = () => {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
         setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
+        setUserImg(roomUserInfo?.hostImageUrl);
       }
       if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
         setUserType('guest');
         setUserPoint(roomUserInfo?.participantPoints);
+        setUserImg(roomUserInfo?.participantImageUrl);
         setOtherNickname(roomUserInfo?.hostNickname);
         setOtherPoint(roomUserInfo?.hostPoints);
+        setOtherImg(roomUserInfo?.hostImageUrl);
       }
     } else {
       if (roomUserInfo?.participantCount === 2) {
         setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
+        setUserImg(roomUserInfo?.hostImageUrl);
         setOtherNickname(roomUserInfo?.participantNickname);
         setOtherPoint(roomUserInfo?.participantPoints);
+        setOtherImg(roomUserInfo?.participantImageUrl);
       }
     }
     // setGameRoomState(roomUserInfo?.gameRoomState);
@@ -496,9 +513,6 @@ const GameRoomPage = () => {
       }
     }
   }, [useUserChoice]);
-  const maxBetPoint = useMemo(() => {
-    return Math.min(userPoint, otherPoint);
-  }, [userPoint, otherPoint]);
 
   return (
     <GameWrap>
@@ -509,6 +523,7 @@ const GameRoomPage = () => {
               <img src={exitButton} alt="" />
             </Button>
           </LeaveButton>
+          <MusicButton />
           <GameRoomInfo>
             <p>일반전</p>
             <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
@@ -519,6 +534,7 @@ const GameRoomPage = () => {
           nick={otherNickname ? otherNickname : '상대방을 기다리는 중..'}
           point={otherPoint.toString()}
           state={otherGameState}
+          imageUrl={otherImg}
         />
         <MyState>
           <Player
@@ -526,6 +542,7 @@ const GameRoomPage = () => {
             nick={userInfoDecode.nickname}
             point={userPoint.toString()}
             state={userReady ? 'ready' : currentPlayer ? 'choose' : 'wait'}
+            imageUrl={userImg}
           />
           {gameRoomState === 'READY' ? (
             <ReadyButton $userReady={userReady}>
@@ -571,6 +588,7 @@ const GameRoomPage = () => {
     </GameWrap>
   );
 };
+
 const GameHeaderBtns = styled.div`
   position: absolute;
   top: 20px;
@@ -579,6 +597,12 @@ const GameHeaderBtns = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 20px;
+  & > div {
+    &:nth-child(2) {
+      margin-left: auto;
+    }
+  }
 `;
 const LeaveButton = styled.div``;
 const GameRoomInfo = styled.div`

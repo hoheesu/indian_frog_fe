@@ -150,6 +150,9 @@ const ChatList = styled.ul`
     p {
       color: #6b6852;
     }
+    span {
+      font-size: 18px;
+    }
   }
   .notice {
     color: #cd7522;

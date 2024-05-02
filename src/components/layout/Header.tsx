@@ -26,7 +26,7 @@ function Header() {
   return (
     <HeaderContainer $location={location}>
       <HeaderInner>
-        <Button onClickFnc={() => navigate('/')} isBorder={false}>
+        <Button onClickFnc={() => navigate('/main')} isBorder={false}>
           <p>
             <span>
               <img src={IconHome} alt="" />

@@ -39,6 +39,6 @@ authInstance.interceptors.response.use(
         throw Promise.reject(refreshError);
       }
     }
-    throw Promise.reject(error);
+    throw error;
   },
 );

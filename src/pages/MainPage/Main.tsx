@@ -22,33 +22,51 @@ function Main() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   const useJoinRoom = useJoinRoomMutation();
   const useGetPoint = useGetUserPoint();
+  const authToken = localStorage.getItem('accessToken');
 
   const handleCreateRoomOnclick = () => {
-    if (useGetPoint.data.myPoint === 0) {
-      alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
+    if (authToken) {
+      if (useGetPoint.data.myPoint === 0) {
+        alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
+      } else {
+        useSetIsModalClick('createRoom');
+      }
     } else {
-      useSetIsModalClick('createRoom');
+      alert('로그인을 먼저 해주세요');
+      useSetIsModalClick('login');
     }
   };
   const handleJoinRoomOnclick = () => {
-    if (useGetPoint.data.myPoint === 0) {
-      alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
+    if (authToken) {
+      if (useGetPoint.data.myPoint === 0) {
+        alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
+      } else {
+        useSetIsModalClick('joinRoom');
+      }
     } else {
-      useSetIsModalClick('joinRoom');
+      alert('로그인을 먼저 해주세요');
+      useSetIsModalClick('login');
     }
   };
   const handleJoinRoomNumberOnClick = (
     roomNumber: number,
     participantCount: number,
   ) => {
-    if (useGetPoint.data.myPoint === 0) {
-      alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
-      navigate(`/main`);
-    } else if (participantCount < 2) {
-      useJoinRoom.mutate(roomNumber);
-      navigate(`/gameroom/${roomNumber}`);
+    if (authToken) {
+      if (useGetPoint.data.myPoint === 0) {
+        alert('포인트가 부족합니다. 포인트 충전 후 다시 이용해 주세요.');
+        navigate(`/main`);
+      } else if (0 < participantCount && participantCount < 2) {
+        useJoinRoom.mutate(roomNumber);
+        // navigate(`/gameroom/${roomNumber}`);
+      } else if (participantCount >= 2) {
+        alert(`${roomNumber}번 방은 인원이 가득찼습니다.`);
+      } else if (0 === participantCount) {
+        alert('들어갈 수 없는 방입니다.');
+      }
     } else {
-      alert(`${roomNumber}번 방은 인원이 가득찼습니다.`);
+      alert('로그인을 먼저 해주세요');
+      useSetIsModalClick('login');
     }
   };
 

@@ -18,6 +18,7 @@ interface PlayerProps {
   nick: string;
   point: string;
   state: string;
+  imageUrl?: string | null;
 }
 interface WithPlayerProps {
   player: string;
@@ -36,7 +37,13 @@ const withPlayer =
     return <Component {...props} player={player} state={state} />;
   };
 
-const Player: React.FC<PlayerProps> = ({ player, nick, point, state }) => {
+const Player: React.FC<PlayerProps> = ({
+  player,
+  nick,
+  point,
+  state,
+  imageUrl,
+}) => {
   return (
     <PlayerContext.Provider value={player}>
       <StateContext.Provider value={state}>
@@ -45,7 +52,7 @@ const Player: React.FC<PlayerProps> = ({ player, nick, point, state }) => {
           <BoxInner>
             <TopArea>
               <PlayerProfile>
-                <img src={ImgDefaultProfile} alt="" />
+                <img src={imageUrl || ImgDefaultProfile} alt="" />
               </PlayerProfile>
               <PlayerInfo>
                 <PlayerName>{nick}</PlayerName>
