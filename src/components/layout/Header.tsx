@@ -73,7 +73,7 @@ function Header() {
                 </p>
               </Button>
 
-              {useUserPoint.data?.mtPoint <= 30 ? (
+              {useUserPoint.data?.myPoint <= 30 ? (
                 <Button
                   onClickFnc={() => handleModalOpen('pointCharge')}
                   isBorder={false}
@@ -82,7 +82,7 @@ function Header() {
                     <span>
                       <img src={IconCoin} alt="" />
                     </span>
-                    {useUserPoint.data?.mtPoint < 0
+                    {useUserPoint.data?.myPoint < 0
                       ? 0
                       : formatNumber(useUserPoint.data?.myPoint)}
                   </p>
