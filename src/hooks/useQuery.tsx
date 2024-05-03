@@ -13,7 +13,7 @@ export const QUERY_KEYS = {
 
 export const useGetGameRoomsList = () => {
   return useInfiniteQuery({
-    queryKey: [QUERY_KEYS.GameRoomsList],
+    queryKey: [QUERY_KEYS.GameRoomsList, getGameRoomsList],
     queryFn: ({ pageParam = 1 }) => getGameRoomsList(pageParam),
     getNextPageParam: (lastPage: any) => {
       if (!lastPage.isLast) return lastPage.nextPage;
@@ -21,8 +21,9 @@ export const useGetGameRoomsList = () => {
       return undefined;
     },
     initialPageParam: 0,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnMount: true,
+    refetchInterval: 1000,
     retry: 1,
   });
 };

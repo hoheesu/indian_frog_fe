@@ -122,22 +122,23 @@ const ChatWrap = styled.div`
     position: absolute;
     top: 0;
     left: 0;
-    width: 95%;
-    height: 50px;
+    width: 98%;
+    height: 60px;
     background: rgb(189, 236, 127);
     background: linear-gradient(
       180deg,
-      rgba(189, 236, 127, 1) 0%,
+      #c5ec82 0%,
       rgba(189, 236, 127, 0) 100%
     );
   }
-  padding-top: 10px;
-  grid-area: 3/1;
+  padding-top: 20px;
+  grid-area: 2/1;
   width: 100%;
   align-self: flex-end;
 `;
 const ChatList = styled.ul`
-  height: 300px;
+  min-height: 150px;
+  max-height: 200px;
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -148,6 +149,9 @@ const ChatList = styled.ul`
     span,
     p {
       color: #6b6852;
+    }
+    span {
+      font-size: 18px;
     }
   }
   .notice {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
@@ -15,7 +15,6 @@ import { history } from '../../utils/history';
 import CardImages from './CardImages';
 import IconCoin from '../../assets/images/icons/icon-coin.svg';
 import exitButton from '../../assets/images/icons/exitButton.png';
-import MusicButton from '../../components/layout/MusicButton';
 import styled, { css } from 'styled-components';
 
 interface GameRoomInfo {
@@ -81,9 +80,13 @@ const GameRoomPage = () => {
   const authToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
 
+  const raiseMaxBet = useRef<number | null>(null);
   const maxBetPoint = useMemo(() => {
-    return Math.min(userPoint, otherPoint);
-  }, [userPoint, otherPoint]);
+    const usersPoint = Math.min(userPoint, otherPoint);
+    return raiseMaxBet.current !== null
+      ? Math.min(usersPoint, raiseMaxBet.current)
+      : userPoint;
+  }, [userPoint, otherPoint, raiseMaxBet]);
 
   const userInfoDecode: {
     auth: string;
@@ -92,6 +95,7 @@ const GameRoomPage = () => {
     nickname: string;
     sub: string;
   } = jwtDecode(authToken!);
+  console.log(maxBetPoint);
 
   const connect = () => {
     // WS 커넥트
@@ -168,6 +172,7 @@ const GameRoomPage = () => {
         });
       }
       if (message.nowState === 'ACTION') {
+        raiseMaxBet.current = null;
         message.previousPlayer === userInfoDecode.nickname
           ? setUserPoint(message.myPoint)
           : setOtherPoint(message.myPoint);
@@ -181,6 +186,9 @@ const GameRoomPage = () => {
             const updatedMessages = [...prev, newMessage];
             return updatedMessages;
           });
+          if (message.previousPlayer !== userInfoDecode.nickname) {
+            raiseMaxBet.current = message.otherPoint - message.nowBet;
+          }
         } else if (
           message.actionType === 'CHECK' ||
           message.actionType === 'DIE'
@@ -227,10 +235,9 @@ const GameRoomPage = () => {
           cardState: true,
         });
       }
-      if (message.firstBet) {
-        setUserPoint(message.myPoint - message.roundPot / 2);
-        setOtherPoint(message.otherPoint - message.roundPot / 2);
-        console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
+      if (message.firstBet || message.firstBet === 0) {
+        setUserPoint(message.myPoint);
+        setOtherPoint(message.otherPoint);
       }
       if (message.roundPot) {
         setRoundPoint(message.roundPot);
@@ -274,12 +281,14 @@ const GameRoomPage = () => {
             setReStart(true);
             setRoundEnd(false);
           }
-        }, 5000);
+        }, 7000);
       }
+
       if (message.nextState === 'GAME_END') {
         setGameEnd(true);
         setGameRoomState('READY');
       }
+
       if (message.nowState === 'GAME_END') {
         useSetIsModalClick('gameOver');
         useSetGameEndInfo({
@@ -304,6 +313,7 @@ const GameRoomPage = () => {
       JSON.stringify({ sender: userInfoDecode.nickname }),
     );
     stompClient.disconnect();
+
     navigate('/main');
   };
 
@@ -328,7 +338,8 @@ const GameRoomPage = () => {
       setRoomUserInfo(result);
       return result;
     } catch (err) {
-      throw err;
+      alert(err);
+      navigate('/main');
     }
   };
 
@@ -337,21 +348,13 @@ const GameRoomPage = () => {
   useEffect(() => {
     //첫번째 마운트 상황에서 실행하는 Effect
     connect();
-    (async () => {
-      try {
-        await gameRoomInfoUpdate();
-      } catch (error: any) {
-        if (stompClient) {
-          handleLeaveButtonClick();
-        }
-      }
-    })();
     const handleKeyPress = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
         event.preventDefault();
       }
     };
     useSetUserChoice('');
+    window.addEventListener('keydown', handleKeyPress);
     const sendToNotice = () => {
       setMessageArea((prev) => {
         const newMessage = {
@@ -363,14 +366,10 @@ const GameRoomPage = () => {
         return updatedMessages;
       });
     };
-
     sendToNotice();
-
     setInterval(() => {
       sendToNotice();
     }, 120000);
-
-    window.addEventListener('keydown', handleKeyPress);
 
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
@@ -379,6 +378,17 @@ const GameRoomPage = () => {
       }
     };
   }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        await gameRoomInfoUpdate();
+      } catch (error: any) {
+        if (stompClient) {
+          handleLeaveButtonClick();
+        }
+      }
+    })();
+  }, [joinNickname]);
 
   useEffect(() => {
     const listenBackEvent = () => {
@@ -400,7 +410,12 @@ const GameRoomPage = () => {
     return unlistenHistoryEvent;
   }, [connect]);
 
+  // console.log(roomUserInfo?.participantImageUrl);
+
   useEffect(() => {
+    if (roomUserInfo?.participantImageUrl === null) {
+      setOtherImg(null);
+    }
     if (userInfoDecode.nickname !== leaveNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
         setUserType('host');
@@ -414,6 +429,11 @@ const GameRoomPage = () => {
         setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
         setUserImg(roomUserInfo?.hostImageUrl);
+        if (roomUserInfo?.participantCount === 2) {
+          setOtherNickname(roomUserInfo?.participantNickname);
+          setOtherPoint(roomUserInfo?.participantPoints);
+          setOtherImg(roomUserInfo?.participantImageUrl);
+        }
       }
       if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
         setUserType('guest');
@@ -425,15 +445,24 @@ const GameRoomPage = () => {
       }
     } else {
       if (roomUserInfo?.participantCount === 2) {
-        setUserType('host');
-        setUserPoint(roomUserInfo?.hostPoints);
-        setUserImg(roomUserInfo?.hostImageUrl);
-        setOtherNickname(roomUserInfo?.participantNickname);
-        setOtherPoint(roomUserInfo?.participantPoints);
-        setOtherImg(roomUserInfo?.participantImageUrl);
+        if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
+          setUserType('host');
+          setUserPoint(roomUserInfo?.hostPoints);
+          setUserImg(roomUserInfo?.hostImageUrl);
+          setOtherNickname(roomUserInfo?.participantNickname);
+          setOtherPoint(roomUserInfo?.participantPoints);
+          setOtherImg(roomUserInfo?.participantImageUrl);
+          if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
+            setUserType('guest');
+            setUserPoint(roomUserInfo?.participantPoints);
+            setUserImg(roomUserInfo?.participantImageUrl);
+            setOtherNickname(roomUserInfo?.hostNickname);
+            setOtherPoint(roomUserInfo?.hostPoints);
+            setOtherImg(roomUserInfo?.hostImageUrl);
+          }
+        }
       }
     }
-    // setGameRoomState(roomUserInfo?.gameRoomState);
   }, [roomUserInfo]);
 
   useEffect(() => {
@@ -481,35 +510,36 @@ const GameRoomPage = () => {
 
   useEffect(() => {
     if (gameEnd) {
-      if (userType === 'guest') {
-        setTimeout(() => {
+      setTimeout(() => {
+        if (userType === 'guest') {
+          setTimeout(() => {
+            stompClient.send(
+              `/app/gameRoom/${gameId}/GAME_END`,
+              {},
+              JSON.stringify({}),
+            );
+          }, 200);
+        } else {
           stompClient.send(
             `/app/gameRoom/${gameId}/GAME_END`,
             {},
             JSON.stringify({}),
           );
-        }, 200);
-      } else {
-        stompClient.send(
-          `/app/gameRoom/${gameId}/GAME_END`,
-          {},
-          JSON.stringify({}),
-        );
-      }
-      setTimeout(() => {
-        setCardState({
-          cardState: false,
-          otherCard: '',
-          userCard: '',
-        });
-      }, 9000);
+        }
+        setTimeout(() => {
+          setCardState({
+            cardState: false,
+            otherCard: '',
+            userCard: '',
+          });
+        }, 4000);
+      }, 4000);
     }
   }, [gameEnd]);
 
   useEffect(() => {
     if (gameEnd && useUserChoice) {
       if (useUserChoice === 'LEAVE') {
-        console.log('나가기');
         handleLeaveButtonClick();
       }
     }
@@ -524,7 +554,6 @@ const GameRoomPage = () => {
               <img src={exitButton} alt="" />
             </Button>
           </LeaveButton>
-          <MusicButton />
           <GameRoomInfo>
             <p>일반전</p>
             <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
@@ -552,7 +581,11 @@ const GameRoomPage = () => {
               </Button>
             </ReadyButton>
           ) : currentPlayer ? (
-            <GameButton stompClient={stompClient} setIsRaise={setIsRaise} />
+            <GameButton
+              stompClient={stompClient}
+              setIsRaise={setIsRaise}
+              maxBetPoint={maxBetPoint}
+            />
           ) : null}
           {isRaise ? (
             <BattingInput
@@ -579,16 +612,20 @@ const GameRoomPage = () => {
         {/* <p>WINNER : hoheesu1</p>
         <p>LOSER : hoheesu2</p>
         <p>POINT : 1000</p> */}
-        <p>라운드 승자 : {roundEndInfo.roundWinner}</p>
-        <p>라운드 패자 : {roundEndInfo.roundLoser}</p>
-        <p>라운드 배팅 : {roundEndInfo.roundPot.toString()}</p>
+        <h3>라운드 결과</h3>
+        <p className="winner">라운드 승자 : {roundEndInfo.roundWinner}</p>
+        <p className="loser">라운드 패자 : {roundEndInfo.roundLoser}</p>
+        <p className="batting">
+          라운드 배팅 : {roundEndInfo.roundPot.toString()}
+        </p>
       </SnackBar>
     </GameWrap>
   );
 };
+
 const GameHeaderBtns = styled.div`
   position: absolute;
-  top: 0;
+  top: 20px;
   width: 100%;
   padding: 0 20px;
   display: flex;
@@ -622,23 +659,48 @@ const GameRoomInfo = styled.div`
   }
 `;
 const SnackBar = styled.div<any>`
+  h3 {
+    width: 100%;
+    text-align: center;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    font-family: 'NPSfontBold';
+  }
+  > p {
+    font-family: 'NPSfontRegular';
+    padding: 10px 20px;
+    width: 100%;
+    color: #fff;
+    border-radius: 10px;
+    &.winner {
+      background: var(--color-main);
+    }
+    &.loser {
+      background: #999;
+    }
+    &.batting {
+      text-align: center;
+      color: #222;
+    }
+  }
+  gap: 10px;
   position: absolute;
-  /* bottom: 50%; */
+  bottom: 50%;
   left: 50%;
   bottom: ${(props) => (props.$roundEndInfo ? '50%' : '-100px')};
   transform: translate(-50%, 60%);
+  padding: 20px;
   display: flex;
-  width: 350px;
-  height: 175px;
+  min-width: 350px;
   justify-content: center;
   flex-direction: column;
-  align-items: center;
-  row-gap: 15px;
+  align-items: flex-start;
   border-radius: 30px;
   background-color: #fffdee;
   transition: all 0.5s;
   z-index: 100;
-  font-size: 18px;
+  font-size: 16px;
   font-weight: bold;
   box-shadow: 0 0 20px #68af1da9;
   border: 5px solid #68af1d;
@@ -656,6 +718,7 @@ const BattingPoint = styled.div`
     background: url(${IconCoin}) no-repeat center;
     background-size: 100%;
   }
+
   position: absolute;
   top: 50%;
   left: 50%;
@@ -671,6 +734,7 @@ const BattingPoint = styled.div`
   background: #cd7522;
   border-radius: 20px;
   border: 5px solid #95500f;
+  transition: all 0.1s ease-in;
   span {
     font-size: 20px;
     color: #fff;
@@ -680,15 +744,25 @@ const BattingPoint = styled.div`
     color: #fff;
     font-weight: 700;
   }
+  @media (max-height: 700px) {
+    height: 110px;
+    min-width: 200px;
+    & > span {
+      font-size: 16px;
+    }
+    & > p {
+      font-size: 30px;
+    }
+  }
 `;
 
 const MyState = styled.div`
-  grid-area: 3/3;
+  grid-area: 2/3;
   align-self: flex-end;
 `;
 const GameWrap = styled.div`
+  padding-top: 100px;
   position: relative;
-  padding-top: 20px;
   background: linear-gradient(
     180deg,
     rgba(163, 231, 111, 1) 0%,
@@ -698,10 +772,14 @@ const GameWrap = styled.div`
   overflow: hidden;
 `;
 const GameRoom = styled.div`
+  @media (max-height: 900px) {
+    padding: 130px 20px 40px;
+  }
   position: relative;
   display: grid;
   grid-template-columns: 400px 1fr 400px;
-  grid-template-rows: 1fr 1fr 1fr;
+  grid-template-rows: min(0px) 1fr;
+  gap: 20px;
   padding: 130px 20px;
   position: relative;
   margin: 0 auto;
@@ -715,28 +793,34 @@ interface CardType {
 const OtherCard = styled.div<CardType>`
   position: absolute;
   top: 20%;
-  transition: 0.5s;
+  transition: all 0.2s;
   filter: drop-shadow(10px 6px 6px rgba(0, 0, 0, 0.1));
   ${({ $cardState }) =>
     $cardState
       ? css`
           left: 50%;
           right: unset;
-          top: 130px;
-          transform: translateX(-50%);
+          top: 3%;
+          transform: translateX(-50%) rotate(0);
         `
-      : ` right: 100px;`}
+      : `right: 80px;
+        transform: rotate(-2deg) translateX(0%);
+      `}
 `;
 const UserCard = styled(OtherCard)<CardType>`
   ${({ $cardState }) =>
     $cardState
       ? css`
           left: 50%;
-          transform: translateX(-50%);
-          bottom: 100px;
+          transform: translateX(-50%) rotate(0);
+          bottom: 3%;
           top: unset;
         `
-      : ` right: 100px;`}
+      : ` 
+    right: 100px;
+    transform: rotate(-10deg)  translateX(0%);
+      
+      `}
 `;
 interface ReadyState {
   $userReady: boolean;

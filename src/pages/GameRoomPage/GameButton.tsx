@@ -6,9 +6,10 @@ import { jwtDecode } from 'jwt-decode';
 interface Props {
   setIsRaise: React.Dispatch<React.SetStateAction<boolean>>;
   stompClient: any;
+  maxBetPoint: number;
 }
 
-const GameButton = ({ setIsRaise, stompClient }: Props) => {
+const GameButton = ({ setIsRaise, stompClient, maxBetPoint }: Props) => {
   const { gameId } = useParams(); // 게임방 아이디
   const authToken = localStorage.getItem('accessToken'); // AccessToken (로컬스토리지)
   const userInfoDecode: {
@@ -26,11 +27,12 @@ const GameButton = ({ setIsRaise, stompClient }: Props) => {
         {},
         JSON.stringify({ action: 'DIE', nickname: userInfoDecode.nickname }),
       );
+      setIsRaise(false);
     }
   };
 
   const handleRaiseButtonClick = () => {
-    setIsRaise(true);
+    setIsRaise((prev) => !prev);
   };
 
   const handleCheckButtonClick = () => {
@@ -40,15 +42,20 @@ const GameButton = ({ setIsRaise, stompClient }: Props) => {
         {},
         JSON.stringify({ action: 'CHECK', nickname: userInfoDecode.nickname }),
       );
+      setIsRaise(false);
     }
   };
 
   return (
-    <GameBtns>
+    <GameBtns $maxBetPoint={maxBetPoint}>
       <Button onClickFnc={handleDieButtonClick} isBorder={false}>
         <p className="die">Die</p>
       </Button>
-      <Button onClickFnc={handleRaiseButtonClick} isBorder={false}>
+      <Button
+        onClickFnc={handleRaiseButtonClick}
+        isBorder={false}
+        disabled={maxBetPoint <= 0 ? true : false}
+      >
         <p className="raise">Raise</p>
       </Button>
       <Button onClickFnc={handleCheckButtonClick} isBorder={false}>
@@ -57,7 +64,10 @@ const GameButton = ({ setIsRaise, stompClient }: Props) => {
     </GameBtns>
   );
 };
-const GameBtns = styled.div`
+interface MaxBetPoint {
+  $maxBetPoint: number;
+}
+const GameBtns = styled.div<MaxBetPoint>`
   margin-top: 15px;
   background: #59300a;
   border-radius: 50px;
@@ -90,12 +100,16 @@ const GameBtns = styled.div`
       color: #fff;
     }
   }
+
   .raise {
-    color: #bfec80;
+    ${(props) =>
+      props.$maxBetPoint <= 0
+        ? `color: #777; cursor: default`
+        : `color: #bfec80;
     &:hover {
       background: #79b50a;
       color: #fff;
-    }
+      }`}
   }
   .check {
     color: #fff;

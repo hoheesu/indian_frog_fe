@@ -36,6 +36,7 @@ function Main() {
       useSetIsModalClick('login');
     }
   };
+
   const handleJoinRoomOnclick = () => {
     if (authToken) {
       if (useGetPoint.data.myPoint === 0) {
@@ -48,6 +49,7 @@ function Main() {
       useSetIsModalClick('login');
     }
   };
+
   const handleJoinRoomNumberOnClick = (
     roomNumber: number,
     participantCount: number,
@@ -58,7 +60,7 @@ function Main() {
         navigate(`/main`);
       } else if (0 < participantCount && participantCount < 2) {
         useJoinRoom.mutate(roomNumber);
-        navigate(`/gameroom/${roomNumber}`);
+        // navigate(`/gameroom/${roomNumber}`);
       } else if (participantCount >= 2) {
         alert(`${roomNumber}번 방은 인원이 가득찼습니다.`);
       } else if (0 === participantCount) {
@@ -79,6 +81,7 @@ function Main() {
   }, [result]);
 
   const [ref, inView] = useInView();
+
   useEffect(() => {
     if (inView && result?.pages[0].hasNextPage) {
       setTimeout(() => {

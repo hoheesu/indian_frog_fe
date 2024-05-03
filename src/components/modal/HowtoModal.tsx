@@ -138,7 +138,7 @@ const HowtoModal = () => {
                   <Description>
                     <span>8</span>
                     <p>
-                      RAISE 이후 HECK나 DIE 가 나오면 베팅을 종료하고 라운드가
+                      RAISE 이후 CHEK나 DIE 가 나오면 베팅을 종료하고 라운드가
                       종료된다.
                     </p>
                   </Description>

@@ -1,28 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import indianFrogMainMusic1 from '../../assets/audio/IndianFrog_ver1.1.mp3';
 import indianFrogMainMusic2 from '../../assets/audio/indianfrog_ver2.mp3';
-import musicPlay from '../../assets/images/icons/musicPlay.svg';
-import { useLocation } from 'react-router-dom';
+import IconSpeaker from '../../assets/images/icons/icon-speaker.svg';
+import IconSpeakerMute from '../../assets/images/icons/icon-speaker-mute.svg';
+// import { useLocation } from 'react-router-dom';
 
 function MusicButton() {
-  const [isControls, setIsControls] = useState(false);
-  const location = useLocation();
+  const [isBgmPlay, setIsBgmPlay] = useState(false);
+  const [bgmTrack, setBgmTrack] = useState(indianFrogMainMusic1);
+  // const location = useLocation();
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const changeBgmTrack = () => {
+    setBgmTrack((prev) =>
+      prev === indianFrogMainMusic1
+        ? indianFrogMainMusic2
+        : indianFrogMainMusic1,
+    );
+  };
+
+  const handleMusicButton = () => {
+    setIsBgmPlay((prev) => {
+      !prev ? audioRef.current!.play() : audioRef.current!.pause();
+      return !prev;
+    });
+  };
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.volume = 0.1;
+    }
+  }, []);
+
   return (
     <PlayButtonContainer>
-      <button onClick={() => setIsControls((prev) => !prev)}>
-        <img src={musicPlay} />
+      <button onClick={handleMusicButton}>
+        {isBgmPlay ? (
+          <img src={IconSpeaker} alt="음악재생" />
+        ) : (
+          <img src={IconSpeakerMute} alt="음악중지" />
+        )}
       </button>
-      <AudioCotroller
-        src={
-          location.pathname.substring(1, 9) === 'gameroom'
-            ? indianFrogMainMusic1
-            : indianFrogMainMusic2
-        }
-        autoPlay
-        controls={isControls}
-        loop={true}
-      ></AudioCotroller>
+      {audioRef && (
+        <AudioCotroller
+          typeof="audio/mp3"
+          autoPlay
+          ref={audioRef}
+          src={bgmTrack}
+          onEnded={changeBgmTrack}
+        ></AudioCotroller>
+      )}
     </PlayButtonContainer>
   );
 }
