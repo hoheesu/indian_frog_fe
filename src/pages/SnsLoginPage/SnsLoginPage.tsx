@@ -16,11 +16,14 @@ const SnsLoginPage = () => {
   // }
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    const code = searchParams.get('code');
-    if (code) {
-      alert('CODE = ' + code);
-    }
-  }, [location]);
+    // const code = searchParams.get('code');
+    console.log(searchParams);
+    alert(searchParams);
+
+    // const accessToken = data?.headers.authorization;
+    // alert(accessToken);
+    // localStorage.setItem('accessToken', accessToken);
+  }, []);
   return (
     <>
       <div>Processing...</div>
