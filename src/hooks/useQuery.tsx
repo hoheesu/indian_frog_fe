@@ -1,8 +1,7 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 import { getGameRoomsList } from '../api/gameRoomApi';
 import { getMypageInfo, getRankingList } from '../api/myPageApi';
-import { getUserPoint } from '../api/userAuthApi';
-// import { getUserPoint, snsLoginUser } from '../api/userAuthApi';
+import { getUserPoint, snsLoginUser } from '../api/userAuthApi';
 
 export const QUERY_KEYS = {
   GameRoomsList: 'gameRoomsList',
@@ -48,10 +47,10 @@ export const useGetRankingList = () => {
     queryFn: getRankingList,
   });
 };
-// export const useGetSnsLogin = (snsName: string, options = {}) => {
-//   return useQuery({
-//     queryKey: [QUERY_KEYS.SnsLogin, snsName],
-//     queryFn: () => snsLoginUser(snsName),
-//     ...options,
-//   });
-// };
+export const useGetSnsLogin = (snsName: string, options = {}) => {
+  return useQuery({
+    queryKey: [QUERY_KEYS.SnsLogin, snsName],
+    queryFn: () => snsLoginUser(snsName),
+    ...options,
+  });
+};

@@ -8,12 +8,10 @@ import {
   passwordValidCheck,
 } from '../../utils/inputValidCheck';
 import { useLoginSubmitMutation } from '../../hooks/useMutation';
-// import styled from 'styled-components';
-// import IconSnsNaver from '../../assets/images/icons/icon-sns-naver.svg';
-// import IconSnsGoogle from '../../assets/images/icons/icon-sns-google.svg';
-// import IconSnsKakao from '../../assets/images/icons/icon-sns-kakao.svg';
-// import { useGetSnsLogin } from '../../hooks/useQuery';
-// import { useGetSnsLogin } from '../../hooks/useQuery';
+import styled from 'styled-components';
+import IconSnsGoogle from '../../assets/images/icons/icon-sns-google.svg';
+import IconSnsKakao from '../../assets/images/icons/icon-sns-kakao.svg';
+import { useGetSnsLogin } from '../../hooks/useQuery';
 
 function LoginModal() {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -29,7 +27,7 @@ function LoginModal() {
     email: '',
     password: '',
   });
-  // const [snsName, setSnsName] = useState('');
+  const [snsName, setSnsName] = useState('');
   const handleInputOnChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setLoginInput({ ...loginInput, [name]: value });
@@ -53,18 +51,18 @@ function LoginModal() {
     } else setUserValid(true);
   }, [loginInput]);
 
-  // const { data } = useGetSnsLogin(snsName);
-  // const handleSnsLoginClick = (name: string) => {
-  //   setSnsName(name);
-  //   const accessToken = data?.headers.authorization;
-  //   alert(accessToken);
-  //   localStorage.setItem('accessToken', accessToken);
-  // };
-  // useEffect(() => {
-  //   if (data) {
-  //     window.location.href = data;
-  //   }
-  // }, [handleSnsLoginClick]);
+  const { data } = useGetSnsLogin(snsName);
+  const handleSnsLoginClick = (name: string) => {
+    setSnsName(name);
+    // const accessToken = data?.headers.authorization;
+    // alert(accessToken);
+    // localStorage.setItem('accessToken', accessToken);
+  };
+  useEffect(() => {
+    if (data) {
+      window.location.href = data;
+    }
+  }, [handleSnsLoginClick]);
 
   return (
     <>
@@ -130,104 +128,93 @@ function LoginModal() {
           <p>아직 계정이 없으신가요?</p>
         </Button>
       </div>
-      {/* <SnsLoginForm>
-        <h3>간편하게 시작하기</h3>
-        <ul>
-          <li className="sns-naver">
-            <Button
-              isBorder={false}
-              onClickFnc={() => handleSnsLoginClick('naver')}
-            >
-              <p>네이버로 시작하기</p>
-            </Button>
-          </li>
-          <li className="sns-google">
-            <Button
-              isBorder={false}
-              onClickFnc={() => handleSnsLoginClick('google')}
-            >
-              <p>구글로 시작하기</p>
-            </Button>
-          </li>
-          <li className="sns-kakao">
-            <Button
-              isBorder={false}
-              onClickFnc={() => handleSnsLoginClick('kakao')}
-            >
-              <p>카카오로 시작하기</p>
-            </Button>
-          </li>
-        </ul>
-      </SnsLoginForm> */}
+      {
+        <SnsLoginForm IconSnsGoogle={IconSnsGoogle} IconSnsKakao={IconSnsKakao}>
+          <h3>간편하게 시작하기</h3>
+          <ul>
+            <li className="sns-google">
+              <Button
+                isBorder={false}
+                onClickFnc={() => handleSnsLoginClick('google')}
+              >
+                <p>구글로 시작하기</p>
+              </Button>
+            </li>
+            <li className="sns-kakao">
+              <Button
+                isBorder={false}
+                onClickFnc={() => handleSnsLoginClick('kakao')}
+              >
+                <p>카카오로 시작하기</p>
+              </Button>
+            </li>
+          </ul>
+        </SnsLoginForm>
+      }
     </>
   );
 }
-// const SnsLoginForm = styled.div`
-//   margin-top: 40px;
-//   padding-top: 40px;
-//   border-top: 1px solid #eeeeee;
-//   h3 {
-//     font-size: 18px;
-//     font-weight: 700;
-//     color: #555;
-//   }
-//   ul {
-//     margin-top: 20px;
-//     display: flex;
-//     flex-direction: column;
-//     gap: 15px;
-//     li {
-//       height: 60px;
-//       width: 100%;
-//       text-align: center;
-//       border-radius: 10px;
-//       &.sns-naver {
-//         background: #03c75a;
-//         p {
-//           &::before {
-//             background: url(${IconSnsNaver});
-//           }
-//           color: #fff;
-//         }
-//       }
-//       &.sns-google {
-//         background: #ececec;
-//         p {
-//           &::before {
-//             background: url(${IconSnsGoogle});
-//           }
-//           color: #56533d;
-//         }
-//       }
-//       &.sns-kakao {
-//         background: #fee500;
-//         p {
-//           &::before {
-//             background: url(${IconSnsKakao});
-//           }
-//           color: #181600;
-//         }
-//       }
-//       button {
-//         height: 100%;
-//         width: 100%;
-//         p {
-//           width: 100%;
-//           display: flex;
-//           align-items: center;
-//           justify-content: center;
-//           gap: 10px;
-//           font-size: 16px;
-//           font-weight: 800;
-//           &::before {
-//             content: '';
-//             display: block;
-//             width: 27px;
-//             height: 27px;
-//           }
-//         }
-//       }
-//     }
-//   }
-// `;
+interface SnsIconInfo {
+  IconSnsGoogle: string;
+  IconSnsKakao: string;
+}
+const SnsLoginForm = styled.div<SnsIconInfo>`
+  margin-top: 40px;
+  padding-top: 40px;
+  border-top: 1px solid #eeeeee;
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+    color: #555;
+  }
+  ul {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    li {
+      height: 60px;
+      width: 100%;
+      text-align: center;
+      border-radius: 10px;
+      &.sns-google {
+        background: #ececec;
+        p {
+          &::before {
+            background: url(${{ IconSnsGoogle }});
+          }
+          color: #56533d;
+        }
+      }
+      &.sns-kakao {
+        background: #fee500;
+        p {
+          &::before {
+            background: url(${{ IconSnsKakao }});
+          }
+          color: #181600;
+        }
+      }
+      button {
+        height: 100%;
+        width: 100%;
+        p {
+          width: 100%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          font-size: 16px;
+          font-weight: 800;
+          &::before {
+            content: '';
+            display: block;
+            width: 27px;
+            height: 27px;
+          }
+        }
+      }
+    }
+  }
+`;
 export default LoginModal;

@@ -8,6 +8,7 @@ import RankingPage from '../pages/RankingPage/RankingPage';
 import GameRoomPage from '../pages/GameRoomPage/GameRoomPage';
 import Mypage from '../pages/Mypage/Mypage';
 import GameStoryPage from '../pages/GameStory/GameStoryPage';
+import SnsLoginPage from '../pages/SnsLoginPage/SnsLoginPage';
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -62,6 +63,10 @@ export const router = createBrowserRouter([
       {
         path: '/gamestory',
         element: <GameStoryPage />,
+      },
+      {
+        path: '/oauth2/success',
+        element: <SnsLoginPage />,
       },
     ],
   },

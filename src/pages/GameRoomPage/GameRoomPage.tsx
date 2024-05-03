@@ -410,7 +410,12 @@ const GameRoomPage = () => {
     return unlistenHistoryEvent;
   }, [connect]);
 
+  // console.log(roomUserInfo?.participantImageUrl);
+
   useEffect(() => {
+    if (roomUserInfo?.participantImageUrl === null) {
+      setOtherImg(null);
+    }
     if (userInfoDecode.nickname !== leaveNickname) {
       if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
         setUserType('host');
