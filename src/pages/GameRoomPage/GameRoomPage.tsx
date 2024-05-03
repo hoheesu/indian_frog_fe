@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { jwtDecode } from 'jwt-decode';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Stomp } from '@stomp/stompjs';
@@ -15,7 +15,6 @@ import { history } from '../../utils/history';
 import CardImages from './CardImages';
 import IconCoin from '../../assets/images/icons/icon-coin.svg';
 import exitButton from '../../assets/images/icons/exitButton.png';
-import MusicButton from '../../components/layout/MusicButton';
 import styled, { css } from 'styled-components';
 
 interface GameRoomInfo {
@@ -81,9 +80,13 @@ const GameRoomPage = () => {
   const authToken = localStorage.getItem('accessToken');
   const navigate = useNavigate();
 
+  const raiseMaxBet = useRef<number | null>(null);
   const maxBetPoint = useMemo(() => {
-    return Math.min(userPoint, otherPoint);
-  }, [userPoint, otherPoint]);
+    const usersPoint = Math.min(userPoint, otherPoint);
+    return raiseMaxBet.current !== null
+      ? Math.min(usersPoint, raiseMaxBet.current)
+      : userPoint;
+  }, [userPoint, otherPoint, raiseMaxBet]);
 
   const userInfoDecode: {
     auth: string;
@@ -92,6 +95,7 @@ const GameRoomPage = () => {
     nickname: string;
     sub: string;
   } = jwtDecode(authToken!);
+  console.log(maxBetPoint);
 
   const connect = () => {
     // WS 커넥트
@@ -168,6 +172,7 @@ const GameRoomPage = () => {
         });
       }
       if (message.nowState === 'ACTION') {
+        raiseMaxBet.current = null;
         message.previousPlayer === userInfoDecode.nickname
           ? setUserPoint(message.myPoint)
           : setOtherPoint(message.myPoint);
@@ -181,6 +186,9 @@ const GameRoomPage = () => {
             const updatedMessages = [...prev, newMessage];
             return updatedMessages;
           });
+          if (message.previousPlayer !== userInfoDecode.nickname) {
+            raiseMaxBet.current = message.otherPoint - message.nowBet;
+          }
         } else if (
           message.actionType === 'CHECK' ||
           message.actionType === 'DIE'
@@ -305,6 +313,7 @@ const GameRoomPage = () => {
       JSON.stringify({ sender: userInfoDecode.nickname }),
     );
     stompClient.disconnect();
+
     navigate('/main');
   };
 
@@ -329,7 +338,8 @@ const GameRoomPage = () => {
       setRoomUserInfo(result);
       return result;
     } catch (err) {
-      throw err;
+      alert(err);
+      navigate('/main');
     }
   };
 
@@ -338,21 +348,13 @@ const GameRoomPage = () => {
   useEffect(() => {
     //첫번째 마운트 상황에서 실행하는 Effect
     connect();
-    (async () => {
-      try {
-        await gameRoomInfoUpdate();
-      } catch (error: any) {
-        if (stompClient) {
-          handleLeaveButtonClick();
-        }
-      }
-    })();
     const handleKeyPress = (event: KeyboardEvent) => {
       if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
         event.preventDefault();
       }
     };
     useSetUserChoice('');
+    window.addEventListener('keydown', handleKeyPress);
     const sendToNotice = () => {
       setMessageArea((prev) => {
         const newMessage = {
@@ -364,14 +366,10 @@ const GameRoomPage = () => {
         return updatedMessages;
       });
     };
-
     sendToNotice();
-
     setInterval(() => {
       sendToNotice();
     }, 120000);
-
-    window.addEventListener('keydown', handleKeyPress);
 
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
@@ -380,6 +378,17 @@ const GameRoomPage = () => {
       }
     };
   }, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        await gameRoomInfoUpdate();
+      } catch (error: any) {
+        if (stompClient) {
+          handleLeaveButtonClick();
+        }
+      }
+    })();
+  }, [joinNickname]);
 
   useEffect(() => {
     const listenBackEvent = () => {
@@ -415,6 +424,11 @@ const GameRoomPage = () => {
         setUserType('host');
         setUserPoint(roomUserInfo?.hostPoints);
         setUserImg(roomUserInfo?.hostImageUrl);
+        if (roomUserInfo?.participantCount === 2) {
+          setOtherNickname(roomUserInfo?.participantNickname);
+          setOtherPoint(roomUserInfo?.participantPoints);
+          setOtherImg(roomUserInfo?.participantImageUrl);
+        }
       }
       if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
         setUserType('guest');
@@ -426,15 +440,24 @@ const GameRoomPage = () => {
       }
     } else {
       if (roomUserInfo?.participantCount === 2) {
-        setUserType('host');
-        setUserPoint(roomUserInfo?.hostPoints);
-        setUserImg(roomUserInfo?.hostImageUrl);
-        setOtherNickname(roomUserInfo?.participantNickname);
-        setOtherPoint(roomUserInfo?.participantPoints);
-        setOtherImg(roomUserInfo?.participantImageUrl);
+        if (userInfoDecode.nickname === roomUserInfo?.hostNickname) {
+          setUserType('host');
+          setUserPoint(roomUserInfo?.hostPoints);
+          setUserImg(roomUserInfo?.hostImageUrl);
+          setOtherNickname(roomUserInfo?.participantNickname);
+          setOtherPoint(roomUserInfo?.participantPoints);
+          setOtherImg(roomUserInfo?.participantImageUrl);
+          if (userInfoDecode.nickname === roomUserInfo?.participantNickname) {
+            setUserType('guest');
+            setUserPoint(roomUserInfo?.participantPoints);
+            setUserImg(roomUserInfo?.participantImageUrl);
+            setOtherNickname(roomUserInfo?.hostNickname);
+            setOtherPoint(roomUserInfo?.hostPoints);
+            setOtherImg(roomUserInfo?.hostImageUrl);
+          }
+        }
       }
     }
-    // setGameRoomState(roomUserInfo?.gameRoomState);
   }, [roomUserInfo]);
 
   useEffect(() => {
@@ -482,35 +505,36 @@ const GameRoomPage = () => {
 
   useEffect(() => {
     if (gameEnd) {
-      if (userType === 'guest') {
-        setTimeout(() => {
+      setTimeout(() => {
+        if (userType === 'guest') {
+          setTimeout(() => {
+            stompClient.send(
+              `/app/gameRoom/${gameId}/GAME_END`,
+              {},
+              JSON.stringify({}),
+            );
+          }, 200);
+        } else {
           stompClient.send(
             `/app/gameRoom/${gameId}/GAME_END`,
             {},
             JSON.stringify({}),
           );
-        }, 200);
-      } else {
-        stompClient.send(
-          `/app/gameRoom/${gameId}/GAME_END`,
-          {},
-          JSON.stringify({}),
-        );
-      }
-      setTimeout(() => {
-        setCardState({
-          cardState: false,
-          otherCard: '',
-          userCard: '',
-        });
-      }, 9000);
+        }
+        setTimeout(() => {
+          setCardState({
+            cardState: false,
+            otherCard: '',
+            userCard: '',
+          });
+        }, 4000);
+      }, 4000);
     }
   }, [gameEnd]);
 
   useEffect(() => {
     if (gameEnd && useUserChoice) {
       if (useUserChoice === 'LEAVE') {
-        console.log('나가기');
         handleLeaveButtonClick();
       }
     }
@@ -525,7 +549,6 @@ const GameRoomPage = () => {
               <img src={exitButton} alt="" />
             </Button>
           </LeaveButton>
-          <MusicButton />
           <GameRoomInfo>
             <p>일반전</p>
             <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
@@ -553,7 +576,11 @@ const GameRoomPage = () => {
               </Button>
             </ReadyButton>
           ) : currentPlayer ? (
-            <GameButton stompClient={stompClient} setIsRaise={setIsRaise} />
+            <GameButton
+              stompClient={stompClient}
+              setIsRaise={setIsRaise}
+              maxBetPoint={maxBetPoint}
+            />
           ) : null}
           {isRaise ? (
             <BattingInput
@@ -702,7 +729,7 @@ const BattingPoint = styled.div`
   background: #cd7522;
   border-radius: 20px;
   border: 5px solid #95500f;
-  transition: all .1s ease-in;
+  transition: all 0.1s ease-in;
   span {
     font-size: 20px;
     color: #fff;
@@ -714,7 +741,7 @@ const BattingPoint = styled.div`
   }
   @media (max-height: 700px) {
     height: 110px;
-    min-width:200px;
+    min-width: 200px;
     & > span {
       font-size: 16px;
     }
@@ -729,6 +756,7 @@ const MyState = styled.div`
   align-self: flex-end;
 `;
 const GameWrap = styled.div`
+  padding-top: 100px;
   position: relative;
   background: linear-gradient(
     180deg,

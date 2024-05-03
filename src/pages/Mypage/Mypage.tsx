@@ -1,5 +1,4 @@
 import styled from 'styled-components';
-import ImgCharacterDummy from '../../assets/images/img-character.svg';
 import Button from '../../components/layout/form/Button';
 import { useGetMypageInfo } from '../../hooks/useQuery';
 import { formatNumber } from '../../utils/numberFormatCheck';
@@ -9,6 +8,7 @@ import IconCoin from '../../assets/images/icons/icon-coin-rotate.svg';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useNavigate } from 'react-router-dom';
 import ImgRandomProfile01 from '../../assets/images/img-randomProfile01.svg';
+// import ImgCharacterDummy from '../../assets/images/img-character.svg';
 // import ImgRandomProfile02 from '../../assets/images/img-randomProfile02.svg';
 // import ImgRandomProfile03 from '../../assets/images/img-randomProfile03.svg';
 // import ImgRandomProfile04 from '../../assets/images/img-randomProfile04.svg';
@@ -22,82 +22,80 @@ const Mypage = () => {
   };
   const navigate = useNavigate();
   return (
-    <>
-      <MypageWrap>
-        <ProfileWrap>
-          <PictureWrap>
-            <picture>
-              {myPageInfo.data?.myImageUrl ? (
-                <img src={myPageInfo.data?.myImageUrl} alt="" />
+    <MypageWrap>
+      <ProfileWrap>
+        <PictureWrap>
+          <picture>
+            {myPageInfo.data?.myImageUrl ? (
+              <img src={myPageInfo.data?.myImageUrl} alt="" />
+            ) : (
+              <img src={ImgRandomProfile01} alt="" />
+            )}
+          </picture>
+        </PictureWrap>
+        <p>{myPageInfo.data?.nickName}</p>
+        <BtnWrap>
+          <Button
+            onClickFnc={() => handleModalOpen('updateImg')}
+            isBorder={false}
+          >
+            <p>프로필 편집</p>
+          </Button>
+          <Button
+            onClickFnc={() => handleModalOpen('changePassword')}
+            isBorder={false}
+          >
+            <p>비밀번호 변경</p>
+          </Button>
+        </BtnWrap>
+      </ProfileWrap>
+      <MyDetailInfoList>
+        <li>
+          <ItemBox>
+            <p>내 현재 순위는</p>
+            <p>
+              <i>
+                <img src={IconRanking} alt="" />
+              </i>
+              <span>{myPageInfo.data?.ranking}</span>위
+            </p>
+          </ItemBox>
+          <ArrowLink onClick={() => navigate('/ranking')}>
+            전체 랭킹 보기
+          </ArrowLink>
+        </li>
+        <li>
+          <ItemBox>
+            <p>
+              {myPageInfo.data?.point <= 30 ? (
+                <ArrowLink onClick={() => handleModalOpen('pointCharge')}>
+                  포인트 충전
+                </ArrowLink>
               ) : (
-                <img src={ImgRandomProfile01} alt="" />
+                <ArrowLink
+                  onClick={() => {
+                    alert('포인트가 30이하일 경우에만 충전이 가능합니다!');
+                  }}
+                >
+                  포인트 충전
+                </ArrowLink>
               )}
-            </picture>
-          </PictureWrap>
-          <p>{myPageInfo.data?.nickName}</p>
-          <BtnWrap>
-            <Button
-              onClickFnc={() => handleModalOpen('updateImg')}
-              isBorder={false}
-            >
-              <p>프로필 편집</p>
-            </Button>
-            <Button
-              onClickFnc={() => handleModalOpen('changePassword')}
-              isBorder={false}
-            >
-              <p>비밀번호 변경</p>
-            </Button>
-          </BtnWrap>
-        </ProfileWrap>
-        <MyDetailInfoList>
-          <li>
-            <ItemBox>
-              <p>내 현재 순위는</p>
-              <p>
-                <i>
-                  <img src={IconRanking} alt="" />
-                </i>
-                <span>{myPageInfo.data?.ranking}</span>위
-              </p>
-            </ItemBox>
-            <ArrowLink onClick={() => navigate('/ranking')}>
-              전체 랭킹 보기
-            </ArrowLink>
-          </li>
-          <li>
-            <ItemBox>
-              <p>
-                {myPageInfo.data?.point <= 30 ? (
-                  <ArrowLink onClick={() => handleModalOpen('pointCharge')}>
-                    포인트 충전
-                  </ArrowLink>
-                ) : (
-                  <ArrowLink
-                    onClick={() => {
-                      alert('포인트가 30이하일 경우에만 충전이 가능합니다!');
-                    }}
-                  >
-                    포인트 충전
-                  </ArrowLink>
-                )}
-              </p>
-              <p>
-                <i>
-                  <img src={IconCoin} alt="" />
-                </i>
-                <span>
-                  {' '}
-                  {myPageInfo.data?.point < 0
-                    ? 0
-                    : formatNumber(myPageInfo.data?.point)}
-                </span>
-              </p>
-            </ItemBox>
-          </li>
-        </MyDetailInfoList>
-      </MypageWrap>
-    </>
+            </p>
+            <p>
+              <i>
+                <img src={IconCoin} alt="" />
+              </i>
+              <span>
+                {' '}
+                {myPageInfo.data?.point < 0
+                  ? 0
+                  : formatNumber(myPageInfo.data?.point)}
+              </span>
+            </p>
+          </ItemBox>
+        </li>
+      </MyDetailInfoList>
+    </MypageWrap>
   );
 };
 const BtnWrap = styled.div`
@@ -107,7 +105,8 @@ const BtnWrap = styled.div`
   button {
     width: 100%;
     min-width: 150px;
-    height: 55px;
+    /* height: 55px; */
+    padding: 3px;
     border-radius: 30px;
     background: #5a8900;
     &:hover {
@@ -163,8 +162,8 @@ const ItemBox = styled.div`
   align-items: center;
   background: #fff;
   border-radius: 20px;
-  padding: 10px 30px;
-  height: 100px;
+  padding: 20px 30px;
+  /* height: 100px; */
   width: 600px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
   + button {
@@ -186,11 +185,11 @@ const ItemBox = styled.div`
       font-size: 20px;
     }
     + p {
-      font-size: 30px;
+      font-size: 20px;
     }
   }
   span {
-    font-size: 35px;
+    font-size: 25px;
     font-weight: 700;
     padding: 010px;
   }
@@ -202,13 +201,14 @@ const PictureWrap = styled.div`
 const MypageWrap = styled.div`
   position: relative;
   height: 100vh;
+  padding-top: 120px;
   overflow: hidden;
 `;
 const ProfileWrap = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  margin: 200px auto 0;
+  /* margin: 200px auto 0; */
   align-items: center;
   justify-content: center;
   gap: 25px;
@@ -223,8 +223,8 @@ const ProfileWrap = styled.div`
     align-items: center;
     justify-content: center;
     position: relative;
-    width: 200px;
-    height: 200px;
+    width: 170px;
+    height: 170px;
     object-fit: fill;
     overflow: hidden;
     border-radius: 50%;
