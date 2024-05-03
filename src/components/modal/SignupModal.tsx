@@ -204,7 +204,9 @@ function SignupModal() {
             onChangeFnc={handleInputOnchange}
           />
           {!pwValid ? (
-            <p>영문자, 특수문자, 숫자를 포함하여 8 ~ 15자리로 작성해주세요</p>
+            <p style={{ color: 'red' }}>
+              영문자, 특수문자, 숫자를 포함하여 8 ~ 15자리로 작성해주세요
+            </p>
           ) : (
             <p></p>
           )}

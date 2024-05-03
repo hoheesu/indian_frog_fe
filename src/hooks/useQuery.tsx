@@ -14,7 +14,7 @@ export const QUERY_KEYS = {
 
 export const useGetGameRoomsList = () => {
   return useInfiniteQuery({
-    queryKey: [QUERY_KEYS.GameRoomsList],
+    queryKey: [QUERY_KEYS.GameRoomsList, getGameRoomsList],
     queryFn: ({ pageParam = 1 }) => getGameRoomsList(pageParam),
     getNextPageParam: (lastPage: any) => {
       if (!lastPage.isLast) return lastPage.nextPage;
