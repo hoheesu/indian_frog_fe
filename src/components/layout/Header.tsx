@@ -1,7 +1,7 @@
 import Button from './form/Button';
 import styled, { css } from 'styled-components';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import IconHowto from '../../assets/images/icons/icon-howto.svg';
 import IconMakers from '../../assets/images/icons/icon-makers.svg';
 import IconRanking from '../../assets/images/icons/icon-ranking.svg';
@@ -23,7 +23,6 @@ function Header() {
   const authToken = localStorage.getItem('accessToken');
   const useUserPoint = useGetUserPoint();
   const navigate = useNavigate();
-  // const isGameroom =
 
   return (
     <HeaderContainer $location={location}>

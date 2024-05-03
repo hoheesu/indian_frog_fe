@@ -3,12 +3,12 @@ import styled from 'styled-components';
 import indianFrogMainMusic1 from '../../assets/audio/IndianFrog_ver1.1.mp3';
 import indianFrogMainMusic2 from '../../assets/audio/indianfrog_ver2.mp3';
 import musicPlay from '../../assets/images/icons/musicPlay.svg';
-import { useLocation } from 'react-router-dom';
+// import { useLocation } from 'react-router-dom';
 
 function MusicButton() {
-  const [bgmPlay, setBgmPlay] = useState(true);
+  const [_, setBgmPlay] = useState(true);
   const [bgmTrack, setBgmTrack] = useState(indianFrogMainMusic1);
-  const location = useLocation();
+  // const location = useLocation();
   const audioRef = useRef<HTMLAudioElement>(null);
 
   const changeBgmTrack = () => {
