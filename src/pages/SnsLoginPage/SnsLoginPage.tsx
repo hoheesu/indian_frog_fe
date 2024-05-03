@@ -1,16 +1,39 @@
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 
 const SnsLoginPage = () => {
-  window.onload = function () {
-    const urlParams = new URLSearchParams(window.location.search);
-    const accessToken = urlParams.get('accessToken');
-    if (accessToken) {
-      console.log('Access Token:', accessToken);
-      // 이제 액세스 토큰을 사용하여 API 호출 등을 할 수 있습니다.
-    } else {
-      console.error('Access token not found in the URL');
+  const navigate = useNavigate();
+  // URL에서 쿼리 파라미터를 파싱하는 함수
+  useEffect(() => {
+    function getParameterByName(
+      name: string,
+      url: string = window.location.href,
+    ): string | null {
+      name = name.replace(/[\[\]]/g, '\\$&');
+      const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)'),
+        results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, ' '));
     }
-  };
+
+    // accessToken 값 가져오기
+    const accessTokenWithBearer = getParameterByName('accessToken');
+
+    // 'Bearer ' 접두어 제거 및 undefined 상태 처리
+    const accessToken = accessTokenWithBearer
+      ? accessTokenWithBearer.replace('Bearer%20', '')
+      : '';
+
+    // Local storage에 저장
+    if (accessToken) {
+      // accessToken이 비어있지 않은 경우에만 실행
+      localStorage.setItem('accessToken', accessToken);
+      navigate('/');
+    }
+  }, [navigate]);
+
   return (
     <SnsLoginWrap>
       <h2>로그인중...</h2>
