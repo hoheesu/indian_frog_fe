@@ -52,20 +52,6 @@ const Mypage = () => {
       <MyDetailInfoList>
         <li>
           <ItemBox>
-            <p>내 현재 순위는</p>
-            <p>
-              <i>
-                <img src={IconRanking} alt="" />
-              </i>
-              <span>{myPageInfo.data?.ranking}</span>위
-            </p>
-          </ItemBox>
-          <ArrowLink onClick={() => navigate('/ranking')}>
-            전체 랭킹 보기
-          </ArrowLink>
-        </li>
-        <li>
-          <ItemBox>
             <p>
               {myPageInfo.data?.point <= 30 ? (
                 <ArrowLink onClick={() => handleModalOpen('pointCharge')}>
@@ -94,6 +80,20 @@ const Mypage = () => {
             </p>
           </ItemBox>
         </li>
+        <li>
+          <ItemBox>
+            <p>내 현재 순위는</p>
+            <p>
+              <i>
+                <img src={IconRanking} alt="" />
+              </i>
+              <span>{myPageInfo.data?.ranking}</span>위
+            </p>
+          </ItemBox>
+          <ArrowLink onClick={() => navigate('/ranking')}>
+            전체 랭킹 보기
+          </ArrowLink>
+        </li>
       </MyDetailInfoList>
     </MypageWrap>
   );
@@ -105,7 +105,7 @@ const BtnWrap = styled.div`
   button {
     width: 100%;
     min-width: 150px;
-    /* height: 55px; */
+    height: 55px;
     padding: 3px;
     border-radius: 30px;
     background: #5a8900;
@@ -114,7 +114,7 @@ const BtnWrap = styled.div`
     }
     p {
       padding: 5px 10px;
-      font-size: 18px;
+      font-size: 16px;
       font-weight: 500;
       color: #fff;
     }
@@ -133,9 +133,9 @@ const BtnWrap = styled.div`
 const MyDetailInfoList = styled.ul`
   margin-top: 50px;
   display: flex;
-  align-items: center;
-  flex-direction: column;
-  gap: 40px;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 20px;
 `;
 const ArrowLink = styled.button`
   display: flex;
@@ -153,17 +153,18 @@ const ArrowLink = styled.button`
     background: url(${IconArrowRight}) no-repeat center;
     background-size: 100%;
   }
-  font-size: 18px;
+  font-size: 16px;
   gap: 5px;
 `;
 const ItemBox = styled.div`
+  max-width: 400px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   background: #fff;
   border-radius: 20px;
   padding: 20px 30px;
-  /* height: 100px; */
+  height: 100px;
   width: 600px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.1);
   + button {
@@ -174,7 +175,7 @@ const ItemBox = styled.div`
     font-family: 'NPSfontBold';
     display: flex;
     align-items: center;
-    font-size: 20px;
+    font-size: 16px;
     i {
       width: 30px;
       img {
@@ -182,7 +183,7 @@ const ItemBox = styled.div`
       }
     }
     > a {
-      font-size: 20px;
+      font-size: 18px;
     }
     + p {
       font-size: 20px;
@@ -199,16 +200,17 @@ const PictureWrap = styled.div`
   display: flex;
 `;
 const MypageWrap = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
   position: relative;
   height: 100vh;
-  padding-top: 120px;
-  overflow: hidden;
 `;
 const ProfileWrap = styled.div`
   position: relative;
   display: flex;
   flex-direction: column;
-  /* margin: 200px auto 0; */
   align-items: center;
   justify-content: center;
   gap: 25px;

@@ -53,34 +53,58 @@ function Header() {
             THE MAKERS
           </p>
         </Button>
-        <Button
-          onClickFnc={() => {
-            authToken
-              ? handleModalOpen('ranking')
-              : alert('로그인 후 이용 가능합니다.');
-          }}
-          isBorder={false}
-        >
-          <p>
-            <span>
-              <img src={IconRanking} alt="" />
-            </span>
-            RANKING
-          </p>
-        </Button>
 
         {authToken ? (
           location.substring(1, 9) !== 'gameroom' ? (
-            <Button onClickFnc={() => {}} isBorder={false}>
-              <p className="myPoint">
-                <span>
-                  <img src={IconCoin} alt="" />
-                </span>
-                {useUserPoint.data?.mtPoint < 0
-                  ? 0
-                  : formatNumber(useUserPoint.data?.myPoint)}
-              </p>
-            </Button>
+            <>
+              <Button
+                onClickFnc={() => {
+                  authToken
+                    ? handleModalOpen('ranking')
+                    : alert('로그인 후 이용 가능합니다.');
+                }}
+                isBorder={false}
+              >
+                <p>
+                  <span>
+                    <img src={IconRanking} alt="" />
+                  </span>
+                  RANKING
+                </p>
+              </Button>
+
+              {useUserPoint.data?.mtPoint <= 30 ? (
+                <Button
+                  onClickFnc={() => handleModalOpen('pointCharge')}
+                  isBorder={false}
+                >
+                  <p className="myPoint">
+                    <span>
+                      <img src={IconCoin} alt="" />
+                    </span>
+                    {useUserPoint.data?.mtPoint < 0
+                      ? 0
+                      : formatNumber(useUserPoint.data?.myPoint)}
+                  </p>
+                </Button>
+              ) : (
+                <Button
+                  onClickFnc={() =>
+                    alert('포인트가 30이하일 경우에만 충전이 가능합니다!')
+                  }
+                  isBorder={false}
+                >
+                  <p className="myPoint">
+                    <span>
+                      <img src={IconCoin} alt="" />
+                    </span>
+                    {useUserPoint.data?.mtPoint < 0
+                      ? 0
+                      : formatNumber(useUserPoint.data?.myPoint)}
+                  </p>
+                </Button>
+              )}
+            </>
           ) : null
         ) : null}
         {authToken ? (
