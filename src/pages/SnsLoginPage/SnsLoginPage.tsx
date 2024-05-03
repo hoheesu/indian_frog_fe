@@ -1,34 +1,31 @@
-import { useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
-// import { instance } from '../../api/axios';
+import styled from 'styled-components';
 
 const SnsLoginPage = () => {
-  const location = useLocation();
-  //   const navigate = useNavigate();
-  // const handleOAuthSns = async (code:any) => {
-  //     try {
-  //         const response = await instance.get(`/oauth/login/kakao?code=${code}`)
-  //         const data = response.data;
-  //         navigate("/")
-  //     } catch (error) {
-
-  //     }
-  // }
-  useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    // const code = searchParams.get('code');
-    console.log(searchParams);
-    alert(searchParams);
-
-    // const accessToken = data?.headers.authorization;
-    // alert(accessToken);
-    // localStorage.setItem('accessToken', accessToken);
-  }, []);
+  window.onload = function () {
+    const urlParams = new URLSearchParams(window.location.search);
+    const accessToken = urlParams.get('accessToken');
+    if (accessToken) {
+      console.log('Access Token:', accessToken);
+      // 이제 액세스 토큰을 사용하여 API 호출 등을 할 수 있습니다.
+    } else {
+      console.error('Access token not found in the URL');
+    }
+  };
   return (
-    <>
-      <div>Processing...</div>
-    </>
+    <SnsLoginWrap>
+      <h2>로그인중...</h2>
+    </SnsLoginWrap>
   );
 };
-
+const SnsLoginWrap = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+  h2 {
+    font-family: NPSfontBold;
+    font-size: 40px;
+  }
+`;
 export default SnsLoginPage;
