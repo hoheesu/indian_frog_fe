@@ -178,7 +178,7 @@ const SnsLoginForm = styled.div<SnsIconInfo>`
         background: #ececec;
         p {
           &::before {
-            background: url(${{ IconSnsGoogle }});
+            background: url(${(props) => props.IconSnsGoogle});
           }
           color: #56533d;
         }
@@ -187,7 +187,7 @@ const SnsLoginForm = styled.div<SnsIconInfo>`
         background: #fee500;
         p {
           &::before {
-            background: url(${{ IconSnsKakao }});
+            background: url(${(props) => props.IconSnsKakao});
           }
           color: #181600;
         }
