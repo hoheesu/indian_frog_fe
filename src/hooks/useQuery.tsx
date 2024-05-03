@@ -22,8 +22,9 @@ export const useGetGameRoomsList = () => {
       return undefined;
     },
     initialPageParam: 0,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
     refetchOnMount: true,
+    refetchInterval: 1000,
     retry: 1,
   });
 };

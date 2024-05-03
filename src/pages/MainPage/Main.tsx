@@ -1,11 +1,7 @@
 import styled from 'styled-components';
 import Button from '../../components/layout/form/Button';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
-import {
-  QUERY_KEYS,
-  useGetGameRoomsList,
-  useGetUserPoint,
-} from '../../hooks/useQuery';
+import { useGetGameRoomsList, useGetUserPoint } from '../../hooks/useQuery';
 import { useNavigate } from 'react-router-dom';
 import { useJoinRoomMutation } from '../../hooks/useMutation';
 import { LobbyContents } from './MainLobbyType';
@@ -15,8 +11,6 @@ import ImgListleaf from '../../assets/images/img-listicon.svg';
 import ImgListleaf2 from '../../assets/images/img-listicon2.svg';
 import { useInView } from 'react-intersection-observer';
 import { useEffect, useMemo } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { getGameRoomsList } from '../../api/gameRoomApi';
 
 function Main() {
   const {
@@ -87,13 +81,6 @@ function Main() {
   }, [result]);
 
   const [ref, inView] = useInView();
-  const queryClient = useQueryClient();
-
-  useEffect(() => {
-    queryClient.invalidateQueries({
-      queryKey: [QUERY_KEYS.GameRoomsList, getGameRoomsList],
-    });
-  }, []);
 
   useEffect(() => {
     if (inView && result?.pages[0].hasNextPage) {

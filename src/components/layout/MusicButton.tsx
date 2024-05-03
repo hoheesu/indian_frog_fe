@@ -2,11 +2,12 @@ import { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import indianFrogMainMusic1 from '../../assets/audio/IndianFrog_ver1.1.mp3';
 import indianFrogMainMusic2 from '../../assets/audio/indianfrog_ver2.mp3';
-import musicPlay from '../../assets/images/icons/musicPlay.svg';
+import IconSpeaker from '../../assets/images/icons/icon-speaker.svg';
+import IconSpeakerMute from '../../assets/images/icons/icon-speaker-mute.svg';
 // import { useLocation } from 'react-router-dom';
 
 function MusicButton() {
-  const [_, setBgmPlay] = useState(true);
+  const [isBgmPlay, setIsBgmPlay] = useState(false);
   const [bgmTrack, setBgmTrack] = useState(indianFrogMainMusic1);
   // const location = useLocation();
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -20,7 +21,7 @@ function MusicButton() {
   };
 
   const handleMusicButton = () => {
-    setBgmPlay((prev) => {
+    setIsBgmPlay((prev) => {
       !prev ? audioRef.current!.play() : audioRef.current!.pause();
       return !prev;
     });
@@ -35,7 +36,11 @@ function MusicButton() {
   return (
     <PlayButtonContainer>
       <button onClick={handleMusicButton}>
-        <img src={musicPlay} />
+        {isBgmPlay ? (
+          <img src={IconSpeaker} alt="음악재생" />
+        ) : (
+          <img src={IconSpeakerMute} alt="음악중지" />
+        )}
       </button>
       {audioRef && (
         <AudioCotroller
