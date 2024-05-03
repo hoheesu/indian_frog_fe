@@ -137,8 +137,8 @@ const ChatWrap = styled.div`
   align-self: flex-end;
 `;
 const ChatList = styled.ul`
-  min-height: 80px;
-  height: 100px;
+  min-height: 150px;
+  max-height: 200px;
   display: flex;
   flex-direction: column;
   gap: 20px;

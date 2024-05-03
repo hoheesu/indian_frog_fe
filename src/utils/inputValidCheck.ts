@@ -3,7 +3,7 @@ export function emailValidCheck(email: string) {
   return pattern.test(email) ? true : false;
 }
 export function passwordValidCheck(passowrd: string) {
-  const pattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).{8,15}$/;
+  const pattern = /^(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&]).{8,15}$/;
 
   return pattern.test(passowrd) ? true : false;
 }
