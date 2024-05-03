@@ -50,7 +50,6 @@ export const useCreateRoomMutation = () => {
 };
 
 export const useJoinRoomMutation = () => {
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   return useMutation({
@@ -59,12 +58,13 @@ export const useJoinRoomMutation = () => {
       console.log('성공', data);
       navigate(`/gameroom/${roomNumber}`);
       useSetIsModalClick();
-      queryClient.invalidateQueries({
-        queryKey: [QUERY_KEYS.GameRoomsList],
-      });
     },
     onError: (error: any) => {
-      alert(error);
+      if (error.status === 500) {
+        alert('존재하지 않는 게임방입니다.');
+      } else {
+        alert(error.message);
+      }
     },
   });
 };
@@ -149,7 +149,6 @@ export const useChangePasswordMutation = () => {
   return useMutation({
     mutationFn: changePassword,
     onSuccess: (data) => {
-      
       if (data.passwordChange) {
         alert('비밀번호가 변경되었습니다.');
         useSetIsModalClick();

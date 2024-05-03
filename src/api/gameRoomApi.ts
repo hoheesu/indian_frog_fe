@@ -44,7 +44,7 @@ export const joinGameRoom = async (gameRoomId: number) => {
       throw response;
     }
   } catch (error: any) {
-    throw error.response.data.message;
+    throw error.response.data;
   }
 };
 
@@ -53,10 +53,6 @@ export const gameRoomInfo = async (gameRoomId: number) => {
     const response = await authInstance.get(`/gameRoom/${gameRoomId}`);
     return response.data.data;
   } catch (error: any) {
-    const axiosError = error as AxiosError<ErrorResponse>;
-    if (axiosError.response) {
-      throw axiosError.response.data;
-    }
-    throw error?.response?.data.message;
+    throw error.response.data.message;
   }
 };

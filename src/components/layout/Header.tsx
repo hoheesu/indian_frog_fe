@@ -23,17 +23,20 @@ function Header() {
   const authToken = localStorage.getItem('accessToken');
   const useUserPoint = useGetUserPoint();
   const navigate = useNavigate();
+
   return (
     <HeaderContainer $location={location}>
       <HeaderInner>
-        <Button onClickFnc={() => navigate('/main')} isBorder={false}>
-          <p>
-            <span>
-              <img src={IconHome} alt="" />
-            </span>
-            HOME
-          </p>
-        </Button>
+        {location.substring(1, 9) !== 'gameroom' ? (
+          <Button onClickFnc={() => navigate('/main')} isBorder={false}>
+            <p>
+              <span>
+                <img src={IconHome} alt="" />
+              </span>
+              HOME
+            </p>
+          </Button>
+        ) : null}
         <Button onClickFnc={() => handleModalOpen('howto')} isBorder={false}>
           <p>
             <span>
@@ -65,60 +68,69 @@ function Header() {
             RANKING
           </p>
         </Button>
+
         {authToken ? (
-          <Button onClickFnc={() => {}} isBorder={false}>
-            <p className="myPoint">
-              <span>
-                <img src={IconCoin} alt="" />
-              </span>
-              {useUserPoint.data?.mtPoint < 0
-                ? 0
-                : formatNumber(useUserPoint.data?.myPoint)}
-            </p>
-          </Button>
+          location.substring(1, 9) !== 'gameroom' ? (
+            <Button onClickFnc={() => {}} isBorder={false}>
+              <p className="myPoint">
+                <span>
+                  <img src={IconCoin} alt="" />
+                </span>
+                {useUserPoint.data?.mtPoint < 0
+                  ? 0
+                  : formatNumber(useUserPoint.data?.myPoint)}
+              </p>
+            </Button>
+          ) : null
         ) : null}
         {authToken ? (
           <UserMemberBtns>
             <MusicButton />
-            <Button
-              onClickFnc={() => {
-                navigate('/mypage');
-              }}
-              isBorder={false}
-            >
-              <p>
-                <span>
-                  <img src={IconMypage} alt="" />
-                </span>
-                MY PAGE
-              </p>
-            </Button>
-            <Button
-              onClickFnc={() => handleModalOpen('logout')}
-              isBorder={false}
-            >
-              <p>
-                <span>
-                  <img src={IconLogin} alt="" />
-                </span>
-                LOG OUT
-              </p>
-            </Button>
+            {location.substring(1, 9) !== 'gameroom' ? (
+              <>
+                <Button
+                  onClickFnc={() => {
+                    navigate('/mypage');
+                  }}
+                  isBorder={false}
+                >
+                  <p>
+                    <span>
+                      <img src={IconMypage} alt="" />
+                    </span>
+                    MY PAGE
+                  </p>
+                </Button>
+                <Button
+                  onClickFnc={() => handleModalOpen('logout')}
+                  isBorder={false}
+                >
+                  <p>
+                    <span>
+                      <img src={IconLogin} alt="" />
+                    </span>
+                    LOG OUT
+                  </p>
+                </Button>
+              </>
+            ) : null}
           </UserMemberBtns>
         ) : (
           <UserMemberBtns>
             <MusicButton />
-            <Button
-              onClickFnc={() => handleModalOpen('login')}
-              isBorder={false}
-            >
-              <p>
-                <span>
-                  <img src={IconLogout} alt="" />
-                </span>
-                LOG IN
-              </p>
-            </Button>
+            {
+              <Button
+                onClickFnc={() => handleModalOpen('login')}
+                isBorder={false}
+              >
+                <p>
+                  <span>
+                    <img src={IconLogout} alt="" />
+                  </span>
+                  LOG IN
+                </p>
+              </Button>
+            }
           </UserMemberBtns>
         )}
       </HeaderInner>
@@ -147,7 +159,6 @@ const HeaderInner = styled.div`
   margin: 0 auto;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
   height: 100px;
   gap: 10px;
   button {
