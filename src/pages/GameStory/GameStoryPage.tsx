@@ -185,6 +185,9 @@ const StoryBox = styled.div`
   max-width: 1460px;
   margin: 80px auto;
   padding: 0 20px;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    margin: 20px auto;
+  }
 `;
 const StoryBoxBtn = styled.button`
   position: relative;
@@ -228,6 +231,17 @@ const TextContent = styled.div`
       }
     }
   }
+  @media (max-height: 600px) or (max-width: 1110px) {
+    height: 100px;
+    & > div:nth-child(1) {
+      padding: 15px;
+      border-width: 5px;
+      border-radius: 10px;
+      & > p {
+        font-size: 18px;
+      }
+    }
+  }
 `;
 
 const Speaker = styled.div`
@@ -256,12 +270,35 @@ const Speaker = styled.div`
   &.well-frog {
     background-color: #76b400;
   }
+  @media (max-height: 600px) or (max-width: 1110px) {
+    top: -30px;
+    padding: 10px 20px;
+    min-width: 100px;
+    border-radius: 15px;
+    font-size: 18px;
+    &.commentary {
+      & > img {
+        position: absolute;
+        top: 0px;
+        width: 60px;
+        transform: translateY(-50%);
+      }
+    }
+  }
 `;
 const SpeakerCharacter = styled.div`
   position: absolute;
   top: -230px;
   left: 6.8%;
-  z-index: 1;
+  z-index: -1;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    max-width: 140px;
+    top: -170px;
+    left: 5%;
+    img {
+      width: 100%;
+    }
+  }
 `;
 const WellFrogImage = styled.div`
   position: absolute;
@@ -269,12 +306,26 @@ const WellFrogImage = styled.div`
   left: 30%;
   z-index: 1;
   transform: translateY(-110%);
+  @media (max-height: 600px) or (max-width: 1110px) {
+    max-width: 130px;
+    img {
+      width: 100%;
+    }
+  }
 `;
 const WellImage = styled.div`
   position: absolute;
   top: -180px;
   left: 50%;
   z-index: -1;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    max-width: 300px;
+    top: -110px;
+    left: 55%;
+    img {
+      width: 100%;
+    }
+  }
 `;
 const SkipButton = styled.button`
   position: relative;
@@ -293,6 +344,12 @@ const SkipButton = styled.button`
   border: 3px solid #fff;
   &:hover {
     background-color: #81c008;
+  }
+  @media (max-height: 600px) or (max-width: 1110px) {
+    margin-bottom: 10px;
+    font-size: 16px;
+    padding: 5px 10px;
+    min-width: 110px;
   }
 `;
 

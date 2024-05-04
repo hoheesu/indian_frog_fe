@@ -14,7 +14,7 @@ import { useGameEndStore } from '../../store/gameRoom/GameEndStore';
 import { history } from '../../utils/history';
 import CardImages from './CardImages';
 import IconCoin from '../../assets/images/icons/icon-coin.svg';
-import exitButton from '../../assets/images/icons/exitButton.png';
+import IconExit from '../../assets/images/icons/icon-exit.svg';
 import styled, { css } from 'styled-components';
 
 interface GameRoomInfo {
@@ -62,7 +62,7 @@ const GameRoomPage = () => {
     otherCard: '',
     userCard: '',
   });
-  const [roundPot, setRoundPoint] = useState('');
+  const [roundPot, setRoundPoint] = useState(0);
   const [isRaise, setIsRaise] = useState(false);
   const [currentPlayer, setCurrentPlayer] = useState<boolean | null>(null);
   const [roundEndInfo, setRoundEndInfo] = useState({
@@ -550,13 +550,11 @@ const GameRoomPage = () => {
       <GameRoom>
         <GameHeaderBtns>
           <LeaveButton>
-            <Button onClickFnc={handleLeaveButtonClick}>
-              <img src={exitButton} alt="" />
-            </Button>
+            <img src={IconExit} alt="" />
+            <Button onClickFnc={handleLeaveButtonClick}>EXIT</Button>
           </LeaveButton>
           <GameRoomInfo>
-            <p>일반전</p>
-            <p>{roomUserInfo?.roomName}</p>|<p>{roomUserInfo?.roomId}</p>
+            <p>{roomUserInfo?.roomId}</p>|<p>{roomUserInfo?.roomName}</p>
           </GameRoomInfo>
         </GameHeaderBtns>
         <Player
@@ -624,21 +622,43 @@ const GameRoomPage = () => {
 };
 
 const GameHeaderBtns = styled.div`
-  position: absolute;
-  top: 20px;
-  width: 100%;
-  padding: 0 20px;
+  grid-area: 1/3;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
   & > div {
     &:nth-child(2) {
       margin-left: auto;
     }
   }
 `;
-const LeaveButton = styled.div``;
+const LeaveButton = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 6px;
+  background: #fffdee;
+  border-radius: 30px;
+  img {
+    width: 33px;
+    background: var(--color-main);
+    border-radius: 50%;
+    padding: 6px;
+  }
+  button {
+    font-size: 20px;
+    font-weight: 600;
+    color: #56533d;
+  }
+  @media (max-height: 600px) {
+    img {
+      width: 25px;
+      padding: 3px;
+    }
+    button {
+      font-size: 16px;
+    }
+  }
+`;
 const GameRoomInfo = styled.div`
   padding: 5px 5px;
   display: flex;
@@ -656,6 +676,16 @@ const GameRoomInfo = styled.div`
   }
   & > p:nth-last-child(1) {
     margin-right: 7px;
+  }
+  @media (max-height: 600px) {
+    gap: 5px;
+    font-size: 16px;
+    & > p:nth-child(1) {
+      padding: 5px 8px;
+    }
+    & > p:nth-last-child(1) {
+      margin-left: unset;
+    }
   }
 `;
 const SnackBar = styled.div<any>`
@@ -744,6 +774,7 @@ const BattingPoint = styled.div`
     color: #fff;
     font-weight: 700;
   }
+
   @media (max-height: 700px) {
     height: 110px;
     min-width: 200px;
@@ -754,11 +785,42 @@ const BattingPoint = styled.div`
       font-size: 30px;
     }
   }
+  @media (max-height: 600px) {
+    gap: 5px;
+    min-height: 40px;
+    border-radius: 10px;
+    padding: 10px 20px;
+    top: 40%;
+    &::before {
+      content: '';
+      display: block;
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      top: -32px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: url(${IconCoin}) no-repeat center;
+      background-size: 100%;
+    }
+    height: auto;
+    min-width: 140px;
+    border-width: 3px;
+    & > span {
+      display: none;
+    }
+    & > p {
+      font-size: 18px;
+    }
+  }
 `;
 
 const MyState = styled.div`
   grid-area: 2/3;
   align-self: flex-end;
+  @media (max-height: 600px) {
+    margin-bottom: 20px;
+  }
 `;
 const GameWrap = styled.div`
   padding-top: 100px;
@@ -770,17 +832,22 @@ const GameWrap = styled.div`
   );
   height: 100vh;
   overflow: hidden;
+  @media (max-height: 600px) {
+    padding: 90px 0 0;
+  }
 `;
 const GameRoom = styled.div`
-  @media (max-height: 900px) {
-    padding: 130px 20px 40px;
+  @media (max-height: 600px) {
+    padding: 0px 20px;
+    grid-template-columns: 1fr 1fr 1fr;
+    min-width: 100%;
   }
   position: relative;
   display: grid;
   grid-template-columns: 400px 1fr 400px;
   grid-template-rows: min(0px) 1fr;
   gap: 20px;
-  padding: 130px 20px;
+  padding: 50px 20px;
   position: relative;
   margin: 0 auto;
   max-width: 1460px;
@@ -806,6 +873,19 @@ const OtherCard = styled.div<CardType>`
       : `right: 80px;
         transform: rotate(-2deg) translateX(0%);
       `}
+  @media (max-height:600px) {
+    ${({ $cardState }) =>
+      $cardState
+        ? css`
+            left: 50%;
+            right: unset;
+            top: -70px;
+            transform: translateX(-50%) rotate(0);
+          `
+        : `right: 80px;
+        transform: rotate(-2deg) translateX(0%);
+      `}
+  }
 `;
 const UserCard = styled(OtherCard)<CardType>`
   ${({ $cardState }) =>
@@ -826,6 +906,8 @@ interface ReadyState {
   $userReady: boolean;
 }
 const ReadyButton = styled.div<ReadyState>`
+  position: relative;
+  z-index: 10;
   & > button {
     margin-top: 15px;
     border-radius: 50px;
@@ -834,13 +916,21 @@ const ReadyButton = styled.div<ReadyState>`
     height: 80px;
     font-size: 24px;
     font-weight: 700;
-    border-radius: 50px;
     ${(props) =>
       props.$userReady
         ? 'background-color: #cd7522; border: 4px solid #a95f1b; color: #fff;'
         : 'background-color: #fff; border: 4px solid #cd7522; color: #cd7522;'}
   }
   transition: all 0.3s;
+  @media (max-height: 600px) {
+    & > button {
+      margin-top: 5px;
+      height: 45px;
+      font-size: 16px;
+      border-radius: 10px;
+      border-width: 3px;
+    }
+  }
 `;
 
 export default GameRoomPage;
