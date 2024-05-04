@@ -55,9 +55,14 @@ function MusicButton() {
   );
 }
 const PlayButtonContainer = styled.div`
-  z-index: 99;
+  margin-top: 2px;
   position: relative;
   button {
+    @media (max-height: 600px) {
+      img {
+        width: 26px;
+      }
+    }
   }
 `;
 const AudioCotroller = styled.audio`

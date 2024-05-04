@@ -33,7 +33,7 @@ function Header() {
               <span>
                 <img src={IconHome} alt="" />
               </span>
-              HOME
+              <span>HOME</span>
             </p>
           </Button>
         ) : null}
@@ -42,7 +42,7 @@ function Header() {
             <span>
               <img src={IconHowto} alt="" />
             </span>
-            HOWTO
+            <span>HOWTO</span>
           </p>
         </Button>
         <Button onClickFnc={() => handleModalOpen('members')} isBorder={false}>
@@ -50,7 +50,7 @@ function Header() {
             <span>
               <img src={IconMakers} alt="" />
             </span>
-            THE MAKERS
+            <span>THE MAKERS</span>
           </p>
         </Button>
 
@@ -69,7 +69,7 @@ function Header() {
                   <span>
                     <img src={IconRanking} alt="" />
                   </span>
-                  RANKING
+                  <span>RANKING</span>
                 </p>
               </Button>
 
@@ -82,9 +82,11 @@ function Header() {
                     <span>
                       <img src={IconCoin} alt="" />
                     </span>
-                    {useUserPoint.data?.myPoint < 0
-                      ? 0
-                      : formatNumber(useUserPoint.data?.myPoint)}
+                    <span>
+                      {useUserPoint.data?.myPoint < 0
+                        ? 0
+                        : formatNumber(useUserPoint.data?.myPoint)}
+                    </span>
                   </p>
                 </Button>
               ) : (
@@ -98,9 +100,11 @@ function Header() {
                     <span>
                       <img src={IconCoin} alt="" />
                     </span>
-                    {useUserPoint.data?.mtPoint < 0
-                      ? 0
-                      : formatNumber(useUserPoint.data?.myPoint)}
+                    <span>
+                      {useUserPoint.data?.mtPoint < 0
+                        ? 0
+                        : formatNumber(useUserPoint.data?.myPoint)}
+                    </span>
                   </p>
                 </Button>
               )}
@@ -122,7 +126,7 @@ function Header() {
                     <span>
                       <img src={IconMypage} alt="" />
                     </span>
-                    MY PAGE
+                    <span>MY PAGE</span>
                   </p>
                 </Button>
                 <Button
@@ -133,7 +137,7 @@ function Header() {
                     <span>
                       <img src={IconLogin} alt="" />
                     </span>
-                    LOG OUT
+                    <span>LOG OUT</span>
                   </p>
                 </Button>
               </>
@@ -151,7 +155,7 @@ function Header() {
                   <span>
                     <img src={IconLogout} alt="" />
                   </span>
-                  LOG IN
+                  <span>LOG IN</span>
                 </p>
               </Button>
             }
@@ -161,6 +165,7 @@ function Header() {
     </HeaderContainer>
   );
 }
+
 const HeaderContainer = styled.div<{ $location: string }>`
   position: fixed;
   top: 0;
@@ -184,15 +189,18 @@ const HeaderInner = styled.div`
   display: flex;
   align-items: center;
   height: 100px;
-  gap: 10px;
+
   button {
     > p {
-      font-family: NPSfontBold;
-      display: inline-flex;
+      display: flex;
       align-items: center;
       gap: 10px;
-      font-size: 16px;
-      font-weight: 500;
+      span {
+        font-family: NPSfontBold;
+
+        font-size: 16px;
+        font-weight: 500;
+      }
       &.myPoint {
         font-size: 18px;
         font-weight: 800;
@@ -202,11 +210,46 @@ const HeaderInner = styled.div`
       }
     }
   }
+  @media (max-height: 600px) or (max-width: 1110px) {
+    @media (max-width: 850px) {
+      gap: 20px;
+      button {
+        span + span {
+          display: none;
+        }
+      }
+    }
+    height: 60px;
+    button {
+      > p {
+        gap: 7px;
+        span {
+          font-size: 13px;
+          font-weight: 500;
+        }
+        &.myPoint {
+          font-size: 15px;
+          font-weight: 500;
+        }
+        img {
+          width: 25px;
+        }
+      }
+      @media (max-width: 950px) {
+      }
+    }
+  }
 `;
 const UserMemberBtns = styled.div`
   display: flex;
   align-items: center;
   margin-left: auto;
   gap: 10px;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    gap: 20px;
+    img {
+      width: 25px;
+    }
+  }
 `;
 export default Header;

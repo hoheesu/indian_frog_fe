@@ -111,5 +111,28 @@ const BattingWrap = styled.div`
       right: -99999px;
     }
   }
+  @media (max-height: 600px) {
+    margin-top: 10px;
+    input {
+      padding: 0 20px;
+      height: 50px;
+    }
+    &:after {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      right: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background-color: #5a8900;
+      background-image: url(${IconEnter});
+      background-position: center;
+      background-repeat: no-repeat;
+      background-size: 50%;
+    }
+  }
 `;
 export default BattingInput;

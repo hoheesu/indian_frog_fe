@@ -117,14 +117,24 @@ export const useEmailCertifiedMutation = () => {
 };
 
 export const useCertifiedCodeMutation = () => {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: emailCertifiedCode,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      console.log(data);
+      if (data.success === false) {
+        alert('인증코드가 잘못되었습니다.');
+      }
       queryClient.invalidateQueries();
     },
-    onError: () => {
-      alert('이미 인증이 완료되었습니다.');
+    onError: (err: any) => {
+      if (err.status === 500) {
+        alert('인증시간이 초과되었습니다.');
+        navigate('/');
+      } else {
+        alert(err.message);
+      }
     },
   });
 };
