@@ -99,8 +99,24 @@ const BoxInner = withPlayer(styled.div<WithPlayerProps>`
   border: ${({ player }) =>
     player === 'other' ? '7px solid #68AF1D' : '7px solid #CD7522'};
   overflow: hidden;
+  @media (max-height: 600px) or (max-width: 900px) {
+    flex-direction: row;
+    border-width: 3px;
+    border-radius: 10px;
+  }
 `);
 const PlayerBadge = withPlayer(styled.em<WithPlayerProps>`
+  @media (max-height: 600px) {
+    min-width: 100px;
+    height: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 14px;
+    border-radius: 20px;
+    &::before {
+      display: none !important;
+    }
+  }
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -131,8 +147,10 @@ const PlayerBadge = withPlayer(styled.em<WithPlayerProps>`
 `);
 
 const TopArea = styled.div`
-  @media (max-height: 900px) {
-    padding: 30px 20px 20px;
+  @media (max-height: 600px) or (max-width: 900px) {
+    gap: 15px;
+    padding: 20px 0px 15px 15px;
+    flex: 2;
   }
   display: flex;
   align-items: center;
@@ -140,6 +158,11 @@ const TopArea = styled.div`
   padding: 40px 30px 30px;
 `;
 const BottomArea = withPlayer(styled.div<WithPlayerProps>`
+  @media (max-height: 600px) or (max-width: 900px) {
+    flex: 1;
+    padding: 10px;
+    background: none;
+  }
   display: flex;
   align-items: center;
   background: #ddd;
@@ -148,6 +171,9 @@ const BottomArea = withPlayer(styled.div<WithPlayerProps>`
   background: ${({ player }) => (player === 'other' ? '#68AF1D' : '#CD7522')};
 `);
 const PlayerProfile = withPlayer(styled.div<WithPlayerProps>`
+  @media (max-height: 600px) or (max-width: 900px) {
+    display: none;
+  }
   position: relative;
   width: 120px;
   height: 120px;
@@ -176,12 +202,18 @@ const PlayerProfile = withPlayer(styled.div<WithPlayerProps>`
   }
 `);
 const PlayerInfo = styled.div`
+  @media (max-height: 600px) or (max-width: 900px) {
+    gap: 10px;
+  }
   display: flex;
   flex-direction: column;
   flex: 2;
   gap: 15px;
 `;
 const PlayerName = styled.p`
+  @media (max-height: 600px) or (max-width: 900px) {
+    font-size: 16px;
+  }
   font-size: 22px;
   font-weight: 400;
   color: #5c5943;
@@ -203,6 +235,21 @@ const PlayerPoint = styled.p`
     height: 20px;
     background: url(${IconCoinRotate}) no-repeat center;
     background-size: 100%;
+  }
+  @media (max-height: 600px) or (max-width: 900px) {
+    font-size: 18px;
+    padding-left: 20px;
+    &::before {
+      content: '';
+      display: inline-block;
+      position: absolute;
+      left: 0;
+      top: 1px;
+      width: 15px;
+      height: 15px;
+      background: url(${IconCoinRotate}) no-repeat center;
+      background-size: 100%;
+    }
   }
 `;
 const Timer = withPlayer(styled.div<WithPlayerProps>`
@@ -231,6 +278,11 @@ const Timer = withPlayer(styled.div<WithPlayerProps>`
     }};
     background-size: 90%;
   }
+  @media (max-height: 600px) or (max-width: 900px) {
+    padding: 5px 10px;
+    height: 40px;
+    font-size: 18px;
+  }
 `);
 
 const Status = withPlayer(styled(Timer)<WithPlayerProps>`
@@ -256,6 +308,12 @@ const Status = withPlayer(styled(Timer)<WithPlayerProps>`
                     : null;
     }};
     background-size: 85%;
+  }
+  @media (max-height: 600px) or (max-width: 900px) {
+    font-size: 14px;
+    &::before {
+      display: none;
+    }
   }
 `);
 export default Player;

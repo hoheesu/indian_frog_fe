@@ -75,12 +75,14 @@ const GameBtns = styled.div<MaxBetPoint>`
   display: flex;
   height: 100%;
   align-items: center;
+
   button {
     flex: 1;
     border-radius: 30px;
     height: 80px;
     margin: 0;
     padding: 0;
+
     p {
       display: inline-flex;
       justify-content: center;
@@ -116,6 +118,15 @@ const GameBtns = styled.div<MaxBetPoint>`
     &:hover {
       background: #d9904c;
       color: #fff;
+    }
+  }
+  @media (max-height: 600px) {
+    margin-top: 10px;
+    button {
+      p {
+        font-size: 18px
+      }
+      height: 50px;
     }
   }
 `;

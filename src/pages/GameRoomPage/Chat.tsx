@@ -135,6 +135,12 @@ const ChatWrap = styled.div`
   grid-area: 2/1;
   width: 100%;
   align-self: flex-end;
+  @media (max-height: 600px) {
+    margin-bottom: 20px;
+    &::before {
+      display: none;
+    }
+  }
 `;
 const ChatList = styled.ul`
   min-height: 150px;
@@ -144,8 +150,7 @@ const ChatList = styled.ul`
   gap: 20px;
   overflow-y: auto;
   li > div {
-    display: flex;
-    gap: 5px;
+    font-size: 13px;
     span,
     p {
       color: #6b6852;
@@ -156,11 +161,23 @@ const ChatList = styled.ul`
   }
   .notice {
     color: #cd7522;
+    
   }
   .me {
     span,
     p {
       color: #4b7201;
+    }
+  }
+  @media (max-height: 600px) {
+    min-height: unset;
+    max-height: unset;
+    height: 100px;
+    gap: 7px;
+    li > div {
+      span {
+        font-size: 13px;
+      }
     }
   }
 `;
@@ -194,6 +211,33 @@ const ChatInput = styled.div`
     border-bottom: 2px solid #7eb737;
     background: none;
     color: #56533d;
+  }
+  @media (max-height: 600px) {
+    margin-top: 30px;
+
+    form {
+      &:after {
+        content: '';
+        display: block;
+        position: absolute;
+        right: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 25px;
+        height: 25px;
+        background-color: #5a8900;
+        border-radius: 50%;
+        background-image: url(${IconSend});
+        background-size: 80%;
+        background-repeat: no-repeat;
+        background-position: center;
+      }
+    }
+    input {
+      font-size: 14px;
+
+      height: 40px;
+    }
   }
 `;
 export default Chat;

@@ -74,11 +74,15 @@ const ModalBackground = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  height: 100%;
   background-color: #000000aa;
   z-index: 100;
   padding: 0 20px;
+  @media (max-height: 600px) {
+    background: #fff;
+    padding-top: 30px;
+  }
 `;
 const ModalContainer = styled.div`
   opacity: 0;
@@ -166,6 +170,73 @@ const ModalContainer = styled.div`
       &:disabled {
         background-color: #ddd;
         cursor: default;
+      }
+    }
+  }
+  @media (max-height: 600px) or (max-width: 1110px) {
+    width: 100%;
+    min-width: unset;
+    max-width: 500px;
+    padding: 30px;
+    overflow: auto;
+    @media (max-height: 600px) {
+      height: 100%;
+    }
+    h2 {
+      font-size: 16px;
+      margin-bottom: 20px;
+      + p {
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+    }
+    form {
+      gap: 10px;
+      & + div {
+        margin-top: 5px;
+        button {
+          > p {
+            font-size: 13px;
+            color: #555;
+          }
+          + button {
+            :before {
+              content: '|';
+              margin-right: 5px;
+            }
+          }
+        }
+      }
+      > div {
+        label {
+          margin-bottom: 5px;
+          + div {
+            & + p {
+              margin-top: 5px;
+              font-size: 11px;
+              color: #5a8900;
+              &.error {
+                color: #ff4a4a;
+              }
+            }
+          }
+        }
+        input {
+          border: 1px solid #56533d;
+          border-radius: 10px;
+          padding: 0 15px;
+          height: 50px;
+          font-size: 16px;
+          + p {
+            margin-top: 5px;
+            font-size: 11px;
+          }
+        }
+      }
+      > button {
+        height: 50px;
+        margin-top: 20px;
+        font-size: 16px;
       }
     }
   }
