@@ -43,7 +43,6 @@ function SignupModal() {
   const [isCertifiedNum, setIsCertifiedNum] = useState(false);
   const useEmailCertified = useEmailCertifiedMutation();
   const useCertifiedCode = useCertifiedCodeMutation();
-  const [certifiedTimer, setCertifiedTimer] = useState(50);
 
   const handleInputOnchange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -325,7 +324,7 @@ const SignupForm = styled.form`
       margin-top: 0;
       grid-area: 3/2;
     }
-    &+div {
+    & + div {
       margin-top: 20px;
     }
   }
