@@ -247,8 +247,7 @@ const MypageWrap = styled.div`
   justify-content: center;
   flex-direction: column;
   position: relative;
-  height: auto;
-  min-height: 100vh;
+  height: 100vh;
   @media (max-height: 600px) {
     flex-direction: row;
     padding: 0 100px;
