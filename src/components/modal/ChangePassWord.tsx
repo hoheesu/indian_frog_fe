@@ -88,7 +88,9 @@ const ChangePassWord = () => {
               <p className="error">비밀번호 형식이 틀렸습니다.</p>
             ) : changePWInput.originPassword ===
               changePWInput.updatedPassword ? (
-              <p className="error">변경할 비밀번호가 현재 비밀번호와 동일합니다.</p>
+              <p className="error">
+                변경할 비밀번호가 현재 비밀번호와 동일합니다.
+              </p>
             ) : (
               <p>확인</p>
             )
@@ -127,6 +129,7 @@ const ChangePassWord = () => {
     </>
   );
 };
+
 const PasswordInput = styled.div`
   position: relative;
   width: 100%;

@@ -124,6 +124,19 @@ const RankingItem = styled(ListTitle)`
     font-size: 20px;
     color: #56533d;
   }
+  @media (max-height: 600px) {
+    height: 50px;
+    font-size: 16px;
+    p {
+      font-size: 13px;
+      &:nth-child(2) {
+        font-size: 13px;
+      }
+      &:nth-child(4) {
+        font-size: 13px;
+      }
+    }
+  }
 `;
 const ProfileImg = styled.picture`
   display: flex;
@@ -138,8 +151,13 @@ const ProfileImg = styled.picture`
   box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.3);
   img {
     object-fit: cover;
-    width: 55px;
-    height: 55px;
+    width: inherit;
+    height: inherit;
+  }
+  @media (max-height: 600px) {
+    width: 35px;
+    height: 35px;
+    border-width: 1px;
   }
 `;
 const MyRankingWrap = styled.div`
@@ -150,6 +168,11 @@ const MyRankingWrap = styled.div`
   width: 100%;
   max-width: 900px;
   padding: 0 20px;
+  @media (max-height: 600px) {
+    bottom: 20px;
+    max-width: 100%;
+    padding: 0 30px;
+  }
 `;
 const MyRankingInfo = styled(ListTitle)`
   &:before {
@@ -175,10 +198,17 @@ const MyRankingInfo = styled(ListTitle)`
   border: 3px solid #7eb737;
   border-radius: 50px;
   box-shadow: 5px 5px 10px rgba(0, 0, 0, 0.2);
+  @media (max-height: 600px) {
+    height: 50px;
+    border-width: 2px;
+  }
   p {
     font-weight: 800;
     font-size: 20px;
     color: #56533d;
+    @media (max-height: 600px) {
+      font-size: 16px;
+    }
     &:nth-child(4) {
       display: flex;
       justify-content: center;
@@ -197,6 +227,15 @@ const RanKingWrap = styled.div`
     text-align: center;
     margin: 0 0 80px;
     font-weight: 800;
+  }
+  @media (max-height: 600px) {
+    max-width: 100%;
+    padding: 0 30px;
+    margin: 90px auto 100px;
+    h2 {
+      margin: 0 0 30px;
+      font-size: 20px;
+    }
   }
 `;
 export default RankingPage;

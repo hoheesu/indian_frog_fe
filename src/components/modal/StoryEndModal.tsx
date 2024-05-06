@@ -58,6 +58,11 @@ const StoryEndModalContainer = styled.div`
   row-gap: 30px;
   align-items: center;
   width: 500px;
+  @media (max-width: 900px) or (max-height: 600px) {
+    width: 100%;
+    height: 100%;
+    padding: 20px 100px 70px;
+  }
 `;
 const Title = styled.h3`
   font-size: 30px;

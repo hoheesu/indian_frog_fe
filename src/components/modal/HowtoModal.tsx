@@ -288,6 +288,24 @@ const StepList = styled.ol`
       }
     }
   }
+  @media (max-height: 600px) {
+    gap: 50px;
+    display: flex;
+    flex-direction: column;
+    li {
+      margin: 0 auto;
+      max-width: 400px;
+      picture {
+        height: 150px;
+        max-width: 200px;
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+      }
+    }
+  }
 `;
 const StepCont = styled.div`
   h2 {
@@ -298,12 +316,17 @@ const StepCont = styled.div`
       width: 100%;
     }
   }
+  @media (max-height: 600px) {
+    h2 {
+      margin: 10px auto 40px;
+      width: 150px;
+    }
+  }
 `;
 const Description = styled.div`
   & + div {
     margin-top: 40px;
   }
-  margin-top: 30px;
   h3 {
     font-family: 'NPSfontBold';
     font-size: 20px;
@@ -334,6 +357,27 @@ const Description = styled.div`
       color: #938f78;
     }
   }
+  @media (max-height: 600px) {
+    & + div {
+      margin-top: 20px;
+    }
+    h3 {
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+    span {
+      margin: 10px;
+      width: 20px;
+      height: 20px;
+      font-size: 13px;
+    }
+    p {
+      font-size: 14px;
+      & + p {
+        margin-top: 10px;
+      }
+    }
+  }
 `;
 const HowtoWrap = styled.div`
   min-width: 500px;
@@ -357,6 +401,13 @@ const HowtoWrap = styled.div`
     font-size: 18px;
     font-weight: 500;
   }
+  @media (max-height: 600px) {
+    padding-top: 0;
+    button {
+      height: 50px;
+      max-width: 300px;
+    }
+  }
 `;
 const BannerTitle = styled.h3`
   position: absolute;
@@ -376,5 +427,15 @@ const BannerTitle = styled.h3`
   font-weight: 800;
   background: url(${ImgBannerTitle}) no-repeat center;
   color: #fff;
+  @media (max-height: 600px) {
+    position: relative;
+    inset: inherit;
+    transform: translate(0);
+    width: 100%;
+    font-size: 16px;
+    height: 53px;
+    margin: 0 0 15px;
+    background-size: 120px;
+  }
 `;
 export default HowtoModal;

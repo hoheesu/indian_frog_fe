@@ -7,7 +7,7 @@ import IconSpeakerMute from '../../assets/images/icons/icon-speaker-mute.svg';
 // import { useLocation } from 'react-router-dom';
 
 function MusicButton() {
-  const [isBgmPlay, setIsBgmPlay] = useState(false);
+  const [isBgmPlay, setIsBgmPlay] = useState(true);
   const [bgmTrack, setBgmTrack] = useState(indianFrogMainMusic1);
   // const location = useLocation();
   const audioRef = useRef<HTMLAudioElement>(null);

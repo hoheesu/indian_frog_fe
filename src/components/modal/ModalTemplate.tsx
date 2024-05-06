@@ -81,7 +81,7 @@ const ModalBackground = styled.div`
   padding: 0 20px;
   @media (max-height: 600px) {
     background: #fff;
-    padding-top: 30px;
+    padding: 0;
   }
 `;
 const ModalContainer = styled.div`
@@ -176,13 +176,14 @@ const ModalContainer = styled.div`
   @media (max-height: 600px) or (max-width: 1110px) {
     width: 100%;
     min-width: unset;
-    max-width: 500px;
+    /* max-width: 500px; */
     padding: 30px;
     overflow: auto;
     @media (max-height: 600px) {
       height: 100%;
     }
     h2 {
+      text-align: center;
       font-size: 16px;
       margin-bottom: 20px;
       + p {
@@ -191,6 +192,8 @@ const ModalContainer = styled.div`
       }
     }
     form {
+      min-width: 500px;
+      margin: 0 auto;
       gap: 10px;
       & + div {
         margin-top: 5px;
