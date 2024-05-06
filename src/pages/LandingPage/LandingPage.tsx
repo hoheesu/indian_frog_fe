@@ -32,7 +32,8 @@ const LandingWrap = styled.div`
     rgba(163, 231, 111, 1) 0%,
     rgba(210, 239, 139, 1) 100%
   );
-  padding: 0 60px;
+  padding: 20px 60px 0;
+  overflow: hidden;
 `;
 const LandingContainer = styled.div`
   display: flex;
@@ -42,16 +43,22 @@ const LandingContainer = styled.div`
   gap: 20px;
   height: 100vh;
   button {
-    max-width: 530px;
+    max-width: 450px;
     width: 100%;
+    @media (max-height: 600px) or (max-width: 1110px) {
+      max-width: 350px;
+    }
     img {
       width: 100%;
     }
   }
 `;
 const H1 = styled.h1`
-  max-width: 700px;
-  width: 100%;
+  max-width: 600px;
+  max-height: 350px;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    max-width: 250px;
+  }
   img {
     width: 100%;
   }

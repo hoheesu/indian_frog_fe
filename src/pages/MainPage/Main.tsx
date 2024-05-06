@@ -117,7 +117,7 @@ function Main() {
                   }}
                   isBorder={true}
                 >
-                  <p>게임 참여하기</p>
+                  <p>게임 참여</p>
                 </Button>
               </ContentBottom>
             </CardItem>
@@ -161,9 +161,11 @@ const LodingContent = styled.div`
 const RoomListsContainer = styled.div`
   position: relative;
   max-width: 1460px;
-  padding: 100px 20px;
+  padding: 100px 20px 300px;
   margin: 0 auto;
-  padding-bottom: 300px;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    padding: 70px 20px 100px;
+  }
 `;
 const RoomCardList = styled.ul`
   display: grid;
@@ -171,6 +173,10 @@ const RoomCardList = styled.ul`
   gap: 60px 30px;
   width: 100%;
   margin-top: 100px;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    margin-top: 10px;
+    gap: 20px 10px;
+  }
 `;
 const RoomInfo = styled.div`
   display: flex;
@@ -193,9 +199,15 @@ const Rules = styled.p`
   color: var(--color-main);
   border-radius: 50px;
   font-size: 14px;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    display: none;
+  }
 `;
 const ContentTop = styled.div`
   padding: 20px 20px 30px;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    padding: 15px 15px 20px;
+  }
 `;
 const RoomName = styled.div`
   margin-top: 70px;
@@ -207,6 +219,11 @@ const RoomName = styled.div`
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  @media (max-height: 600px) or (max-width: 1110px) {
+    margin-top: 30px;
+    font-size: 15px;
+    height: 31px;
+  }
 `;
 const CardItem = styled.li`
   &::before {
@@ -234,6 +251,13 @@ const CardItem = styled.li`
     &::before {
       background: url(${ImgListleaf2}) no-repeat center;
     }
+  }
+  @media (max-height: 600px) or (max-width: 1110px) {
+    &::before {
+      display: none;
+    }
+    border-radius: 15px;
+    border: 4px solid #e6dbbb;
   }
 `;
 interface ParticipantCount {
@@ -273,6 +297,20 @@ const ContentBottom = styled.div<ParticipantCount>`
       background-color: #ff7e05;
     }
   }
+  @media (max-height: 600px) or (max-width: 1110px) {
+    padding: 10px;
+    & > p {
+      padding: 4px 8px;
+      border-radius: 30px;
+      font-size: 14px;
+    }
+    button {
+      min-width: 50px;
+      height: 40px;
+      font-size: 16px;
+      padding: 5px 15px;
+    }
+  }
 `;
 const ButtonsBox = styled.div`
   display: flex;
@@ -288,6 +326,9 @@ const ButtonsBox = styled.div`
     #fffdeeba 10%,
     #fffdee 50%
   );
+  @media (max-height: 600px) or (max-width: 1110px) {
+    height: 100px;
+  }
 `;
 const BoxInner = styled.div`
   width: 100%;
@@ -303,7 +344,6 @@ const BoxInner = styled.div`
     justify-content: center;
     align-items: center;
     gap: 5px;
-    font-size: 30px;
     min-width: 200px;
     height: 70px;
     padding: 10px 20px;
@@ -315,6 +355,15 @@ const BoxInner = styled.div`
     transition: background-color 0.1s ease-in-out;
     &:hover {
       background-color: #81c008;
+    }
+  }
+  @media (max-height: 600px) or (max-width: 1110px) {
+    gap: 5px;
+    & button {
+      font-size: 16px;
+      min-width: 160px;
+      height: 55px;
+      border-radius: 30px;
     }
   }
 `;

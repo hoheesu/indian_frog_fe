@@ -87,12 +87,18 @@ const ResultModalContainer = styled.div`
   row-gap: 30px;
   align-items: center;
   width: 500px;
+  @media (max-height: 600px) {
+    width: 100%;
+  }
 `;
 const ResultTitle = styled.h3`
   font-size: 50px;
   text-align: center;
   font-weight: bold;
   color: var(--color-main);
+  @media (max-height: 600px) {
+    font-size: 30px;
+  }
 `;
 const TimerContainer = styled.div`
   display: inline-block;
@@ -132,6 +138,15 @@ const UserResult = styled.ul`
       font-size: 24px;
     }
   }
+  @media (max-height: 600px) {
+    & > li {
+      padding: 20px 40px;
+      p {
+        text-align: center;
+        font-size: 16px;
+      }
+    }
+  }
 `;
 const WinnerInfo = styled.li`
   background-color: #99d95f;
@@ -143,9 +158,10 @@ const LoserInfo = styled.li`
 const ButtonWrapper = styled.div`
   display: flex;
   width: 100%;
-  gap: 10%;
+  gap: 20px;
   & > button {
-    width: 45%;
+    flex: 1;
+    width: 100%;
     height: 60px;
     border-radius: 30px;
     font-size: 25px;
@@ -157,6 +173,16 @@ const ButtonWrapper = styled.div`
     &:nth-child(2) {
       border: 4px solid var(--color-main);
       color: var(--color-main);
+    }
+  }
+  @media (max-height: 600px) {
+    & > button {
+      height: 50px;
+      border-radius: 20px;
+      font-size: 18px;
+      &:nth-child(2) {
+        border: 2px solid var(--color-main);
+      }
     }
   }
 `;

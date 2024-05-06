@@ -83,6 +83,9 @@ const CardWrapper = styled.div`
   @media (max-height: 700px) {
     height: 200px;
   }
+  @media (max-height: 600px){
+    height: 160px;
+  }
   height: 300px;
   transition: height 0.1s ease-in;
   img {

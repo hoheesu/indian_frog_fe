@@ -129,6 +129,16 @@ const BtnWrap = styled.div`
       }
     }
   }
+  @media (max-height: 600px) {
+    button {
+      height: 45px;
+      min-width: 140px;
+      p {
+        padding: 10px 20px;
+        font-size: 14px;
+      }
+    }
+  }
 `;
 const MyDetailInfoList = styled.ul`
   margin-top: 50px;
@@ -136,6 +146,16 @@ const MyDetailInfoList = styled.ul`
   align-items: flex-start;
   justify-content: center;
   gap: 20px;
+  @media (max-height: 600px) {
+    li {
+      width: 100%;
+      height: 50px;
+    }
+    flex: 1;
+    margin-top: 0;
+    flex-direction: column;
+    gap: 10px;
+  }
 `;
 const ArrowLink = styled.button`
   display: flex;
@@ -155,6 +175,13 @@ const ArrowLink = styled.button`
   }
   font-size: 16px;
   gap: 5px;
+  @media (max-height: 600px) {
+    font-size: 13px;
+    &:after {
+      width: 13px;
+      height: 13px;
+    }
+  }
 `;
 const ItemBox = styled.div`
   max-width: 400px;
@@ -192,7 +219,22 @@ const ItemBox = styled.div`
   span {
     font-size: 25px;
     font-weight: 700;
-    padding: 010px;
+    padding: 0 10px;
+  }
+  @media (max-height: 600px) {
+    max-width: unset;
+    width: 100%;
+    height: 100%;
+    padding: 10px 20px;
+    p {
+      font-size: 13px;
+      i {
+        width: 20px;
+      }
+    }
+    span {
+      font-size: 18px;
+    }
   }
 `;
 const PictureWrap = styled.div`
@@ -206,6 +248,11 @@ const MypageWrap = styled.div`
   flex-direction: column;
   position: relative;
   height: 100vh;
+  @media (max-height: 600px) {
+    flex-direction: row;
+    padding: 0 100px;
+    gap: 20px;
+  }
 `;
 const ProfileWrap = styled.div`
   position: relative;
@@ -233,9 +280,26 @@ const ProfileWrap = styled.div`
     border: 5px solid #222222;
     background: #fff;
     img {
-      height: 200px;
-      width: 200px;
+      height: inherit;
+      width: inherit;
       object-fit: cover;
+    }
+  }
+  @media (max-height: 600px) {
+    flex: 1;
+    gap: 20px;
+    p {
+      font-size: 18px;
+    }
+    picture {
+      width: 100px;
+      height: 100px;
+      border-width: 2px;
+      img {
+        width: inherit;
+        height: inherit;
+        object-fit: cover;
+      }
     }
   }
 `;

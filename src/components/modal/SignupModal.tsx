@@ -79,7 +79,11 @@ function SignupModal() {
 
   useEffect(() => {
     if (emailDuplication && nicknameDuplication && pwValid) {
-      if (signupInput.password === signupInput.checkPassword) {
+      if (
+        signupInput.password === signupInput.checkPassword &&
+        isCertifiedNum &&
+        emailDuplication
+      ) {
         setUserValid(false);
       } else setUserValid(true);
     } else setUserValid(true);
@@ -115,12 +119,14 @@ function SignupModal() {
     if (useCertifiedCode.data?.success === true) {
       setIsCertifiedNum(true);
     }
-  }, [useCertifiedCode]);
+    console.log(useCertifiedCode.data?.success);
+  }, [useCertifiedCode.data]);
+
   return (
     <>
       <ClosedModalButton />
       <h2>회원가입</h2>
-      <form onSubmit={(e) => e.preventDefault()}>
+      <SignupForm className="signup-form" onSubmit={(e) => e.preventDefault()}>
         <div>
           <label>이메일</label>
           <InputBtnWrap>
@@ -145,20 +151,23 @@ function SignupModal() {
           </InputBtnWrap>
           {isEmailCertified ? (
             <InputBtnWrap>
-              <Input
-                type="text"
-                name="certifiedNum"
-                value={signupInput.certifiedNum}
-                placeholder="인증번호를 입력하세요"
-                onChangeFnc={handleInputOnchange}
-                disabled={isCertifiedNum}
-              />
+              <TimerWithInput>
+                <Input
+                  type="text"
+                  name="certifiedNum"
+                  value={signupInput.certifiedNum}
+                  placeholder="인증번호를 입력하세요"
+                  onChangeFnc={handleInputOnchange}
+                  disabled={isCertifiedNum}
+                />
+                <Timer>00:00</Timer>
+              </TimerWithInput>
               <Button
                 type="submit"
                 isBorder={false}
                 onClickFnc={handleEmailCertifiedNumber}
               >
-                <p>인증번호 확인</p>
+                <p>인증하기</p>
               </Button>
             </InputBtnWrap>
           ) : null}
@@ -233,7 +242,7 @@ function SignupModal() {
         >
           <p>회원가입</p>
         </Button>
-      </form>
+      </SignupForm>
       <div>
         <Button
           isBorder={false}
@@ -248,6 +257,25 @@ function SignupModal() {
     </>
   );
 }
+
+const TimerWithInput = styled.div`
+  width: 100%;
+  position: relative;
+  > input {
+    width: 100%;
+    padding-right: 70px !important;
+  }
+
+  & + button {
+    min-width: 120px;
+  }
+`;
+const Timer = styled.span`
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  right: 20px;
+`;
 const InputBtnWrap = styled.div`
   display: flex;
   align-items: center;
@@ -270,6 +298,9 @@ const InputBtnWrap = styled.div`
     }
   }
   button {
+    @media (max-height: 600px) {
+      height: 50px;
+    }
     padding: 10px 30px;
     background: var(--color-main);
     color: var(--color-white);
@@ -279,6 +310,22 @@ const InputBtnWrap = styled.div`
     &:disabled {
       background: #ddd;
       cursor: default;
+    }
+  }
+`;
+const SignupForm = styled.form`
+  &.signup-form {
+    @media (max-height: 600px) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    button {
+      margin-top: 0;
+      grid-area: 3/2;
+    }
+    & + div {
+      margin-top: 20px;
     }
   }
 `;

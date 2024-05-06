@@ -100,6 +100,9 @@ const MembersList = styled.ul`
     height: 67px;
     filter: grayscale(1);
     background: url(${ImgLogoGray}) no-repeat bottom center;
+    @media (max-height: 600px) {
+      display: none;
+    }
   }
 
   li {
@@ -133,15 +136,23 @@ const MembersList = styled.ul`
       }
     }
   }
+  @media (max-height: 600px) {
+    gap: 10px;
+    padding: 0 100px 50px;
+  }
 `;
 const ImageBox = styled.div`
   width: 125px;
   height: 125px;
   border-radius: 50%;
   img {
-    width: 120px;
-    height: 120px;
+    width: inherit;
+    height: inherit;
     object-fit: cover;
+  }
+  @media (max-height: 600px) {
+    width: 80px;
+    height: 80px;
   }
 `;
 

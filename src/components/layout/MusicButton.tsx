@@ -7,7 +7,7 @@ import IconSpeakerMute from '../../assets/images/icons/icon-speaker-mute.svg';
 // import { useLocation } from 'react-router-dom';
 
 function MusicButton() {
-  const [isBgmPlay, setIsBgmPlay] = useState(false);
+  const [isBgmPlay, setIsBgmPlay] = useState(true);
   const [bgmTrack, setBgmTrack] = useState(indianFrogMainMusic1);
   // const location = useLocation();
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -55,9 +55,14 @@ function MusicButton() {
   );
 }
 const PlayButtonContainer = styled.div`
-  z-index: 99;
+  margin-top: 2px;
   position: relative;
   button {
+    @media (max-height: 600px) {
+      img {
+        width: 26px;
+      }
+    }
   }
 `;
 const AudioCotroller = styled.audio`
