@@ -41,8 +41,8 @@ const LandingContainer = styled.div`
   justify-content: center;
   align-items: center;
   gap: 20px;
-  height: auto;
-  min-height: 100vh;
+
+  height: 100vh;
   button {
     max-width: 450px;
     width: 100%;
