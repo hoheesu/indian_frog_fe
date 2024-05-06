@@ -47,6 +47,10 @@ const ProfileChangeWarp = styled.div`
   h2 {
     font-size: 20px;
   }
+  @media (max-height: 600px) {
+    max-width: 500px;
+    margin: 0 auto;
+  }
 `;
 const FileSelected = styled.div`
   display: flex;

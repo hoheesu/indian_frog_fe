@@ -65,67 +65,73 @@ function LoginModal() {
     <>
       <ClosedModalButton />
       <h2>로그인</h2>
-      <form onSubmit={(e) => e.preventDefault()}>
-        <div>
-          <label>이메일</label>
-          <Input
-            type="email"
-            name="email"
-            placeholder="이메일을 입력하세요"
-            value={loginInput.email}
-            onChangeFnc={handleInputOnChange}
-          />
-          {loginInput.email.trim() ? (
-            !emailValid ? (
-              <p className="error">이메일 형식이 틀렸습니다.</p>
-            ) : (
-              <p>확인</p>
-            )
-          ) : (
-            <p className="error">이메일을 입력해주세요</p>
-          )}
-        </div>
-        <div>
-          <label>비밀번호</label>
-          <Input
-            type="password"
-            name="password"
-            placeholder="비밀번호를 입력하세요"
-            value={loginInput.password}
-            onChangeFnc={handleInputOnChange}
-          />
-          {loginInput.password.trim() ? (
-            !pwValid ? (
-              <p className="error">비밀번호 형식이 틀렸습니다.</p>
-            ) : (
-              <p>확인</p>
-            )
-          ) : (
-            <p className="error">비밀번호를 입력해주세요</p>
-          )}
-        </div>
+      <LoginWrap>
+        <LoginForm>
+          <form onSubmit={(e) => e.preventDefault()}>
+            <div>
+              <label>이메일</label>
+              <Input
+                type="email"
+                name="email"
+                placeholder="이메일을 입력하세요"
+                value={loginInput.email}
+                onChangeFnc={handleInputOnChange}
+              />
+              {loginInput.email.trim() ? (
+                !emailValid ? (
+                  <p className="error">이메일 형식이 틀렸습니다.</p>
+                ) : (
+                  <p>확인</p>
+                )
+              ) : (
+                <p className="error">이메일을 입력해주세요</p>
+              )}
+            </div>
+            <div>
+              <label>비밀번호</label>
+              <Input
+                type="password"
+                name="password"
+                placeholder="비밀번호를 입력하세요"
+                value={loginInput.password}
+                onChangeFnc={handleInputOnChange}
+              />
+              {loginInput.password.trim() ? (
+                !pwValid ? (
+                  <p className="error">비밀번호 형식이 틀렸습니다.</p>
+                ) : (
+                  <p>확인</p>
+                )
+              ) : (
+                <p className="error">비밀번호를 입력해주세요</p>
+              )}
+            </div>
 
-        <Button
-          isBorder={true}
-          onClickFnc={handleLoginSubmit}
-          type="submit"
-          disabled={userValid}
-        >
-          <p>로그인</p>
-        </Button>
-      </form>
-      <div>
-        <Button
-          isBorder={false}
-          onClickFnc={() => handleModalOpen('findPassword')}
-        >
-          <p>비밀번호 찾기</p>
-        </Button>
-        <Button isBorder={false} onClickFnc={() => handleModalOpen('signup')}>
-          <p>아직 계정이 없으신가요?</p>
-        </Button>
-      </div>
-      {
+            <Button
+              isBorder={true}
+              onClickFnc={handleLoginSubmit}
+              type="submit"
+              disabled={userValid}
+            >
+              <p>로그인</p>
+            </Button>
+          </form>
+          <div>
+            <Button
+              isBorder={false}
+              onClickFnc={() => handleModalOpen('findPassword')}
+            >
+              <p>비밀번호 찾기</p>
+            </Button>
+            <Button
+              isBorder={false}
+              onClickFnc={() => handleModalOpen('signup')}
+            >
+              <p>아직 계정이 없으신가요?</p>
+            </Button>
+          </div>
+        </LoginForm>
+
         <SnsLoginForm IconSnsGoogle={IconSnsGoogle} IconSnsKakao={IconSnsKakao}>
           <h3>간편하게 시작하기</h3>
           <ul>
@@ -147,7 +153,7 @@ function LoginModal() {
             </li>
           </ul>
         </SnsLoginForm>
-      }
+      </LoginWrap>
     </>
   );
 }
@@ -155,6 +161,16 @@ interface SnsIconInfo {
   IconSnsGoogle: string;
   IconSnsKakao: string;
 }
+const LoginWrap = styled.div`
+  @media (max-height: 600px) {
+    display: flex;
+    width: 100%;
+    gap: 40px;
+  }
+`;
+const LoginForm = styled.div`
+  flex: 1;
+`;
 const SnsLoginForm = styled.div<SnsIconInfo>`
   margin-top: 40px;
   padding-top: 40px;
@@ -208,6 +224,27 @@ const SnsLoginForm = styled.div<SnsIconInfo>`
             display: block;
             width: 27px;
             height: 27px;
+          }
+        }
+      }
+    }
+  }
+  @media (max-height: 600px) {
+    flex: 1;
+    margin-top: 0px;
+    padding-top: 0px;
+    padding-left: 40px;
+    border-top: none;
+    border-left: 1px solid #ddd;
+    h3 {
+      font-size: 14px;
+    }
+    ul {
+      li {
+        height: 50px;
+        button {
+          p {
+            font-size: 14px;
           }
         }
       }

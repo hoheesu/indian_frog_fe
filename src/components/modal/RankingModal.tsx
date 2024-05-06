@@ -81,12 +81,21 @@ const ListTitle = styled.div`
     color: #56533d;
     gap: 6px;
   }
+  @media (max-height: 600px) {
+    gap: 0px;
+    p {
+      font-size: 13px;
+    }
+  }
 `;
 const RankingList = styled.ul`
   display: flex;
   flex-direction: column;
   margin-top: 10px;
   gap: 10px;
+  @media (max-height: 600px) {
+    gap: 5px;
+  }
 `;
 const RankingItem = styled(ListTitle)`
   &:nth-child(1) {
@@ -130,6 +139,33 @@ const RankingItem = styled(ListTitle)`
     font-size: 16px;
     color: #56533d;
   }
+  @media (max-height: 600px) {
+    height: 35px;
+    p {
+      &:nth-child(2) {
+        font-size: 13px;
+      }
+      &:nth-child(4) {
+        font-size: 13px;
+      }
+      font-size: 13px;
+    }
+  }
+  &:nth-child(-n + 3) {
+    p {
+      &:nth-child(1) {
+        &::before {
+          content: '';
+          display: block;
+          width: 16px;
+          height: 12px;
+          background: url(${IconCrown}) no-repeat center;
+          background-size: 70%;
+        }
+      }
+      color: #fff;
+    }
+  }
 `;
 const MyRanking = styled(RankingItem)`
   background: #d0ef8a;
@@ -170,6 +206,12 @@ const RanKingWrap = styled.div`
       }
     }
   }
+  @media (max-height: 600px) {
+    min-width: unset;
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 0;
+  }
 `;
 const BannerTitle = styled.h3`
   position: absolute;
@@ -189,5 +231,15 @@ const BannerTitle = styled.h3`
   font-weight: 800;
   background: url(${ImgBannerTitle}) no-repeat center;
   color: #fff;
+  @media (max-height: 600px) {
+    position: relative;
+    inset: inherit;
+    transform: translate(0);
+    width: 100%;
+    font-size: 16px;
+    height: 53px;
+    margin: 0 0 15px;
+    background-size: 120px;
+  }
 `;
 export default RankingModal;

@@ -24,5 +24,11 @@ const CloseBtnWrap = styled.div`
   position: absolute;
   top: 20px;
   right: 20px;
+  @media (max-height: 600px) {
+    position: sticky;
+    top: 0;
+    right: 0;
+    text-align: right;
+  }
 `;
 export default ClosedModalButton;
