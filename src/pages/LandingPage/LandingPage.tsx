@@ -33,6 +33,7 @@ const LandingWrap = styled.div`
     rgba(210, 239, 139, 1) 100%
   );
   padding: 20px 60px 0;
+  overflow: hidden;
 `;
 const LandingContainer = styled.div`
   display: flex;

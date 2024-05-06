@@ -42,6 +42,13 @@ const BasicModalWarp = styled.div`
     font-size: 18px;
     color: #555;
   }
+  @media (max-height: 600px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
 `;
 const BtnWrap = styled.div`
   display: flex;
@@ -62,6 +69,14 @@ const BtnWrap = styled.div`
       color: #fff;
       font-weight: 500;
       font-size: 20px;
+    }
+  }
+  @media (max-height: 600px) {
+    margin-top: 10px;
+    gap: 5px;
+    button {
+      height: 50px;
+      min-width: 120px;
     }
   }
 `;

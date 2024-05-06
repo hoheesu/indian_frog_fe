@@ -127,7 +127,7 @@ function SignupModal() {
     <>
       <ClosedModalButton />
       <h2>회원가입</h2>
-      <form onSubmit={(e) => e.preventDefault()}>
+      <SignupForm className="signup-form" onSubmit={(e) => e.preventDefault()}>
         <div>
           <label>이메일</label>
           <InputBtnWrap>
@@ -243,7 +243,7 @@ function SignupModal() {
         >
           <p>회원가입</p>
         </Button>
-      </form>
+      </SignupForm>
       <div>
         <Button
           isBorder={false}
@@ -258,6 +258,7 @@ function SignupModal() {
     </>
   );
 }
+
 const TimerWithInput = styled.div`
   width: 100%;
   position: relative;
@@ -298,6 +299,9 @@ const InputBtnWrap = styled.div`
     }
   }
   button {
+    @media (max-height: 600px) {
+      height: 50px;
+    }
     padding: 10px 30px;
     background: var(--color-main);
     color: var(--color-white);
@@ -307,6 +311,22 @@ const InputBtnWrap = styled.div`
     &:disabled {
       background: #ddd;
       cursor: default;
+    }
+  }
+`;
+const SignupForm = styled.form`
+  &.signup-form {
+    @media (max-height: 600px) {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    button {
+      margin-top: 0;
+      grid-area: 3/2;
+    }
+    &+div {
+      margin-top: 20px;
     }
   }
 `;
