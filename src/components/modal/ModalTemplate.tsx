@@ -192,7 +192,7 @@ const ModalContainer = styled.div`
       }
     }
     form {
-      min-width: 500px;
+      min-width: unset;
       margin: 0 auto;
       gap: 10px;
       & + div {
