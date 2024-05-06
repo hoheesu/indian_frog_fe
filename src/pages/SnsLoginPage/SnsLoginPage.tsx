@@ -45,7 +45,8 @@ const SnsLoginWrap = styled.div`
   justify-content: center;
   align-items: center;
   width: 100%;
-  height: 100vh;
+  height: auto;
+  min-height: 100vh;
   h2 {
     font-family: NPSfontBold;
     font-size: 40px;
