@@ -1,17 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
 
 const GlobalStyles = createGlobalStyle`
-@media( orientation: portrait ){
-    html {
-      transform: rotate(-90deg);
-      transform-origin: top left;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100vh;
-      height: 100vw;
-    }
-  }
+
   :root {
     background-color: #fffdee;
     /* color */
@@ -89,5 +79,26 @@ a {
   color: inherit;
   text-decoration: none;
 }
+@media( orientation: portrait ){
+    html {
+      transform: rotate(-90deg);
+      transform-origin: top left;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100vh;
+      height: 100vw;
+    }
+  }
+  body {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-text-size-adjust: none; /* Chrome, Safari, Opera */
+  -ms-text-size-adjust: none; /* IE */
+  user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+  height: 100%; /* Prevent vertical bounce and set height to full view */
+  margin: 0;
+  padding: 0;
+}
 `;
+
 export default GlobalStyles;
