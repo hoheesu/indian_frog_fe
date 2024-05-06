@@ -830,7 +830,8 @@ const GameWrap = styled.div`
     rgba(163, 231, 111, 1) 0%,
     rgba(210, 239, 139, 1) 100%
   );
-  height: 100vh;
+  height: auto;
+  min-height: 100vh;
   overflow: hidden;
   @media (max-height: 600px) {
     padding: 90px 0 0;
