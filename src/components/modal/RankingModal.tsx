@@ -18,7 +18,7 @@ function RankingModal() {
   };
   const rankingList = useGetRankingList();
   const rankingInfo = rankingList?.data;
-  console.log(rankingInfo);
+  // console.log(rankingInfo);
 
   interface Rankings {
     ranking: number;

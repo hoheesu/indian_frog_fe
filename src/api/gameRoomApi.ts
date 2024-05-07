@@ -17,7 +17,7 @@ export const createGameRoom = async (roomInput: { roomName: string }) => {
 export const getGameRoomsList = async (pageNum: number) => {
   try {
     const { data } = await instance.get(`/gameRoom?page=${pageNum}`);
-    console.log(data.data);
+    // console.log(data.data);
 
     return {
       result: data.data.content,
@@ -40,7 +40,7 @@ export const joinGameRoom = async (gameRoomId: number) => {
       return response.data;
     }
     if (response.status === 400) {
-      console.log(response);
+      // console.log(response);
       throw response;
     }
   } catch (error: any) {

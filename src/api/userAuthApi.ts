@@ -5,7 +5,7 @@ import { ErrorResponse } from 'react-router-dom';
 export const checkEmailDuplication = async (userEmail: string) => {
   try {
     const response = await instance.get(`/user/email/check?email=${userEmail}`);
-    console.log(response.data.status);
+    // console.log(response.data.status);
     return response.data.status;
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
@@ -19,7 +19,7 @@ export const checkNicknameDuplication = async (userNickname: string) => {
     const response = await instance.get(
       `/user/nickname/check?nickname=${userNickname}`,
     );
-    console.log(response.data.status);
+    // console.log(response.data.status);
     return response.data.status;
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;
@@ -59,12 +59,12 @@ export const loginUser = async (loginInfo: {
         'Content-Type': 'application/json',
       },
     });
-    console.log(response);
+    // console.log(response);
     return response;
   } catch (error: any) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
-      console.log(axiosError.response.data.status);
+      // console.log(axiosError.response.data.status);
       throw axiosError.response.data;
     }
   }
@@ -75,7 +75,7 @@ export const refreshToken = async () => {
     const response = await authInstance.post('/token/refresh', {
       withCredentials: true,
     });
-    console.log(response);
+    // console.log(response);
     const accessToken = response?.headers.authorization;
 
     localStorage.setItem('accessToken', accessToken);
@@ -104,7 +104,7 @@ export const snsLoginUser = async (snsName: string) => {
   } catch (error: any) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
-      console.log(axiosError.response.data.status);
+      // console.log(axiosError.response.data.status);
       throw axiosError.response.data;
     }
   }
@@ -112,12 +112,12 @@ export const snsLoginUser = async (snsName: string) => {
 export const findPassword = async (email: string) => {
   try {
     const response = await instance.post(`/user/password-code?email=${email}`);
-    console.log(response);
+    // console.log(response);
     return response;
   } catch (error: any) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
-      console.log(axiosError.response.data.status);
+      // console.log(axiosError.response.data.status);
       throw axiosError.response.data;
     }
   }
@@ -125,12 +125,12 @@ export const findPassword = async (email: string) => {
 export const emailCertified = async (email: string) => {
   try {
     const response = await instance.post(`/user/email-code?email=${email}`);
-    console.log(response);
+    // console.log(response);
     return response;
   } catch (error: any) {
     const axiosError = error as AxiosError<ErrorResponse>;
     if (axiosError.response) {
-      console.log(axiosError.response.data.status);
+      // console.log(axiosError.response.data.status);
       throw axiosError.response.data;
     }
   }

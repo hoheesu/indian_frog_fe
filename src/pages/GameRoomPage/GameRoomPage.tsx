@@ -37,7 +37,7 @@ interface Message {
 }
 
 const GameRoomPage = () => {
-  const [stompClient, setStompClient] = useState<any>(null); //! 타입 명시
+  const [stompClient, setStompClient] = useState<any>(null);
   const [roomUserInfo, setRoomUserInfo] = useState<GameRoomInfo>(); // 유저 타입 (host / guest)
   const [leaveNickname, setLeaveNickname] = useState(''); // 최근 참여자 닉네임
   const [joinNickname, setJoinNickname] = useState(''); // 최근 참여자 닉네임
@@ -72,6 +72,7 @@ const GameRoomPage = () => {
     roundPot: 0,
   });
   const [messageArea, setMessageArea] = useState<Message[]>([]);
+
   const [useSetGameEndInfo, useUserChoice, useSetUserChoice] = useGameEndStore(
     (state) => [state.setGameEndInfo, state.userChoice, state.setUserChoice],
   );
@@ -95,7 +96,6 @@ const GameRoomPage = () => {
     nickname: string;
     sub: string;
   } = jwtDecode(authToken!);
-  console.log(maxBetPoint);
 
   const connect = () => {
     // WS 커넥트
@@ -227,7 +227,7 @@ const GameRoomPage = () => {
   const gameRecevied = (payload: any) => {
     try {
       const message: any = JSON.parse(payload.body);
-      console.log('*** gameState payload -->', message);
+      // console.log('*** gameState payload -->', message);
       if (message.otherCard) {
         setCardState({
           ...cardState,
@@ -258,7 +258,6 @@ const GameRoomPage = () => {
           roundPot: message.roundPot,
         });
         setCardState({
-          ...cardState,
           otherCard: message.otherCard,
           userCard: message.myCard,
           cardState: true,
@@ -333,7 +332,6 @@ const GameRoomPage = () => {
   const gameRoomInfoUpdate = async () => {
     try {
       const result = await gameRoomInfo(Number(gameId));
-      console.log(result);
       setGameRoomState(result.gameState);
       setRoomUserInfo(result);
       return result;
@@ -378,6 +376,7 @@ const GameRoomPage = () => {
       }
     };
   }, []);
+
   useEffect(() => {
     (async () => {
       try {

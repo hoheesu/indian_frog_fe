@@ -36,10 +36,6 @@ const BattingInput = ({ maxBetPoint, stompClient, setIsRaise }: Props) => {
     if (raisePoint < 1) {
       alert('포인트를 배팅하세요');
     } else {
-      console.log({
-        nickname: userInfoDecode.nickname,
-        point: raisePoint,
-      });
       stompClient.send(
         `/app/gameRoom/${gameId}/ACTION`,
         {},

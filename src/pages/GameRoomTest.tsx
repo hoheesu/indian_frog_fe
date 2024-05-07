@@ -40,7 +40,7 @@ function GameRoomTest() {
   const [yourCard, setYourCard] = useState('');
   const [roundPoint, setRoundPoint] = useState(0);
   const [action, setAction] = useState('');
-  console.log(action);
+  // console.log(action);
   const [turn, setTurn] = useState(false);
 
   const { gameId } = useParams(); // 게임방 아이디
@@ -109,7 +109,7 @@ function GameRoomTest() {
   const onReceived = async (payload: any) => {
     try {
       const message: any = (await JSON.parse(payload.body)) as Message;
-      console.log('payloadMessage -->', message);
+      // console.log('payloadMessage -->', message);
       setOurReady(message.gameState);
       // 채팅목록, 로컬스토리지에 저장
       if (
@@ -171,7 +171,7 @@ function GameRoomTest() {
   const gameRecevied = (payload: any) => {
     try {
       const message: any = JSON.parse(payload.body);
-      console.log('*** gameState payload -->', message);
+      // console.log('*** gameState payload -->', message);
       if (message.nextState === 'START') {
         // 게임라운드 시작할 때,
         setReStart(true); // 라운드 시작
@@ -192,7 +192,7 @@ function GameRoomTest() {
       if (message.firstBet) {
         setMyPoint((prevState) => prevState - message.firstBet);
         setYourPoint((prevState) => prevState - message.firstBet);
-        console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
+        // console.log(`기본 배팅금액은 ${message.firstBet}point입니다.`);
       }
       setGameState(message.gameState);
     } catch (error) {
@@ -202,7 +202,6 @@ function GameRoomTest() {
 
   const readyBtn = () => {
     // 레디 버튼 눌렀을때
-    console.log('레디버튼 눌렀다잉');
     if (stompClient) {
       setMyReady((prev) => !prev);
       stompClient.send(
@@ -291,7 +290,7 @@ function GameRoomTest() {
 
   useEffect(() => {
     // 유저정보가 변경될 때, 실행하는 Effect
-    console.log('방 정보 갖고왔다 이제야', userInfo);
+    // console.log(userInfo);
   }, [userInfo]);
 
   useEffect(() => {
@@ -329,9 +328,7 @@ function GameRoomTest() {
   }, [endRound]);
 
   useEffect(() => {
-    console.log('어벤져스 엔드게임');
     if (stompClient && endGame) {
-      console.log('여기는 조건문 내부 어벤져스 엔드게임');
       stompClient.send(
         `/app/gameRoom/${gameId}/GAME_END`,
         {},

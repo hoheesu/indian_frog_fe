@@ -41,7 +41,7 @@ export const updateProfile = async (userImg: { userImg: File }) => {
 export const certifiedEmail = async (email: string) => {
   try {
     const { data } = await authInstance.post(`/user/email-code?email=${email}`);
-    console.log(data);
+    // console.log(data);
 
     return data;
   } catch (error) {

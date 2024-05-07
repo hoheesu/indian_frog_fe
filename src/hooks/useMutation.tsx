@@ -54,8 +54,8 @@ export const useJoinRoomMutation = () => {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   return useMutation({
     mutationFn: joinGameRoom,
-    onSuccess: (data, roomNumber: number) => {
-      console.log('성공', data);
+    onSuccess: (_, roomNumber: number) => {
+      // console.log('성공', data);
       navigate(`/gameroom/${roomNumber}`);
       useSetIsModalClick();
     },
@@ -122,7 +122,7 @@ export const useCertifiedCodeMutation = () => {
   return useMutation({
     mutationFn: emailCertifiedCode,
     onSuccess: (data) => {
-      console.log(data);
+      // console.log(data);
       if (data.success === false) {
         alert('인증코드가 잘못되었습니다.');
       }
