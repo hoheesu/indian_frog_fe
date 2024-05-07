@@ -119,7 +119,6 @@ function SignupModal() {
     if (useCertifiedCode.data?.success === true) {
       setIsCertifiedNum(true);
     }
-    console.log(useCertifiedCode.data?.success);
   }, [useCertifiedCode.data]);
 
   return (

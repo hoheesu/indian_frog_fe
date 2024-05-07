@@ -545,9 +545,7 @@ const GameRoomPage = () => {
       }
     }
   }, [useUserChoice]);
-  useEffect(() => {
-    setScreeSize();
-  }, []);
+  window.addEventListener('resize', () => setScreeSize());
   return (
     <GameWrap>
       <GameRoom>

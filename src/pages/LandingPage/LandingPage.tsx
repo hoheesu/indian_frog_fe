@@ -3,15 +3,12 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import ImgLogo from '../../assets/images/img-logo.svg';
 import ImgStart from '../../assets/images/img-start.svg';
-import { useEffect } from 'react';
 import { setScreeSize } from '../../utils/heightCheck';
 
 function LandingPage() {
   const navigate = useNavigate();
-  useEffect(() => {
-    setScreeSize();
-  }, []);
 
+  window.addEventListener('resize', () => setScreeSize());
   return (
     <LandingWrap>
       <LandingContainer>
@@ -31,7 +28,7 @@ function LandingPage() {
 
 const LandingWrap = styled.div`
   width: 100%;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   background: linear-gradient(
     90deg,
     rgba(163, 231, 111, 1) 0%,
@@ -47,7 +44,7 @@ const LandingContainer = styled.div`
   align-items: center;
   gap: 20px;
 
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   button {
     max-width: 450px;
     width: 100%;
