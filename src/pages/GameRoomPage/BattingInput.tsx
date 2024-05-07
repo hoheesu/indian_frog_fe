@@ -63,13 +63,13 @@ const BattingInput = ({ maxBetPoint, stompClient, setIsRaise }: Props) => {
           onChangeFnc={handleRaisePointChange}
           placeholder="Raise할 배팅금액을 입력해주세요"
         />
-        <button
+        <EnterBtn
           type="submit"
           onClick={(e) => {
             e.preventDefault();
             handleRaiseSubmit();
           }}
-        ></button>
+        ></EnterBtn>
       </form>
     </BattingWrap>
   );
@@ -78,21 +78,9 @@ const BattingInput = ({ maxBetPoint, stompClient, setIsRaise }: Props) => {
 const BattingWrap = styled.div`
   position: relative;
   margin-top: 50px;
-  &:after {
-    content: '';
-    display: inline-block;
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #5a8900;
-    background-image: url(${IconEnter});
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 80%;
+  form {
+    display: flex;
+    align-items: center;
   }
   input {
     padding: 0 30px;
@@ -105,11 +93,6 @@ const BattingWrap = styled.div`
     &::-webkit-inner-spin-button {
       appearance: none;
     }
-    & + button {
-      position: absolute;
-      top: -99999px;
-      right: -99999px;
-    }
   }
   @media (max-height: 600px) {
     margin-top: 10px;
@@ -117,13 +100,27 @@ const BattingWrap = styled.div`
       padding: 0 20px;
       height: 50px;
     }
+  }
+`;
+const EnterBtn = styled.button`
+  &:after {
+    content: '';
+    display: inline-block;
+
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #5a8900;
+    background-image: url(${IconEnter});
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 80%;
+  }
+  @media (max-height: 600px) {
     &:after {
       content: '';
       display: inline-block;
-      position: absolute;
-      right: 13px;
-      top: 50%;
-      transform: translateY(-50%);
+
       width: 30px;
       height: 30px;
       border-radius: 50%;
