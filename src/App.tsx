@@ -7,6 +7,7 @@ import { useIsModalStore } from './store/modal/CreateModalStore';
 import ModalTemplate from './components/modal/ModalTemplate';
 function App() {
   const useIsModal = useIsModalStore((state) => state.isModal);
+
   return (
     <>
       <GlobalFonts />
