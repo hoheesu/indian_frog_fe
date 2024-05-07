@@ -79,17 +79,7 @@ a {
   color: inherit;
   text-decoration: none;
 }
-@media( orientation: portrait ){
-    html {
-      transform: rotate(-90deg);
-      transform-origin: top left;
-      position: absolute;
-      top: 100%;
-      left: 0;
-      width: 100vh;
-      height: 100vw;
-    }
-  }
+
   body {
   -webkit-touch-callout: none; /* iOS Safari */
   -webkit-text-size-adjust: none; /* Chrome, Safari, Opera */
