@@ -8,12 +8,8 @@ import IconCoin from '../../assets/images/icons/icon-coin-rotate.svg';
 import { useIsModalStore } from '../../store/modal/CreateModalStore';
 import { useNavigate } from 'react-router-dom';
 import ImgRandomProfile01 from '../../assets/images/img-randomProfile01.svg';
-// import ImgCharacterDummy from '../../assets/images/img-character.svg';
-// import ImgRandomProfile02 from '../../assets/images/img-randomProfile02.svg';
-// import ImgRandomProfile03 from '../../assets/images/img-randomProfile03.svg';
-// import ImgRandomProfile04 from '../../assets/images/img-randomProfile04.svg';
-// import ImgRandomProfile05 from '../../assets/images/img-randomProfile05.svg';
-// import ImgRandomProfile06 from '../../assets/images/img-randomProfile06.svg';
+import { setScreeSize } from '../../utils/heightCheck';
+
 const Mypage = () => {
   const myPageInfo = useGetMypageInfo();
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
@@ -21,6 +17,7 @@ const Mypage = () => {
     type ? useSetIsModalClick(type) : useSetIsModalClick();
   };
   const navigate = useNavigate();
+  window.addEventListener('resize', () => setScreeSize());
   return (
     <MypageWrap>
       <ProfileWrap>
@@ -247,7 +244,7 @@ const MypageWrap = styled.div`
   justify-content: center;
   flex-direction: column;
   position: relative;
-  height: 100vh;
+  height: calc(var(--vh, 1vh) * 100);
   @media (max-height: 600px) {
     flex-direction: row;
     padding: 0 100px;

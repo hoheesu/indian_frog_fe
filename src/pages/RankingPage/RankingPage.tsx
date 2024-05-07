@@ -7,7 +7,6 @@ import IconCrown from '../../assets/images/icons/icon-crown.svg';
 const RankingPage = () => {
   const rankingList = useGetRankingList();
   const rankingInfo = rankingList?.data;
-  console.log(rankingInfo);
 
   interface Rankings {
     ranking: number;
