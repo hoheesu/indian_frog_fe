@@ -3,9 +3,14 @@ import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import ImgLogo from '../../assets/images/img-logo.svg';
 import ImgStart from '../../assets/images/img-start.svg';
+import { useEffect } from 'react';
+import { setScreeSize } from '../../utils/heightCheck';
 
 function LandingPage() {
   const navigate = useNavigate();
+  useEffect(() => {
+    setScreeSize();
+  }, []);
 
   return (
     <LandingWrap>
