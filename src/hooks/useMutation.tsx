@@ -54,7 +54,7 @@ export const useJoinRoomMutation = () => {
   const useSetIsModalClick = useIsModalStore((state) => state.setIsModalClick);
   return useMutation({
     mutationFn: joinGameRoom,
-    onSuccess: (data, roomNumber: number) => {
+    onSuccess: (roomNumber: number) => {
       navigate(`/gameroom/${roomNumber}`);
       useSetIsModalClick();
     },
