@@ -42,7 +42,6 @@ export const certifiedEmail = async (email: string) => {
   try {
     const { data } = await authInstance.post(`/user/email-code?email=${email}`);
     // console.log(data);
-
     return data;
   } catch (error) {
     const axiosError = error as AxiosError<ErrorResponse>;

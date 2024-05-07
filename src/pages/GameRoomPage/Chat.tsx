@@ -38,9 +38,7 @@ const Chat = ({ messageArea, stompClient }: Props) => {
 
   useEffect(scrollToBottom, [messageArea]);
 
-  useEffect(() => {
-    console.log(messageArea);
-  }, [messageArea]);
+  useEffect(() => {}, [messageArea]);
 
   const handleMessageSubmit = () => {
     if (messageContent.trim()) {
@@ -109,6 +107,7 @@ const Chat = ({ messageArea, stompClient }: Props) => {
             }}
             placeholder="채팅을 입력해주세요"
           />
+          <SendBtn />
         </form>
       </ChatInput>
     </ChatWrap>
@@ -161,7 +160,6 @@ const ChatList = styled.ul`
   }
   .notice {
     color: #cd7522;
-    
   }
   .me {
     span,
@@ -184,23 +182,11 @@ const ChatList = styled.ul`
 const ChatInput = styled.div`
   margin-top: 40px;
   form {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     position: relative;
-    &:after {
-      content: '';
-      display: block;
-      position: absolute;
-      right: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 30px;
-      height: 30px;
-      background-color: #5a8900;
-      border-radius: 50%;
-      background-image: url(${IconSend});
-      background-size: 80%;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
+    border-bottom: 2px solid #7eb737;
   }
   input {
     padding: 0 10px;
@@ -208,35 +194,47 @@ const ChatInput = styled.div`
     width: 100%;
     height: 50px;
     border: none;
-    border-bottom: 2px solid #7eb737;
+
     background: none;
     color: #56533d;
   }
   @media (max-height: 600px) {
-    margin-top: 30px;
-
-    form {
-      &:after {
-        content: '';
-        display: block;
-        position: absolute;
-        right: 0;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 25px;
-        height: 25px;
-        background-color: #5a8900;
-        border-radius: 50%;
-        background-image: url(${IconSend});
-        background-size: 80%;
-        background-repeat: no-repeat;
-        background-position: center;
-      }
-    }
+    margin-top: 10px;
     input {
       font-size: 14px;
 
       height: 40px;
+    }
+  }
+`;
+const SendBtn = styled.button`
+  height: 50px;
+
+  &:after {
+    content: '';
+    display: block;
+    width: 30px;
+    height: 30px;
+    background-color: #5a8900;
+    border-radius: 50%;
+    background-image: url(${IconSend});
+    background-size: 80%;
+    background-repeat: no-repeat;
+    background-position: center;
+  }
+  @media (max-height: 600px) {
+    height: 40px;
+    &:after {
+      content: '';
+      display: block;
+      width: 25px;
+      height: 25px;
+      background-color: #5a8900;
+      border-radius: 50%;
+      background-image: url(${IconSend});
+      background-size: 80%;
+      background-repeat: no-repeat;
+      background-position: center;
     }
   }
 `;
