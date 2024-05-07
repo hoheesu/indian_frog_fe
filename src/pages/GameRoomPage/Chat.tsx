@@ -39,7 +39,6 @@ const Chat = ({ messageArea, stompClient }: Props) => {
   useEffect(scrollToBottom, [messageArea]);
 
   useEffect(() => {
-    console.log(messageArea);
   }, [messageArea]);
 
   const handleMessageSubmit = () => {
