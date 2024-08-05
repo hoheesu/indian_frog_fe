@@ -46,8 +46,10 @@
 </table>
 
 ## 🏛️ 아키텍처 구성도 <br>
+![아키텍쳐](https://github.com/user-attachments/assets/189d4b9a-a0de-43b6-a99e-8e64b0059ca9)
 
-![아키텍처 구성도](<https://file.notion.so/f/f/83c75a39-3aba-4ba4-a792-7aefe4b07895/1514e84f-e8c4-46fa-9642-5738ac37ee78/indianfrog.drawio_(6).svg?id=fc2e4ee0-38da-4432-b6a4-788cc59b2c56&table=block&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&expirationTimestamp=1715083200000&signature=bWNo0RYuBzrP6nm_C5j9yR20e5shw5iWkxTwu-UKL3I&downloadName=indianfrog.drawio+%286%29.svg>)
+
+
 
 ### 🐥 FRONT-END STACK
 
@@ -72,8 +74,7 @@
 
 <details>
  <summary style="font-weight: bold; font-size: 18px;">✅ 로그인 / 회원가입</summary>
- 
- <img style="width: 500px; display: block; margin: 0 auto;" src="https://file.notion.so/f/f/83c75a39-3aba-4ba4-a792-7aefe4b07895/b4ccc801-df4a-4574-9db1-2915efab1b44/%EB%A1%9C%EA%B7%B8%EC%9D%B8.png?id=d38e3db8-3b39-438b-9723-4967a82b5054&table=block&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&expirationTimestamp=1715090400000&signature=1ExvhXXwzrmbI1u1oA2CBlWExCzYfk194aHRev4a95g&downloadName=%EB%A1%9C%EA%B7%B8%EC%9D%B8.png">
+ <img style="width: 500px; display: block; margin: 0 auto;" alt="로그인" src="https://github.com/user-attachments/assets/8809377a-3bfc-4823-ac9a-1288700f419d">
 
 - 실시간 통신(websoket)을 이용하여 아래 게임로직을 구현
 - 입장한 2명의 플레이어가 모두 READY를 한 경우 게임이 시작된다.
@@ -89,7 +90,8 @@
 
 <details>
  <summary style="font-weight: bold; font-size: 18px;">✅ 게임 로비</summary>
- <img style="width: 500px; display: block; margin: 0 auto;" src="https://file.notion.so/f/f/83c75a39-3aba-4ba4-a792-7aefe4b07895/6ae68ebe-3e2b-47cb-9937-ce5415d349d9/%EB%A1%9C%EB%B9%84.png?id=ba1c95aa-3062-4fdd-a8ac-ee3ed7615322&table=block&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&expirationTimestamp=1715090400000&signature=Q4b5FNZj9pbKNqKhrZVWuaWHpTUkkRI6CUPOsbjM5fk&downloadName=%EB%A1%9C%EB%B9%84.png">
+
+<img style="width: 500px; display: block; margin: 0 auto;" alt="로비" src="https://github.com/user-attachments/assets/0df38007-b87c-49c6-889d-062f9bfd5097">
 
 - 게임방에 참여한 플레이어는 게임을 진행하며 채팅을 할 수 있다.
 - 채팅에는 게임 중 어떤 요청을 보냈는지 (체크, 레이즈, 다이)에 대한 정보도 표시된다.
@@ -99,7 +101,8 @@
 
 <details>
  <summary style="font-weight: bold; font-size: 18px;">✅ 인디언 포커 게임</summary>
- <img style="width: 500px; display: block; margin: 0 auto;" src="https://file.notion.so/f/f/83c75a39-3aba-4ba4-a792-7aefe4b07895/9265e245-b11b-45b5-a352-ef9e35785c97/%EA%B2%8C%EC%9E%84.png?id=6488b3b6-de93-45fe-bdb0-2d9e69f94035&table=block&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&expirationTimestamp=1715090400000&signature=jMFIosOCEWLTJn2yD-dvKyYFbrJ1qb8T8me8CHRIpNw&downloadName=%EA%B2%8C%EC%9E%84.png">
+<img style="width: 500px; display: block; margin: 0 auto;" alt="게임" src="https://github.com/user-attachments/assets/a30249b0-efc2-4765-a8c6-fab5ef235325">
+
 
 - 실시간 통신(websoket)을 이용하여 아래 게임로직을 구현
 - 입장한 2명의 플레이어가 모두 READY를 한 경우 게임이 시작된다.
@@ -115,7 +118,7 @@
 
 <details>
  <summary style="font-weight: bold; font-size: 18px;">✅ 게임방 채팅</summary>
- <img style="width: 500px; display: block; margin: 0 auto;" src="https://file.notion.so/f/f/83c75a39-3aba-4ba4-a792-7aefe4b07895/54faec6e-cd49-4869-8596-99917e8f5e31/ac6fe052-608c-4727-8048-2bee0d7be8de.png?id=33c74275-46a2-4098-9534-8733af86724b&table=block&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&expirationTimestamp=1715090400000&signature=1YPuN5qnM_NSCAppCr5tOEx8tnmvbvyNB3BT8Gl598g&downloadName=%EA%B2%8C%EC%9E%84.png">
+<img style="width: 500px; display: block; margin: 0 auto;" alt="게임" src="https://github.com/user-attachments/assets/6dd85b48-c932-4196-997d-6b27a069ad04">
 
 - 게임방에 참여한 플레이어는 게임을 진행하며 채팅을 할 수 있다.
 - 채팅에는 게임 중 어떤 요청을 보냈는지 (체크, 레이즈, 다이)에 대한 정보도 표시된다.
@@ -125,7 +128,7 @@
 
 <details>
  <summary style="font-weight: bold; font-size: 18px;">✅ 마이 페이지</summary>
- <img style="width: 500px; display: block; margin: 0 auto;" src="https://file.notion.so/f/f/83c75a39-3aba-4ba4-a792-7aefe4b07895/bef7f458-60c0-45ca-8882-6678bfa64c3c/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA_2024-05-06_%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE_10.41.46.png?id=f83cffc3-5bdf-43dd-83a2-3784cb036591&table=block&spaceId=83c75a39-3aba-4ba4-a792-7aefe4b07895&expirationTimestamp=1715089514201&signature=lokR_PUEVLPhO2qy7S4q6nwU9T7iefzMM2KOU3KkhB8&downloadName=%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA+2024-05-06+%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE+10.41.46.png">
+ <img style="width: 500px; display: block; margin: 0 auto;" src="https://github.com/user-attachments/assets/386e405d-6c10-483c-bc8a-8fc4e06b63dc">
 
 - 프로필 및 개인 랭킹을 확인할 수 있다.
 - 프로필 편집으로 프로필 이미지를 변경할 수 있다.
@@ -304,3 +307,6 @@
  <summary style="font-weight: bold; font-size: 18px;">✅ 게임을하다가 방을 퇴장해도 방이 사라지지않는 문제</summary>
 - 인증번호가 확인이 안되면 회원가입버튼을 비활성화시켜 회원가입을 할수 없도록 수정
 </details>
+
+<img style="width: 500px; display: block; margin: 0 auto;" alt="로비" src="https://github.com/user-attachments/assets/3474fb09-7470-4f64-8482-2de36669e168">
+<img style="width: 500px; display: block; margin: 0 auto;" alt="로비" src="https://github.com/user-attachments/assets/4ed1cc6f-6c8d-450e-9f8b-c5e61029c0ad">
