@@ -145,48 +145,50 @@
 - 문제 2: 게임방에서 뒤로가기로 나와도 계속 웹소켓이 연결되어있어 다른방에 들어가도 기존 방과 연결이 끊기지 않음. - 원인: useEffect의 의존성 배열을 비워 첫번째 마운트, 언마운트 상황에 대처하는 코드를 작성했으나 첫번째 마운트 될때에는 웹소켓에 connect가 되지 않아 leave 요청을 보낼 수 없어 에러가 발생
   또한 returnValue는 공식문서에서 사용하지 않는것을 권장하고 있는 속성
 
-  ````js
-  useEffect(() => {
-  const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-  if (confirmNavigation) {
-  const message =
-  "이 페이지를 떠나시겠습니까? 변경 사항이 저장되지 않을 수 있습니다.";
-  event.returnValue = message;
-  return message;
-  }
+```js
+useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (confirmNavigation) {
+      const message =
+      "이 페이지를 떠나시겠습니까? 변경 사항이 저장되지 않을 수 있습니다.";
+      event.returnValue = message;
+      return message;
+    }
   };
 
-          window.addEventListener("beforeunload", handleBeforeUnload);
+  window.addEventListener("beforeunload", handleBeforeUnload);
 
-          return () => {
-            window.removeEventListener("beforeunload", handleBeforeUnload);
-            handleLeaveButtonClick();
-          };
-        }, []);
-      ```
-      - 해결방법: 라이브러리를 사용하여 returnValue를 사용하지 않을 수 있었고, 의존성 배열에 connect를 넣어 뒤로가기 이벤트가 발생하면 서버에 나가는 요청을 보낸후 연결되어있던 웹소켓까지 연결을 끊음
-      ```js
-        useEffect(() => {
-          const listenBackEvent = () => {
-            stompClient.send(
-              `/app/${gameId}/leave`,
-              { Authorization: authToken },
-              JSON.stringify({ sender: userInfoDecode.nickname })
-            );
-            stompClient.disconnect();
-          };
+  return () => {
+    window.removeEventListener("beforeunload", handleBeforeUnload);
+    handleLeaveButtonClick();
+  };
+}, []);
+```
 
-          const unlistenHistoryEvent = history.listen(({ action }) => {
-            if (action === "POP") {
-              listenBackEvent();
-              navigate("/main");
-            }
-          });
+- 해결방법: 라이브러리를 사용하여 returnValue를 사용하지 않을 수 있었고, 의존성 배열에 connect를 넣어 뒤로가기 이벤트가 발생하면 서버에 나가는 요청을 보낸후 연결되어있던 웹소켓까지 연결을 끊음
 
-          return unlistenHistoryEvent;
-        }, [connect]);
-      ```
-  ````
+
+```js
+useEffect(() => {
+  const listenBackEvent = () => {
+    stompClient.send(
+      `/app/${gameId}/leave`,
+      { Authorization: authToken },
+      JSON.stringify({ sender: userInfoDecode.nickname })
+    );
+    stompClient.disconnect();
+  };
+
+  const unlistenHistoryEvent = history.listen(({ action }) => {
+    if (action === "POP") {
+      listenBackEvent();
+      navigate("/main");
+    }
+  });
+
+  return unlistenHistoryEvent;
+}, [connect]);
+```
 
 </details>
 
